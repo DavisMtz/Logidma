@@ -414,34 +414,7 @@
     transition: width 0.1s linear;
   }
 
-  /* CURSOR */
-  .cursor-dot, .cursor-ring{
-    position: fixed; pointer-events: none;
-    z-index: 9998; border-radius: 50%;
-    will-change: transform;
-    transition: opacity 0.3s, width 0.3s var(--e-expo), height 0.3s var(--e-expo);
-    mix-blend-mode: difference;
-    left: -100px; top: -100px;
-  }
-  .cursor-dot{
-    width: 6px; height: 6px;
-    background: var(--accent);
-    transform: translate(-50%, -50%);
-  }
-  .cursor-ring{
-    width: 36px; height: 36px;
-    border: 1px solid var(--accent);
-    transform: translate(-50%, -50%);
-    opacity: 0.5;
-  }
-  .cursor-ring.hover{
-    width: 64px; height: 64px;
-    background: var(--accent-soft);
-    border-color: var(--accent);
-  }
-  @media (hover: none), (pointer: coarse){
-    .cursor-dot, .cursor-ring{ display: none !important; }
-  }
+  /* CURSOR — se usa el del sistema */
 
   /* NAV */
   .nav{
@@ -1284,9 +1257,6 @@
   <div class="progress__bar" id="progressBar"></div>
 </div>
 
-<div class="cursor-dot" id="cursorDot" aria-hidden="true"></div>
-<div class="cursor-ring" id="cursorRing" aria-hidden="true"></div>
-
 <header class="nav" id="nav">
   <div class="nav__brand" onclick="window.scrollTo({top:0,behavior:'smooth'})">
     <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logo Logidma" />
@@ -1657,36 +1627,8 @@
     ioPq.observe(pq);
   }
 
-  // CUSTOM CURSOR
+  // Detector de puntero fino (mouse) para activar efectos opcionales
   const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
-  if (fine) {
-    const dot = document.getElementById('cursorDot');
-    const ring = document.getElementById('cursorRing');
-    let mx = window.innerWidth / 2, my = window.innerHeight / 2;
-    let rx = mx, ry = my;
-
-    document.addEventListener('mousemove', (e) => {
-      mx = e.clientX; my = e.clientY;
-      dot.style.left = mx + 'px';
-      dot.style.top = my + 'px';
-    }, { passive: true });
-
-    function loop() {
-      rx += (mx - rx) * 0.18;
-      ry += (my - ry) * 0.18;
-      ring.style.left = rx + 'px';
-      ring.style.top = ry + 'px';
-      requestAnimationFrame(loop);
-    }
-    loop();
-
-    document.querySelectorAll('a, button, .ccard, .nav__brand, .etym__cell, .totop').forEach(el => {
-      el.addEventListener('mouseenter', () => ring.classList.add('hover'));
-      el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
-    });
-
-    document.documentElement.style.cursor = 'none';
-  }
 
   // ETYM CELLS — radial spotlight
   document.querySelectorAll('.etym__cell').forEach(cell => {
