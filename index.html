@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -34,7 +33,7 @@
       background: var(--bg);
       color: var(--ink);
       font-family: var(--font-mono);
-      font-size: 15px;
+      font-size: clamp(13px, 1.5vw, 15px);
       line-height: 1.7;
       overflow-x: hidden;
     }
@@ -45,6 +44,32 @@
     ::-webkit-scrollbar { width: 4px; }
     ::-webkit-scrollbar-track { background: var(--bg); }
     ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 2px; }
+
+    /* ─── Custom Cursor ─────────────────────────────────────── */
+    @media (pointer: fine) { * { cursor: none !important; } }
+
+    .cursor-dot, .cursor-ring {
+      position: fixed;
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transform: translate(-50%, -50%);
+      top: -100px; left: -100px;
+    }
+    .cursor-dot {
+      width: 5px; height: 5px;
+      background: var(--accent);
+    }
+    .cursor-ring {
+      width: 30px; height: 30px;
+      border: 1px solid rgba(0,229,180,0.5);
+      transition: width 0.2s ease, height 0.2s ease, opacity 0.2s ease, border-color 0.2s;
+    }
+    .cursor-ring.expanded {
+      width: 54px; height: 54px;
+      opacity: 0.4;
+      border-color: var(--accent);
+    }
 
     /* ─── Background Grid ───────────────────────────────────── */
     .bg-grid {
@@ -58,21 +83,34 @@
     .bg-glow {
       position: fixed; inset: 0; z-index: 0; pointer-events: none;
       background:
-        radial-gradient(ellipse 60% 50% at 20% 10%, rgba(0,114,255,0.06) 0%, transparent 70%),
-        radial-gradient(ellipse 50% 40% at 80% 90%, rgba(0,229,180,0.07) 0%, transparent 70%);
+        radial-gradient(ellipse 60% 50% at 20% 10%, rgba(0,114,255,0.07) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 80% 90%, rgba(0,229,180,0.08) 0%, transparent 70%);
+    }
+
+    .bg-grain {
+      position: fixed; inset: 0; z-index: 1; pointer-events: none;
+      opacity: 0.04;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/feTurbulence%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      background-size: 200px 200px;
     }
 
     /* ─── Layout Wrapper ─────────────────────────────────────── */
-    .wrap { position: relative; z-index: 1; }
+    .wrap { position: relative; z-index: 2; }
 
     /* ─── Loader ─────────────────────────────────────────────── */
     #loader {
       position: fixed; inset: 0; z-index: 100;
       background: var(--bg);
-      display: flex; align-items: center; justify-content: center;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 20px;
       transition: opacity 0.6s ease, visibility 0.6s ease;
     }
     #loader.hidden { opacity: 0; visibility: hidden; }
+    .loader-label {
+      font-family: var(--font-mono); font-size: 10px;
+      letter-spacing: 0.25em; color: var(--muted);
+      text-transform: uppercase;
+    }
     .loader-bar {
       width: 160px; height: 1px; background: var(--border);
       overflow: hidden;
@@ -90,23 +128,50 @@
       display: flex; align-items: center; justify-content: space-between;
       border-bottom: 1px solid transparent;
       transition: border-color 0.4s, background 0.4s;
+      gap: 16px;
     }
     nav.scrolled {
-      background: rgba(5,7,12,0.85);
-      backdrop-filter: blur(16px);
+      background: rgba(5,7,12,0.88);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-color: var(--border);
     }
     .nav-logo {
       display: flex; align-items: center; gap: 10px;
       font-family: var(--font-head); font-weight: 800; font-size: 18px;
       letter-spacing: 0.02em; color: var(--ink); text-decoration: none;
+      flex-shrink: 0;
     }
     .nav-logo img { height: 28px; filter: brightness(0) invert(1); }
+    .nav-right {
+      display: flex; align-items: center; gap: 20px;
+    }
+    .nav-section-indicator {
+      font-family: var(--font-mono); font-size: 10px;
+      color: var(--muted); letter-spacing: 0.12em;
+      opacity: 0; transition: opacity 0.5s ease;
+      white-space: nowrap;
+    }
+    .nav-section-indicator.visible { opacity: 1; }
     .nav-pill {
       font-family: var(--font-mono); font-size: 11px; font-weight: 500;
       color: var(--accent); letter-spacing: 0.12em;
       border: 1px solid rgba(0,229,180,0.3); padding: 5px 14px;
       border-radius: 100px;
+      transition: color 0.3s, border-color 0.3s, box-shadow 0.3s;
+      position: relative; overflow: hidden;
+    }
+    .nav-pill::before {
+      content: '';
+      position: absolute; top: 0; left: -100%; width: 60%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0,229,180,0.15), transparent);
+      transition: left 0.5s ease;
+    }
+    .nav-pill:hover::before { left: 150%; }
+    .nav-pill:hover {
+      color: var(--ink);
+      border-color: var(--accent);
+      box-shadow: 0 0 18px rgba(0,229,180,0.2), inset 0 0 12px rgba(0,229,180,0.04);
     }
 
     /* ─── Hero ───────────────────────────────────────────────── */
@@ -117,7 +182,15 @@
       text-align: center;
       padding: 140px 32px 80px;
       position: relative;
+      overflow: hidden;
     }
+
+    #hero-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      pointer-events: none; z-index: 0;
+    }
+    .hero > *:not(#hero-canvas) { position: relative; z-index: 1; }
 
     .hero-tag {
       font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.2em;
@@ -129,17 +202,45 @@
 
     .hero-title {
       font-family: var(--font-head); font-weight: 800;
-      font-size: clamp(3.5rem, 10vw, 9rem);
+      font-size: clamp(3.2rem, 10vw, 9rem);
       line-height: 0.92; letter-spacing: -0.03em;
       margin-bottom: 20px;
       opacity: 0; transform: translateY(24px);
       animation: slideUp 0.9s 1.6s cubic-bezier(0.16,1,0.3,1) forwards;
+      min-height: 1.1em;
     }
 
     .hero-title .grad {
-      background: linear-gradient(135deg, #fff 0%, var(--accent) 60%, var(--accent2) 100%);
+      background: linear-gradient(
+        135deg,
+        #fff 0%,
+        var(--accent) 35%,
+        var(--accent2) 65%,
+        #fff 100%
+      );
+      background-size: 300% 300%;
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
       background-clip: text;
+      animation: gradientShift 7s ease infinite;
+    }
+
+    @keyframes gradientShift {
+      0%, 100% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+    }
+
+    .hero-cursor {
+      display: inline-block;
+      width: 3px; height: 0.85em;
+      background: var(--accent);
+      margin-left: 4px;
+      vertical-align: middle;
+      animation: blink 0.8s step-end infinite;
+    }
+    .hero-cursor.hidden { display: none; }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0; }
     }
 
     .hero-eyeline {
@@ -171,19 +272,31 @@
       margin-bottom: 56px;
       opacity: 0; transform: scale(0.92) translateY(20px);
       animation: logoReveal 1s 2.3s cubic-bezier(0.16,1,0.3,1) forwards;
+      transition: transform 0.1s ease-out;
     }
     .hero-logo-wrap img {
       height: clamp(70px, 14vw, 130px);
-      filter: drop-shadow(0 0 40px rgba(0,229,180,0.25));
+      filter: drop-shadow(0 0 48px rgba(0,229,180,0.3));
     }
 
     .hero-sub {
-      font-family: var(--font-mono); font-size: 13px; color: var(--muted);
+      font-family: var(--font-mono); font-size: clamp(12px, 1.4vw, 14px); color: var(--muted);
       max-width: 520px; line-height: 1.9;
       opacity: 0; transform: translateY(14px);
       animation: slideUp 0.7s 2.6s ease forwards;
     }
     .hero-sub strong { color: var(--ink); font-weight: 500; }
+
+    /* Hero version decorative */
+    .hero-version {
+      position: absolute; left: 28px; top: 50%;
+      transform: translateY(-50%) rotate(-90deg);
+      transform-origin: center center;
+      font-family: var(--font-mono); font-size: 9px;
+      letter-spacing: 0.3em; color: rgba(107,114,128,0.3);
+      text-transform: uppercase; white-space: nowrap;
+      opacity: 0; animation: fadeIn 1s 3.2s ease forwards;
+    }
 
     .scroll-hint {
       position: absolute; bottom: 36px; left: 50%; transform: translateX(-50%);
@@ -225,16 +338,35 @@
     }
 
     .section-title {
-      font-family: var(--font-serif); font-size: clamp(2rem, 5vw, 3.8rem);
+      font-family: var(--font-serif); font-size: clamp(1.8rem, 4.5vw, 3.8rem);
       line-height: 1.1; margin-bottom: 28px;
     }
 
-    /* ─── Reveal Animation ───────────────────────────────────── */
+    /* ─── Reveal Animations ──────────────────────────────────── */
     .reveal {
-      opacity: 0; transform: translateY(30px);
+      opacity: 0; transform: translateY(32px);
       transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1);
     }
     .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    .reveal-left {
+      opacity: 0; transform: translateX(-40px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal-left.visible { opacity: 1; transform: translateX(0); }
+
+    .reveal-right {
+      opacity: 0; transform: translateX(40px);
+      transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal-right.visible { opacity: 1; transform: translateX(0); }
+
+    .reveal-scale {
+      opacity: 0; transform: scale(0.93);
+      transition: opacity 0.9s ease, transform 0.9s cubic-bezier(0.16,1,0.3,1);
+    }
+    .reveal-scale.visible { opacity: 1; transform: scale(1); }
+
     .reveal-delay-1 { transition-delay: 0.1s; }
     .reveal-delay-2 { transition-delay: 0.2s; }
     .reveal-delay-3 { transition-delay: 0.3s; }
@@ -246,15 +378,29 @@
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border);
       background: var(--bg2);
+      position: relative; overflow: hidden;
+    }
+    .evolution-section::before {
+      content: '2025';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: var(--font-head); font-weight: 800;
+      font-size: clamp(6rem, 20vw, 18rem);
+      color: rgba(255,255,255,0.012);
+      pointer-events: none; user-select: none;
+      letter-spacing: -0.05em; white-space: nowrap;
     }
     .evolution-track {
       display: flex; align-items: center; justify-content: center;
-      gap: 0; flex-wrap: wrap; gap: 8px;
+      flex-wrap: wrap; gap: 8px;
+      position: relative; z-index: 1;
     }
     .evo-card {
       background: var(--bg3); border: 1px solid var(--border);
       padding: 28px 44px; border-radius: 8px; text-align: center;
+      transition: border-color 0.3s, box-shadow 0.3s;
     }
+    .evo-card:hover { box-shadow: 0 0 24px rgba(0,229,180,0.06); }
     .evo-card .label {
       font-size: 10px; letter-spacing: 0.2em; color: var(--muted);
       text-transform: uppercase; margin-bottom: 10px; display: block;
@@ -291,6 +437,37 @@
       text-transform: uppercase;
     }
 
+    /* ─── Stats Section ──────────────────────────────────────── */
+    .stats-section {
+      padding: 64px 48px;
+      background: var(--bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr);
+      gap: 2px; max-width: 720px; margin: 0 auto;
+    }
+    .stat-item {
+      text-align: center; padding: 36px 24px;
+      background: var(--bg2);
+      transition: background 0.3s;
+    }
+    .stat-item:hover { background: var(--bg3); }
+    .stat-number {
+      font-family: var(--font-head); font-weight: 800;
+      font-size: clamp(2.4rem, 5vw, 4rem);
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 0%, var(--accent) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      background-clip: text;
+      display: block; line-height: 1;
+    }
+    .stat-label {
+      font-size: 10px; letter-spacing: 0.18em;
+      color: var(--muted); text-transform: uppercase;
+      margin-top: 10px; display: block; line-height: 1.6;
+    }
+
     /* ─── Etymology Section ──────────────────────────────────── */
     .etym-grid {
       display: grid; grid-template-columns: 1fr 1fr;
@@ -299,7 +476,9 @@
     .etym-card {
       background: var(--bg2); padding: 56px 48px;
       position: relative; overflow: hidden;
-      transition: background 0.4s;
+      transition: background 0.4s, transform 0.1s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
     .etym-card:hover { background: var(--bg3); }
     .etym-card::before {
@@ -342,20 +521,46 @@
     .etym-watermark {
       position: absolute; bottom: -16px; right: 16px;
       font-family: var(--font-head); font-weight: 800;
-      font-size: 8rem; color: rgba(255,255,255,0.02);
+      font-size: 8rem; color: rgba(255,255,255,0.025);
       pointer-events: none; user-select: none;
       letter-spacing: -0.04em;
+      transition: color 0.4s;
     }
+    .etym-card:hover .etym-watermark { color: rgba(0,229,180,0.04); }
+
+    /* ─── Animated Deco Line ─────────────────────────────────── */
+    .deco-line {
+      width: 100%; height: 1px; overflow: hidden;
+      background: transparent; position: relative;
+    }
+    .deco-line::after {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(90deg, transparent, var(--accent), var(--accent2), transparent);
+      transform: translateX(-100%);
+      transition: transform 1.6s cubic-bezier(0.16,1,0.3,1);
+    }
+    .deco-line.visible::after { transform: translateX(0); }
 
     /* ─── Philosophy Section ─────────────────────────────────── */
     .philosophy-section { background: var(--bg2); }
     .philosophy-quote {
       font-family: var(--font-serif); font-style: italic;
-      font-size: clamp(1.6rem, 4vw, 3rem);
+      font-size: clamp(1.5rem, 3.5vw, 2.8rem);
       line-height: 1.3; color: var(--ink);
-      border-left: 2px solid var(--accent);
+      border-left: 2px solid transparent;
       padding-left: 40px; margin: 64px 0;
       max-width: 820px;
+      position: relative;
+      transition: border-color 0.8s ease;
+    }
+    .philosophy-quote.visible { border-color: var(--accent); }
+    .philosophy-quote::before {
+      content: '"';
+      position: absolute; left: -8px; top: -20px;
+      font-size: 5rem; color: rgba(0,229,180,0.1);
+      font-family: var(--font-serif); line-height: 1;
+      pointer-events: none;
     }
     .philosophy-body {
       display: grid; grid-template-columns: 1fr 1fr; gap: 48px;
@@ -380,19 +585,43 @@
       border: 1px solid var(--border);
       border-radius: 4px;
       overflow: hidden; position: relative;
+      transition: transform 0.1s ease, box-shadow 0.4s;
+      transform-style: preserve-3d;
+    }
+    .creator-photo-frame:hover {
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(0,229,180,0.08);
     }
     .creator-photo-frame::before {
       content: '';
       position: absolute; inset: 0;
-      background: linear-gradient(to bottom, transparent 50%, rgba(5,7,12,0.8) 100%);
+      background: linear-gradient(to bottom, transparent 50%, rgba(5,7,12,0.85) 100%);
       z-index: 1;
     }
     .creator-photo-frame img {
       width: 100%; height: 100%; object-fit: cover; object-position: top center;
       display: block;
+      transition: transform 0.5s ease;
     }
+    .creator-photo-frame:hover img { transform: scale(1.03); }
     .creator-photo-caption {
       position: absolute; bottom: 20px; left: 20px; right: 20px; z-index: 2;
+    }
+    .online-badge {
+      display: inline-flex; align-items: center; gap: 7px;
+      font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.15em;
+      color: #4ade80; text-transform: uppercase;
+      margin-bottom: 10px;
+    }
+    .online-dot {
+      width: 7px; height: 7px;
+      background: #4ade80; border-radius: 50%;
+      flex-shrink: 0;
+      box-shadow: 0 0 0 0 rgba(74,222,128,0.5);
+      animation: pulse-green 2.2s ease-in-out infinite;
+    }
+    @keyframes pulse-green {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(74,222,128,0.5); }
+      50% { box-shadow: 0 0 0 7px rgba(74,222,128,0); }
     }
     .creator-photo-caption .c-name {
       font-family: var(--font-head); font-weight: 800; font-size: 1.2rem;
@@ -419,7 +648,21 @@
     .creator-tags span {
       font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.12em;
       color: var(--accent); border: 1px solid rgba(0,229,180,0.25);
-      padding: 5px 14px; border-radius: 100px; text-transform: uppercase;
+      padding: 6px 14px; border-radius: 100px; text-transform: uppercase;
+      cursor: pointer; position: relative; overflow: hidden;
+      transition: color 0.25s, border-color 0.25s, background 0.25s, transform 0.2s;
+      user-select: none;
+    }
+    .creator-tags span:hover {
+      background: rgba(0,229,180,0.08);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .creator-tags span:active { transform: translateY(0); }
+    .creator-tags span.copied {
+      color: #000 !important;
+      background: var(--accent) !important;
+      border-color: var(--accent) !important;
     }
 
     /* ─── LinkedIn Badge Wrapper ─────────────────────────────── */
@@ -439,12 +682,18 @@
       background: var(--bg);
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: 20px;
+      position: relative;
+    }
+    footer::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(0,229,180,0.3), transparent);
     }
     .footer-logo {
       display: flex; align-items: center; gap: 12px;
     }
     .footer-logo img {
-      height: 24px; filter: brightness(0) invert(1); opacity: 0.6;
+      height: 24px; filter: brightness(0) invert(1); opacity: 0.5;
     }
     .footer-logo span {
       font-family: var(--font-head); font-weight: 700; font-size: 15px;
@@ -455,286 +704,322 @@
     }
     .footer-right .accent { color: var(--accent); }
 
-    /* ─── Decorative Line ────────────────────────────────────── */
-    .deco-line {
-      width: 100%; height: 1px;
-      background: linear-gradient(90deg, transparent, var(--border), transparent);
-      margin: 0;
-    }
-
     /* ─── Responsive ─────────────────────────────────────────── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-section-indicator { display: none; }
+    }
     @media (max-width: 800px) {
       section { padding: 80px 24px; }
-      nav { padding: 20px 24px; }
       .etym-grid { grid-template-columns: 1fr; }
       .philosophy-body { grid-template-columns: 1fr; }
-      .creator-grid { grid-template-columns: 1fr; }
+      .creator-grid { grid-template-columns: 1fr; gap: 48px; }
       .creator-left { position: static; }
       .creator-photo-frame { max-width: 100%; aspect-ratio: 4/3; }
       footer { padding: 40px 24px; }
       .evo-connector .line { width: 40px; }
       .evolution-section { padding: 60px 24px; }
+      .stats-section { padding: 60px 24px; }
+      .creator-section { padding: 80px 24px; }
     }
-
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr; gap: 2px; }
+    }
     @media (max-width: 480px) {
+      .hero { padding: 120px 20px 80px; }
+      .hero-title { font-size: clamp(2.8rem, 13vw, 4.5rem); }
+      .hero-version { display: none; }
       .evolution-track { flex-direction: column; align-items: center; }
-      .evo-connector { flex-direction: row; transform: rotate(0); }
+      .evo-connector { flex-direction: row; }
       .evo-connector .line { width: 40px; }
+      .etym-card { padding: 40px 28px; }
+      .philosophy-quote { padding-left: 24px; font-size: clamp(1.3rem, 5vw, 1.8rem); }
+      .philosophy-quote::before { display: none; }
+      .nav-pill { display: none; }
+      .creator-tags span { font-size: 9px; padding: 5px 10px; }
     }
   </style>
 
 </head>
 <body>
 
-  <!-- Loader -->
+  <!-- Cursor -->
+  <div class="cursor-dot" id="cursor-dot"></div>
+  <div class="cursor-ring" id="cursor-ring"></div>
 
+  <!-- Loader -->
   <div id="loader">
+    <span class="loader-label">Iniciando sistema</span>
     <div class="loader-bar"><div class="loader-fill"></div></div>
   </div>
 
   <!-- Background -->
-
   <div class="bg-grid"></div>
   <div class="bg-glow"></div>
+  <div class="bg-grain"></div>
 
   <!-- Nav -->
-
   <nav id="nav">
     <a class="nav-logo" href="#">
       <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logidma" />
       Logidma
     </a>
-    <span class="nav-pill">v2.0 — 2025</span>
+    <div class="nav-right">
+      <span class="nav-section-indicator" id="nav-section"></span>
+      <span class="nav-pill">v2.0 — 2025</span>
+    </div>
   </nav>
 
   <!-- Wrap -->
-
   <div class="wrap">
 
-```
-<!-- ── Hero ── -->
-<section class="hero">
-  <span class="hero-tag">// Anuncio de identidad</span>
+    <!-- ── Hero ── -->
+    <section class="hero" id="sec-hero">
+      <canvas id="hero-canvas"></canvas>
 
-  <h1 class="hero-title">
-    <span class="grad">Evolucionamos.</span>
-  </h1>
+      <span class="hero-version">Logidma · v2.0 · 2025</span>
+      <span class="hero-tag">// Anuncio de identidad</span>
 
-  <div class="hero-eyeline">
-    <span class="old">DavarCore</span>
-    <span class="arrow"></span>
-    <span class="new-name">Logidma</span>
-  </div>
+      <h1 class="hero-title" id="hero-title">
+        <span class="grad" id="typewriter-target" data-text="Evolucionamos."></span><span class="hero-cursor" id="hero-cursor"></span>
+      </h1>
 
-  <div class="hero-logo-wrap">
-    <img
-      src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true"
-      alt="Logidma logo"
-    />
-  </div>
-
-  <p class="hero-sub">
-    Una nueva firma. El mismo creador.<br/>
-    <strong>La lógica, ahora sistematizada.</strong>
-  </p>
-
-  <div class="scroll-hint">
-    <span>Explora</span>
-    <div class="scroll-line"></div>
-  </div>
-</section>
-
-<!-- ── Evolution ── -->
-<div class="evolution-section">
-  <div class="evolution-track reveal">
-    <div class="evo-card old">
-      <span class="label">Antes</span>
-      <span class="name">DavarCore</span>
-    </div>
-    <div class="evo-connector">
-      <div class="line"></div>
-      <span class="word">Evolución</span>
-    </div>
-    <div class="evo-card new">
-      <span class="label">Ahora</span>
-      <span class="name">Logidma</span>
-    </div>
-  </div>
-</div>
-
-<!-- ── Etymology ── -->
-<section>
-  <div class="section-inner">
-    <span class="section-tag reveal">// Etimología</span>
-    <h2 class="section-title reveal reveal-delay-1">
-      El origen de<br/><em>un nombre construido</em><br/>con precisión.
-    </h2>
-    <p class="reveal reveal-delay-2" style="color:var(--muted); font-size:13px; max-width:600px; line-height:1.9;">
-      Logidma no es un nombre elegido al azar. Es un <strong style="color:var(--ink)">neologismo técnico</strong>,
-      diseñado meticulosamente a partir de dos pilares que fusionan
-      la ciencia computacional con la identidad de su creador.
-    </p>
-
-    <div class="etym-grid">
-
-      <!-- LOGI -->
-      <div class="etym-card logi reveal reveal-delay-1">
-        <span class="etym-letter">LOGI</span>
-        <span class="etym-from">De Logos (λόγος) · Lógica</span>
-        <h3>El principio del orden</h3>
-        <p>
-          En la filosofía griega clásica, el <em>Logos</em> es el principio del
-          orden y del conocimiento; la razón estructural que rige el universo.
-          En la ciencia computacional, la lógica es el <em>lenguaje absoluto de
-          las máquinas</em>: la capacidad analítica para tomar un problema caótico,
-          desarmarlo y traducirlo en algoritmos que operen de forma impecable.
-        </p>
-        <span class="etym-watermark">λ</span>
+      <div class="hero-eyeline">
+        <span class="old">DavarCore</span>
+        <span class="arrow"></span>
+        <span class="new-name">Logidma</span>
       </div>
 
-      <!-- DMA -->
-      <div class="etym-card dma reveal reveal-delay-2">
-        <span class="etym-letter">DMA</span>
-        <span class="etym-from">David Martínez Arredondo · Firma de autor</span>
-        <h3>El sello personal</h3>
-        <p>
-          Las iniciales actúan como el <em>núcleo de la marca</em>. Es la firma
-          personal integrada directamente en el código de la palabra, garantizando
-          que aunque la solución sea tecnológica y autónoma, el diseño y la
-          arquitectura llevan un <em>sello de autor indiscutible</em>.
-        </p>
-        <span class="etym-watermark">∂</span>
+      <div class="hero-logo-wrap" id="hero-logo">
+        <img
+          src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true"
+          alt="Logidma logo"
+        />
       </div>
 
-    </div>
-  </div>
-</section>
-
-<div class="deco-line"></div>
-
-<!-- ── Philosophy ── -->
-<section class="philosophy-section">
-  <div class="section-inner">
-    <span class="section-tag reveal">// Filosofía</span>
-    <h2 class="section-title reveal reveal-delay-1">
-      No es solo código.<br/>Es el diseño de la<br/>cuadrícula invisible.
-    </h2>
-
-    <blockquote class="philosophy-quote reveal reveal-delay-2">
-      "La transición hacia una nueva identidad no nace de una búsqueda estética,
-      sino de una necesidad estructural."
-    </blockquote>
-
-    <div class="philosophy-body">
-      <p class="reveal reveal-delay-1">
-        A medida que los proyectos de <strong>automatización</strong>, la escritura
-        de scripts y el diseño de arquitecturas internas se vuelven más complejos,
-        la marca que los firma debe reflejar ese mismo nivel de ingeniería y precisión.
-        La evolución de DavarCore hacia Logidma marca el paso de un enfoque de
-        <strong>"desarrollo general"</strong> hacia una mentalidad de pura ingeniería
-        de sistemas y metacognición.
+      <p class="hero-sub">
+        Una nueva firma. El mismo creador.<br/>
+        <strong>La lógica, ahora sistematizada.</strong>
       </p>
-      <p class="reveal reveal-delay-2">
-        Logidma encapsula un superpoder técnico: la capacidad de aplicar
-        <strong>lógica donde hay fricción</strong>. Mientras que los procesos manuales
-        son susceptibles al error, la entropía y el desgaste humano, Logidma representa
-        la imposición de un orden estructural limpio, estético y matemático.
-        <strong>La lógica, sistematizada.</strong>
-      </p>
-    </div>
-  </div>
-</section>
 
-<!-- ── Creator ── -->
-<section class="creator-section">
-  <div class="section-inner">
-    <span class="section-tag reveal">// El creador</span>
-    <h2 class="section-title reveal reveal-delay-1">
-      La mente detrás<br/>de la arquitectura.
-    </h2>
+      <div class="scroll-hint">
+        <span>Explora</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
 
-    <div class="creator-grid">
-
-      <!-- Left: Photo -->
-      <div class="creator-left reveal">
-        <div class="creator-photo-frame">
-          <img
-            src="https://lh3.googleusercontent.com/a/ACg8ocKb8u9IY4BT01_d_9d8g6fEW7PIz2cxRAcivCeGuPw1h2_eAlFa"
-            alt="David Martínez Arredondo"
-          />
-          <div class="creator-photo-caption">
-            <div class="c-name">David Martínez Arredondo</div>
-            <div class="c-role">Arquitecto de sistemas · Fundador</div>
-          </div>
+    <!-- ── Evolution ── -->
+    <div class="evolution-section" id="sec-evo">
+      <div class="evolution-track reveal">
+        <div class="evo-card old">
+          <span class="label">Antes</span>
+          <span class="name">DavarCore</span>
+        </div>
+        <div class="evo-connector">
+          <div class="line"></div>
+          <span class="word">Evolución</span>
+        </div>
+        <div class="evo-card new">
+          <span class="label">Ahora</span>
+          <span class="name">Logidma</span>
         </div>
       </div>
+    </div>
 
-      <!-- Right: Info -->
-      <div class="creator-right">
-        <h2 class="reveal">
-          David<br/>Martínez<br/>Arredondo
+    <!-- ── Stats ── -->
+    <div class="stats-section">
+      <div class="stats-grid">
+        <div class="stat-item reveal">
+          <span class="stat-number" data-target="5">0</span>
+          <span class="stat-label">Años de experiencia</span>
+        </div>
+        <div class="stat-item reveal reveal-delay-1">
+          <span class="stat-number" data-target="30">0</span>
+          <span class="stat-label">Proyectos entregados</span>
+        </div>
+        <div class="stat-item reveal reveal-delay-2">
+          <span class="stat-number" data-target="100" data-suffix="%">0</span>
+          <span class="stat-label">Orientado a sistemas</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── Etymology ── -->
+    <section id="sec-etym">
+      <div class="section-inner">
+        <span class="section-tag reveal">// Etimología</span>
+        <h2 class="section-title reveal reveal-delay-1">
+          El origen de<br/><em>un nombre construido</em><br/>con precisión.
         </h2>
-        <p class="reveal reveal-delay-1">
-          Arquitecto de sistemas internos, desarrollador y diseñador de soluciones
-          de automatización para entornos corporativos. Especializado en
-          <strong>Google Workspace, Apps Script, APIs y arquitecturas HTML</strong>,
-          David construye la cuadrícula invisible que sostiene la eficiencia técnica.
-        </p>
-        <p class="reveal reveal-delay-2">
-          Su trabajo diario consiste en automatizar flujos de información,
-          conectar bases de datos y diseñar secuencias de ejecución que operan
-          en segundo plano, con precisión matemática. Desde Morelia, Michoacán,
-          <strong>cada proyecto lleva el sello DMA integrado en su arquitectura</strong>.
+        <p class="reveal reveal-delay-2" style="color:var(--muted); font-size:13px; max-width:600px; line-height:1.9;">
+          Logidma no es un nombre elegido al azar. Es un <strong style="color:var(--ink)">neologismo técnico</strong>,
+          diseñado meticulosamente a partir de dos pilares que fusionan
+          la ciencia computacional con la identidad de su creador.
         </p>
 
-        <div class="creator-tags reveal reveal-delay-3">
-          <span>Apps Script</span>
-          <span>APIs</span>
-          <span>HTML/CSS</span>
-          <span>Automatización</span>
-          <span>Google Workspace</span>
-          <span>Sistemas</span>
+        <div class="etym-grid">
+
+          <!-- LOGI -->
+          <div class="etym-card logi reveal-left reveal-delay-1" data-tilt>
+            <span class="etym-letter">LOGI</span>
+            <span class="etym-from">De Logos (λόγος) · Lógica</span>
+            <h3>El principio del orden</h3>
+            <p>
+              En la filosofía griega clásica, el <em>Logos</em> es el principio del
+              orden y del conocimiento; la razón estructural que rige el universo.
+              En la ciencia computacional, la lógica es el <em>lenguaje absoluto de
+              las máquinas</em>: la capacidad analítica para tomar un problema caótico,
+              desarmarlo y traducirlo en algoritmos que operen de forma impecable.
+            </p>
+            <span class="etym-watermark">λ</span>
+          </div>
+
+          <!-- DMA -->
+          <div class="etym-card dma reveal-right reveal-delay-2" data-tilt>
+            <span class="etym-letter">DMA</span>
+            <span class="etym-from">David Martínez Arredondo · Firma de autor</span>
+            <h3>El sello personal</h3>
+            <p>
+              Las iniciales actúan como el <em>núcleo de la marca</em>. Es la firma
+              personal integrada directamente en el código de la palabra, garantizando
+              que aunque la solución sea tecnológica y autónoma, el diseño y la
+              arquitectura llevan un <em>sello de autor indiscutible</em>.
+            </p>
+            <span class="etym-watermark">∂</span>
+          </div>
+
         </div>
+      </div>
+    </section>
 
-        <div class="linkedin-wrap reveal reveal-delay-4">
-          <span class="linkedin-label">// Conecta en LinkedIn</span>
-          <div
-            class="badge-base LI-profile-badge"
-            data-locale="es_ES"
-            data-size="medium"
-            data-theme="dark"
-            data-type="VERTICAL"
-            data-vanity="david-martinez-arredondo-86b4182bb"
-            data-version="v1"
-          >
-            <a
-              class="badge-base__link LI-simple-link"
-              href="https://mx.linkedin.com/in/david-martinez-arredondo-86b4182bb?trk=profile-badge"
-              target="_blank"
-              rel="noopener"
-            >
-              David Martinez Arredondo
-            </a>
+    <div class="deco-line reveal"></div>
+
+    <!-- ── Philosophy ── -->
+    <section class="philosophy-section" id="sec-phil">
+      <div class="section-inner">
+        <span class="section-tag reveal">// Filosofía</span>
+        <h2 class="section-title reveal reveal-delay-1">
+          No es solo código.<br/>Es el diseño de la<br/>cuadrícula invisible.
+        </h2>
+
+        <blockquote class="philosophy-quote reveal reveal-delay-2">
+          "La transición hacia una nueva identidad no nace de una búsqueda estética,
+          sino de una necesidad estructural."
+        </blockquote>
+
+        <div class="philosophy-body">
+          <p class="reveal-left reveal-delay-1">
+            A medida que los proyectos de <strong>automatización</strong>, la escritura
+            de scripts y el diseño de arquitecturas internas se vuelven más complejos,
+            la marca que los firma debe reflejar ese mismo nivel de ingeniería y precisión.
+            La evolución de DavarCore hacia Logidma marca el paso de un enfoque de
+            <strong>"desarrollo general"</strong> hacia una mentalidad de pura ingeniería
+            de sistemas y metacognición.
+          </p>
+          <p class="reveal-right reveal-delay-2">
+            Logidma encapsula un superpoder técnico: la capacidad de aplicar
+            <strong>lógica donde hay fricción</strong>. Mientras que los procesos manuales
+            son susceptibles al error, la entropía y el desgaste humano, Logidma representa
+            la imposición de un orden estructural limpio, estético y matemático.
+            <strong>La lógica, sistematizada.</strong>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Creator ── -->
+    <section class="creator-section" id="sec-creator">
+      <div class="section-inner">
+        <span class="section-tag reveal">// El creador</span>
+        <h2 class="section-title reveal reveal-delay-1">
+          La mente detrás<br/>de la arquitectura.
+        </h2>
+
+        <div class="creator-grid">
+
+          <!-- Left: Photo -->
+          <div class="creator-left reveal-scale">
+            <div class="creator-photo-frame" id="creator-photo">
+              <img
+                src="https://lh3.googleusercontent.com/a/ACg8ocKb8u9IY4BT01_d_9d8g6fEW7PIz2cxRAcivCeGuPw1h2_eAlFa"
+                alt="David Martínez Arredondo"
+              />
+              <div class="creator-photo-caption">
+                <div class="online-badge">
+                  <div class="online-dot"></div>
+                  <span>Disponible</span>
+                </div>
+                <div class="c-name">David Martínez Arredondo</div>
+                <div class="c-role">Arquitecto de sistemas · Fundador</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Right: Info -->
+          <div class="creator-right">
+            <h2 class="reveal-right">
+              David<br/>Martínez<br/>Arredondo
+            </h2>
+            <p class="reveal reveal-delay-1">
+              Arquitecto de sistemas internos, desarrollador y diseñador de soluciones
+              de automatización para entornos corporativos. Especializado en
+              <strong>Google Workspace, Apps Script, APIs y arquitecturas HTML</strong>,
+              David construye la cuadrícula invisible que sostiene la eficiencia técnica.
+            </p>
+            <p class="reveal reveal-delay-2">
+              Su trabajo diario consiste en automatizar flujos de información,
+              conectar bases de datos y diseñar secuencias de ejecución que operan
+              en segundo plano, con precisión matemática. Desde Morelia, Michoacán,
+              <strong>cada proyecto lleva el sello DMA integrado en su arquitectura</strong>.
+            </p>
+
+            <div class="creator-tags reveal reveal-delay-3">
+              <span>Apps Script</span>
+              <span>APIs</span>
+              <span>HTML/CSS</span>
+              <span>Automatización</span>
+              <span>Google Workspace</span>
+              <span>Sistemas</span>
+            </div>
+
+            <div class="linkedin-wrap reveal reveal-delay-4">
+              <span class="linkedin-label">// Conecta en LinkedIn</span>
+              <div
+                class="badge-base LI-profile-badge"
+                data-locale="es_ES"
+                data-size="medium"
+                data-theme="dark"
+                data-type="VERTICAL"
+                data-vanity="david-martinez-arredondo-86b4182bb"
+                data-version="v1"
+              >
+                <a
+                  class="badge-base__link LI-simple-link"
+                  href="https://mx.linkedin.com/in/david-martinez-arredondo-86b4182bb?trk=profile-badge"
+                  target="_blank"
+                  rel="noopener"
+                >
+                  David Martinez Arredondo
+                </a>
+              </div>
+            </div>
+
           </div>
         </div>
-
       </div>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- ── Footer ── -->
-<footer>
-  <div class="footer-logo">
-    <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logidma" />
-    <span>Logidma</span>
-  </div>
-  <div class="footer-right">
-    <span class="accent">La lógica, sistematizada.</span>
-    &nbsp;·&nbsp; Antes DavarCore &nbsp;·&nbsp; © 2025 DMA
-  </div>
-</footer>
-```
+    <!-- ── Footer ── -->
+    <footer>
+      <div class="footer-logo">
+        <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logidma" />
+        <span>Logidma</span>
+      </div>
+      <div class="footer-right">
+        <span class="accent">La lógica, sistematizada.</span>
+        &nbsp;·&nbsp; Antes DavarCore &nbsp;·&nbsp; © <span id="current-year"></span> DMA
+      </div>
+    </footer>
 
   </div><!-- /wrap -->
 
@@ -746,14 +1031,150 @@
       }, 1300);
     });
 
+    // ── Dynamic Year ────────────────────────────────────────
+    const yearEl = document.getElementById('current-year');
+    if (yearEl) yearEl.textContent = new Date().getFullYear();
+
     // ── Nav scroll ──────────────────────────────────────────
     const nav = document.getElementById('nav');
     window.addEventListener('scroll', () => {
       nav.classList.toggle('scrolled', window.scrollY > 60);
     }, { passive: true });
 
-    // ── Reveal on scroll ────────────────────────────────────
-    const revealEls = document.querySelectorAll('.reveal');
+    // ── Custom Cursor ───────────────────────────────────────
+    const cursorDot = document.getElementById('cursor-dot');
+    const cursorRing = document.getElementById('cursor-ring');
+    let ringX = 0, ringY = 0, mouseX = -200, mouseY = -200;
+    let cursorVisible = false;
+
+    document.addEventListener('mousemove', e => {
+      mouseX = e.clientX; mouseY = e.clientY;
+      if (!cursorVisible) {
+        cursorDot.style.opacity = '1';
+        cursorRing.style.opacity = '1';
+        cursorVisible = true;
+      }
+      cursorDot.style.left = mouseX + 'px';
+      cursorDot.style.top = mouseY + 'px';
+    });
+
+    document.addEventListener('mouseleave', () => {
+      cursorDot.style.opacity = '0';
+      cursorRing.style.opacity = '0';
+    });
+
+    (function animateRing() {
+      ringX += (mouseX - ringX) * 0.11;
+      ringY += (mouseY - ringY) * 0.11;
+      cursorRing.style.left = ringX + 'px';
+      cursorRing.style.top = ringY + 'px';
+      requestAnimationFrame(animateRing);
+    })();
+
+    document.querySelectorAll('a, button, [data-tilt], .creator-tags span, .nav-pill, .evo-card').forEach(el => {
+      el.addEventListener('mouseenter', () => cursorRing.classList.add('expanded'));
+      el.addEventListener('mouseleave', () => cursorRing.classList.remove('expanded'));
+    });
+
+    // ── Hero Canvas Particles ────────────────────────────────
+    const canvas = document.getElementById('hero-canvas');
+    if (canvas) {
+      const ctx = canvas.getContext('2d');
+      const particles = [];
+      const COUNT = 30;
+
+      function resizeCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetHeight;
+      }
+      resizeCanvas();
+      new ResizeObserver(resizeCanvas).observe(canvas);
+
+      for (let i = 0; i < COUNT; i++) {
+        particles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height,
+          vx: (Math.random() - 0.5) * 0.28,
+          vy: (Math.random() - 0.5) * 0.28,
+          r: Math.random() * 1.4 + 0.4
+        });
+      }
+
+      (function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const dx = particles[i].x - particles[j].x;
+            const dy = particles[i].y - particles[j].y;
+            const distSq = dx * dx + dy * dy;
+            if (distSq < 18000) {
+              ctx.beginPath();
+              ctx.strokeStyle = `rgba(0,229,180,${0.07 * (1 - distSq / 18000)})`;
+              ctx.lineWidth = 0.6;
+              ctx.moveTo(particles[i].x, particles[i].y);
+              ctx.lineTo(particles[j].x, particles[j].y);
+              ctx.stroke();
+            }
+          }
+        }
+        particles.forEach(p => {
+          ctx.beginPath();
+          ctx.fillStyle = 'rgba(0,229,180,0.45)';
+          ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+          ctx.fill();
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+          if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+        });
+        requestAnimationFrame(drawParticles);
+      })();
+    }
+
+    // ── Hero Parallax ────────────────────────────────────────
+    const heroSection = document.querySelector('.hero');
+    const heroLogo = document.getElementById('hero-logo');
+    const heroTitle = document.getElementById('hero-title');
+    let heroReady = false;
+    setTimeout(() => { heroReady = true; }, 3500);
+
+    if (heroSection) {
+      heroSection.addEventListener('mousemove', e => {
+        if (!heroReady) return;
+        const rect = heroSection.getBoundingClientRect();
+        const dx = (e.clientX - rect.left - rect.width / 2) / (rect.width / 2);
+        const dy = (e.clientY - rect.top - rect.height / 2) / (rect.height / 2);
+        if (heroLogo) heroLogo.style.transform = `translate(${dx * 14}px, ${dy * 9}px)`;
+        if (heroTitle) heroTitle.style.transform = `translate(${dx * 6}px, ${dy * 4}px)`;
+      }, { passive: true });
+      heroSection.addEventListener('mouseleave', () => {
+        if (!heroReady) return;
+        if (heroLogo) heroLogo.style.transform = '';
+        if (heroTitle) heroTitle.style.transform = '';
+      });
+    }
+
+    // ── Typewriter Effect ────────────────────────────────────
+    function typewriter(el, text, speed) {
+      let i = 0;
+      el.textContent = '';
+      const cursor = document.getElementById('hero-cursor');
+      const timer = setInterval(() => {
+        el.textContent += text[i++];
+        if (i >= text.length) {
+          clearInterval(timer);
+          setTimeout(() => { if (cursor) cursor.classList.add('hidden'); }, 800);
+        }
+      }, speed);
+    }
+    setTimeout(() => {
+      const tw = document.getElementById('typewriter-target');
+      if (tw) typewriter(tw, tw.dataset.text, 65);
+    }, 2100);
+
+    // ── Reveal on Scroll ─────────────────────────────────────
+    const revealEls = document.querySelectorAll(
+      '.reveal, .reveal-left, .reveal-right, .reveal-scale, .deco-line, .philosophy-quote'
+    );
     const observer = new IntersectionObserver(entries => {
       entries.forEach(e => {
         if (e.isIntersecting) {
@@ -761,8 +1182,105 @@
           observer.unobserve(e.target);
         }
       });
-    }, { threshold: 0.12 });
+    }, { threshold: 0.08 });
     revealEls.forEach(el => observer.observe(el));
+
+    // ── 3D Tilt on Etymology Cards ───────────────────────────
+    document.querySelectorAll('[data-tilt]').forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        card.style.transition = 'transform 0.08s ease, background 0.4s';
+      });
+      card.addEventListener('mousemove', e => {
+        const rect = card.getBoundingClientRect();
+        const rx = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -7;
+        const ry = ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 7;
+        card.style.transform = `perspective(1000px) rotateX(${rx}deg) rotateY(${ry}deg) scale(1.015)`;
+      });
+      card.addEventListener('mouseleave', () => {
+        card.style.transition = 'transform 0.6s cubic-bezier(0.16,1,0.3,1), background 0.4s';
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+      });
+    });
+
+    // ── Copyable Tags ────────────────────────────────────────
+    document.querySelectorAll('.creator-tags span').forEach(tag => {
+      tag.title = 'Click para copiar';
+      tag.addEventListener('click', () => {
+        const text = tag.textContent.trim();
+        const restore = () => {
+          tag.textContent = text;
+          tag.classList.remove('copied');
+        };
+        tag.textContent = '✓ Copiado';
+        tag.classList.add('copied');
+        navigator.clipboard?.writeText(text).catch(() => {});
+        setTimeout(restore, 1500);
+      });
+    });
+
+    // ── Stats Counter Animation ───────────────────────────────
+    function animateCounter(el, target, duration) {
+      const start = performance.now();
+      const suffix = el.dataset.suffix || '';
+      (function update(now) {
+        const p = Math.min((now - start) / duration, 1);
+        const eased = 1 - Math.pow(1 - p, 3);
+        el.textContent = Math.round(eased * target) + (p >= 1 ? suffix : '');
+        if (p < 1) requestAnimationFrame(update);
+      })(start);
+    }
+
+    const statsObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const el = e.target;
+          animateCounter(el, parseInt(el.dataset.target), 1800);
+          statsObserver.unobserve(el);
+        }
+      });
+    }, { threshold: 0.5 });
+    document.querySelectorAll('.stat-number[data-target]').forEach(el => statsObserver.observe(el));
+
+    // ── Creator Photo Depth ───────────────────────────────────
+    const photoFrame = document.getElementById('creator-photo');
+    if (photoFrame) {
+      photoFrame.addEventListener('mouseenter', () => {
+        photoFrame.style.transition = 'transform 0.08s ease, box-shadow 0.4s';
+      });
+      photoFrame.addEventListener('mousemove', e => {
+        const rect = photoFrame.getBoundingClientRect();
+        const rx = ((e.clientY - rect.top - rect.height / 2) / (rect.height / 2)) * -5;
+        const ry = ((e.clientX - rect.left - rect.width / 2) / (rect.width / 2)) * 5;
+        photoFrame.style.transform = `perspective(800px) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      });
+      photoFrame.addEventListener('mouseleave', () => {
+        photoFrame.style.transition = 'transform 0.7s cubic-bezier(0.16,1,0.3,1), box-shadow 0.4s';
+        photoFrame.style.transform = 'perspective(800px) rotateX(0) rotateY(0)';
+      });
+    }
+
+    // ── Active Section Indicator ──────────────────────────────
+    const sectionMap = [
+      { el: document.getElementById('sec-hero'),    name: '// Hero' },
+      { el: document.getElementById('sec-evo'),     name: '// Evolución' },
+      { el: document.getElementById('sec-etym'),    name: '// Etimología' },
+      { el: document.getElementById('sec-phil'),    name: '// Filosofía' },
+      { el: document.getElementById('sec-creator'), name: '// Creador' },
+    ];
+    const navIndicator = document.getElementById('nav-section');
+
+    const sectionObserver = new IntersectionObserver(entries => {
+      entries.forEach(e => {
+        if (e.isIntersecting && navIndicator) {
+          const found = sectionMap.find(s => s.el === e.target);
+          if (found) {
+            navIndicator.textContent = found.name;
+            navIndicator.classList.add('visible');
+          }
+        }
+      });
+    }, { threshold: 0.35 });
+    sectionMap.filter(s => s.el).forEach(s => sectionObserver.observe(s.el));
   </script>
 
 </body>
