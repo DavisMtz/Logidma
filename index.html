@@ -1109,6 +1109,219 @@
     .ccard:last-child{ border-bottom: none; }
   }
 
+  /* ============ FORMULARIO PROYECTO ============ */
+  .form-intro{
+    max-width: 620px;
+    color: var(--cream-soft);
+    font-size: clamp(0.98rem, 1.3vw, 1.05rem);
+    line-height: 1.8;
+    margin-bottom: clamp(40px, 6vw, 56px);
+  }
+  .form-intro strong{ color: var(--cream); font-weight: 500; }
+
+  .pform{
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: clamp(28px, 4vw, 40px) clamp(24px, 3vw, 36px);
+    max-width: 880px;
+    margin-top: clamp(32px, 4vw, 48px);
+  }
+  .pform__field{
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .pform__field--full{ grid-column: 1 / -1; }
+
+  .pform__label{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.4s var(--e-expo);
+    display: flex; align-items: center; gap: 8px;
+  }
+  .pform__label .req{
+    color: var(--accent);
+    font-size: 0.6rem;
+  }
+
+  .pform__input,
+  .pform__textarea{
+    background: transparent;
+    border: none;
+    border-bottom: 1px solid var(--line-strong);
+    color: var(--cream);
+    font-family: 'Manrope', sans-serif;
+    font-size: clamp(1rem, 1.4vw, 1.1rem);
+    font-weight: 300;
+    padding: 12px 0;
+    width: 100%;
+    transition: border-color 0.4s var(--e-expo), padding 0.4s var(--e-expo);
+    outline: none;
+    -webkit-appearance: none;
+    appearance: none;
+    border-radius: 0;
+  }
+  .pform__textarea{
+    resize: vertical;
+    min-height: 120px;
+    line-height: 1.6;
+    font-family: 'Manrope', sans-serif;
+  }
+  .pform__input:focus,
+  .pform__textarea:focus{
+    border-bottom-color: var(--accent);
+    padding-left: 4px;
+  }
+  .pform__input:focus + .pform__line,
+  .pform__textarea:focus + .pform__line{
+    transform: scaleX(1);
+  }
+  .pform__field:focus-within .pform__label{
+    color: var(--accent);
+  }
+  .pform__line{
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.5s var(--e-expo);
+    pointer-events: none;
+    box-shadow: 0 0 10px var(--accent-glow);
+  }
+  .pform__input::placeholder,
+  .pform__textarea::placeholder{
+    color: var(--muted);
+    opacity: 0.6;
+  }
+
+  .pform__error{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: #ff6b6b;
+    margin-top: 4px;
+    letter-spacing: 1px;
+    min-height: 14px;
+    display: block;
+  }
+
+  .pform__bottom{
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+    padding-top: 32px;
+    border-top: 1px solid var(--line);
+  }
+
+  .pform__submit{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    padding: 18px 36px;
+    border: 1px solid var(--accent);
+    border-radius: 999px;
+    color: var(--accent);
+    background: var(--accent-soft);
+    cursor: pointer;
+    transition: all 0.4s var(--e-expo);
+    box-shadow: 0 0 24px -4px var(--accent-glow);
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    position: relative;
+    overflow: hidden;
+  }
+  .pform__submit::after{
+    content:"→";
+    transition: transform 0.4s var(--e-expo);
+  }
+  .pform__submit:hover{
+    background: var(--accent);
+    color: var(--bg);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px -2px var(--accent-glow);
+  }
+  .pform__submit:hover::after{ transform: translateX(6px); }
+  .pform__submit:disabled{
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+  .pform__submit.is-sending::after{
+    content:"";
+    width: 14px; height: 14px;
+    border: 2px solid currentColor;
+    border-top-color: transparent;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    transform: none;
+  }
+  @keyframes spin{
+    to{ transform: rotate(360deg); }
+  }
+
+  .pform__note{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+
+  .pform__status{
+    grid-column: 1 / -1;
+    padding: 20px 24px;
+    border: 1px solid var(--line-strong);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    display: none;
+    animation: fadeUp 0.6s var(--e-expo);
+  }
+  .pform__status.show{ display: block; }
+  .pform__status.success{
+    border-color: var(--accent);
+    background: var(--accent-soft);
+    color: var(--accent);
+  }
+  .pform__status.error{
+    border-color: #ff6b6b;
+    background: rgba(255,107,107,0.08);
+    color: #ff6b6b;
+  }
+  .pform__status strong{
+    display: block;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+    color: inherit;
+  }
+
+  /* Autofill — quitar el feo amarillo de Chrome */
+  .pform__input:-webkit-autofill,
+  .pform__textarea:-webkit-autofill{
+    -webkit-text-fill-color: var(--cream);
+    -webkit-box-shadow: 0 0 0 1000px var(--bg) inset;
+    transition: background-color 5000s ease-in-out 0s;
+  }
+
+  @media (max-width: 700px){
+    .pform{ grid-template-columns: 1fr; }
+    .pform__bottom{ flex-direction: column; align-items: flex-start; }
+    .pform__submit{ width: 100%; justify-content: center; }
+  }
+
   /* FOOTER */
   footer{
     padding: 64px clamp(20px, 4vw, 32px) 48px;
@@ -1264,7 +1477,6 @@
   </div>
   <div class="nav__meta">
     <span><span class="dot"></span>EN LÍNEA</span>
-    <span>EST. 2026</span>
   </div>
 </header>
 
@@ -1275,7 +1487,7 @@
     <h1 class="hero__title" id="heroTitle">Evolucionamos. Ahora somos <em>Logidma</em>.</h1>
     <p class="hero__sub">
       Lo que conociste como <strong>DavarCore</strong> da paso a una mentalidad
-      más afilada: <strong>ingeniería de sistemas y metacognición</strong>.
+      más afilada: <strong>sistemas y metacognición</strong>.
       Una firma que proyecta modernidad, cuidado estético y una visión
       orientada al futuro de la sistematización.
     </p>
@@ -1300,13 +1512,13 @@
       <span class="marquee__item">Estructura</span>
       <span class="marquee__item">Sistemas</span>
       <span class="marquee__item">Código</span>
-      <span class="marquee__item">Arquitectura</span>
+      <span class="marquee__item">IA</span>
       <span class="marquee__item">Logidma</span>
-      <span class="marquee__item">Lógica</span>
-      <span class="marquee__item">Estructura</span>
-      <span class="marquee__item">Sistemas</span>
-      <span class="marquee__item">Código</span>
-      <span class="marquee__item">Arquitectura</span>
+      <span class="marquee__item">AppsScript</span>
+      <span class="marquee__item">HTML</span>
+      <span class="marquee__item">Eficiencia</span>
+      <span class="marquee__item">Imagen</span>
+      <span class="marquee__item">Innovacion</span>
       <span class="marquee__item">Logidma</span>
     </div>
   </div>
@@ -1432,10 +1644,70 @@
   <section class="wrap reveal">
     <div class="section__head">
       <span class="num">04 /</span>
+      <span class="title">Inicia tu proyecto · cuéntame tu idea</span>
+    </div>
+
+    <h2 class="kicker">¿Qué quieres <em>sistematizar</em>?</h2>
+    <p class="form-intro">
+      Comparte una <strong>idea o necesidad</strong> de proyecto. Llena los campos y
+      la información llega directamente a mi bandeja para revisarla con calma.
+      Suelo responder en menos de 72 horas.
+    </p>
+
+    <form class="pform" id="projectForm" novalidate>
+      <div class="pform__field">
+        <label class="pform__label" for="pf-nombre">// Nombre completo <span class="req">*</span></label>
+        <input class="pform__input" type="text" id="pf-nombre" name="nombre" placeholder="¿Cómo te llamas?" required autocomplete="name" />
+        <span class="pform__line"></span>
+        <span class="pform__error" data-error-for="nombre"></span>
+      </div>
+
+      <div class="pform__field">
+        <label class="pform__label" for="pf-email">// Email <span class="req">*</span></label>
+        <input class="pform__input" type="email" id="pf-email" name="email" placeholder="tu@correo.com" required autocomplete="email" />
+        <span class="pform__line"></span>
+        <span class="pform__error" data-error-for="email"></span>
+      </div>
+
+      <div class="pform__field">
+        <label class="pform__label" for="pf-telefono">// Número telefónico</label>
+        <input class="pform__input" type="tel" id="pf-telefono" name="telefono" placeholder="+52 ..." autocomplete="tel" inputmode="tel" />
+        <span class="pform__line"></span>
+        <span class="pform__error" data-error-for="telefono"></span>
+      </div>
+
+      <div class="pform__field">
+        <label class="pform__label" for="pf-correo">// Correo alternativo</label>
+        <input class="pform__input" type="text" id="pf-correo" name="correo" placeholder="opcional" />
+        <span class="pform__line"></span>
+        <span class="pform__error" data-error-for="correo"></span>
+      </div>
+
+      <div class="pform__field pform__field--full">
+        <label class="pform__label" for="pf-idea">// Idea o necesidad <span class="req">*</span></label>
+        <textarea class="pform__textarea" id="pf-idea" name="idea" placeholder="Cuéntame qué proceso quieres automatizar, qué problema resuelve, o cualquier idea que tengas en mente..." required rows="5"></textarea>
+        <span class="pform__line"></span>
+        <span class="pform__error" data-error-for="idea"></span>
+      </div>
+
+      <div class="pform__status" id="pformStatus" role="status" aria-live="polite"></div>
+
+      <div class="pform__bottom">
+        <span class="pform__note">// Tus datos solo los uso para responderte</span>
+        <button class="pform__submit" type="submit" id="pformSubmit">
+          <span class="pform__submit-text">Enviar idea</span>
+        </button>
+      </div>
+    </form>
+  </section>
+
+  <section class="wrap reveal">
+    <div class="section__head">
+      <span class="num">05 /</span>
       <span class="title">Contacto · canales directos</span>
     </div>
 
-    <h2 class="kicker">¿Listo para <em>sistematizar</em> lo que hoy es manual?</h2>
+    <h2 class="kicker">¿Prefieres <em>conversar</em> directo?</h2>
 
     <div class="contact-grid reveal reveal--stagger">
 
@@ -1668,6 +1940,110 @@
       const cy = (e.clientY / window.innerHeight - 0.5) * 14;
       heroLogo.style.transform = 'translateY(calc(-50% + ' + cy + 'px)) translateX(' + cx + 'px)';
     }, { passive: true });
+  }
+
+  // ============ FORMULARIO PROYECTO → GOOGLE APPS SCRIPT ============
+  const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbyeHTmABdGjckQ04nPUbMh0KblMNbXXVa3lq_-UzJhEsiHx4oPvFdRgM6gvLtpZuCGV/exec';
+
+  const pform = document.getElementById('projectForm');
+  if (pform) {
+    const submitBtn = document.getElementById('pformSubmit');
+    const submitText = submitBtn.querySelector('.pform__submit-text');
+    const statusBox = document.getElementById('pformStatus');
+    const errorEls = pform.querySelectorAll('.pform__error');
+
+    function clearErrors(){
+      errorEls.forEach(el => el.textContent = '');
+      statusBox.classList.remove('show', 'success', 'error');
+      statusBox.innerHTML = '';
+    }
+
+    function showError(field, msg){
+      const el = pform.querySelector('[data-error-for="' + field + '"]');
+      if (el) el.textContent = msg;
+    }
+
+    function validate(data){
+      let ok = true;
+      if (!data.nombre || data.nombre.trim().length < 2){
+        showError('nombre', 'Necesito tu nombre');
+        ok = false;
+      }
+      if (!data.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)){
+        showError('email', 'Email inválido');
+        ok = false;
+      }
+      if (!data.idea || data.idea.trim().length < 10){
+        showError('idea', 'Cuéntame un poco más (mínimo 10 caracteres)');
+        ok = false;
+      }
+      return ok;
+    }
+
+    function setSending(sending){
+      submitBtn.disabled = sending;
+      submitBtn.classList.toggle('is-sending', sending);
+      submitText.textContent = sending ? 'Enviando' : 'Enviar idea';
+    }
+
+    function showStatus(type, title, msg){
+      statusBox.classList.add('show', type);
+      statusBox.innerHTML = '<strong>' + title + '</strong>' + msg;
+    }
+
+    pform.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      clearErrors();
+
+      const formData = new FormData(pform);
+      const data = {
+        fecha: new Date().toLocaleString('es-MX', { timeZone: 'America/Mexico_City' }),
+        nombre: formData.get('nombre') || '',
+        email: formData.get('email') || '',
+        telefono: formData.get('telefono') || '',
+        correo: formData.get('correo') || '',
+        idea: formData.get('idea') || ''
+      };
+
+      if (!validate(data)) {
+        showStatus('error', 'Revisa los campos marcados', 'Algunos datos faltan o están incompletos.');
+        return;
+      }
+
+      setSending(true);
+
+      try {
+        // Apps Script — usamos text/plain para evitar preflight CORS
+        await fetch(APPS_SCRIPT_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(data)
+        });
+
+        // Con no-cors no podemos leer la respuesta; asumimos éxito si no hay error de red
+        pform.reset();
+        showStatus('success', '¡Recibido!',
+          'Tu idea está conmigo. Te contacto en menos de 24 horas. Mientras tanto, puedes escribirme también por WhatsApp si urge.');
+        setSending(false);
+
+        // Scroll suave al status
+        statusBox.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+      } catch (err) {
+        showStatus('error', 'Algo falló al enviar',
+          'No pude conectar con el servidor. Inténtalo de nuevo o escríbeme directo por WhatsApp.');
+        setSending(false);
+      }
+    });
+
+    // Limpiar error individual al escribir
+    pform.querySelectorAll('input, textarea').forEach(input => {
+      input.addEventListener('input', () => {
+        const errEl = pform.querySelector('[data-error-for="' + input.name + '"]');
+        if (errEl) errEl.textContent = '';
+      });
+    });
   }
 
 })();
