@@ -1958,7 +1958,7 @@
   <nav class="nav__links" aria-label="Secciones">
     <a href="#etimologia">Concepto</a>
     <a href="#filosofia">Filosofía</a>
-    <a href="#proyectos">Proyectos</a>
+    <a href="proyectos.html">Proyectos</a>
     <a href="#contacto">Contacto</a>
   </nav>
   <div style="display:flex;align-items:center;gap:clamp(12px,2vw,24px);">
@@ -2776,6 +2776,19 @@ googleSignIn && googleSignIn.addEventListener('click', async () => {
 
 /* ── Logout ── */
 navLogout && navLogout.addEventListener('click', () => signOut(auth));
+
+/* ── Auto-open modal from URL param (redirect from proyectos.html) ── */
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const authParam = params.get('auth');
+  if (authParam === 'login' || authParam === 'register') {
+    history.replaceState({}, '', window.location.pathname);
+    setTimeout(() => {
+      openModal();
+      if (authParam === 'register') setMode(true);
+    }, 600);
+  }
+})();
 
 /* ── Auth state ── */
 onAuthStateChanged(auth, user => {
