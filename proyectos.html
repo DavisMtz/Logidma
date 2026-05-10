@@ -658,6 +658,190 @@
       transition-duration:.01ms !important;
     }
   }
+
+  /* ══ MOBILE NAVIGATION ══ */
+  .nav__right{ display:flex; align-items:center; gap:clamp(12px,2vw,24px); }
+
+  .nav__hamburger{
+    display:none; flex-direction:column; gap:5px;
+    cursor:pointer; background:transparent;
+    border:1px solid var(--line-strong); border-radius:6px;
+    padding:9px 11px; z-index:201; position:relative;
+    transition:border-color .35s var(--e-expo),background .35s;
+    flex-shrink:0;
+  }
+  .nav__hamburger:hover{ border-color:var(--accent); background:var(--accent-soft); }
+  .nav__hamburger span{
+    display:block; width:20px; height:1.5px;
+    background:var(--cream);
+    transition:transform .45s var(--e-expo),opacity .3s,width .4s var(--e-expo);
+    transform-origin:center;
+  }
+  .nav__hamburger.is-open span:nth-child(1){ transform:translateY(6.5px) rotate(45deg); }
+  .nav__hamburger.is-open span:nth-child(2){ opacity:0; width:0; }
+  .nav__hamburger.is-open span:nth-child(3){ transform:translateY(-6.5px) rotate(-45deg); }
+  .nav__hamburger[data-authed]::after{
+    content:""; position:absolute; top:5px; right:5px;
+    width:6px; height:6px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 8px var(--accent);
+  }
+  @media(max-width:680px){
+    .nav__hamburger{ display:flex; }
+    .nav__meta{ display:none; }
+    #navAuth{ display:none; }
+  }
+
+  .mmenu{
+    position:fixed; inset:0; z-index:200;
+    display:flex; flex-direction:column;
+    background:var(--bg); opacity:0; visibility:hidden;
+    transition:opacity .5s var(--e-expo),visibility .5s;
+    overflow:hidden;
+  }
+  .mmenu.is-open{ opacity:1; visibility:visible; }
+  .mmenu::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:80px 80px; pointer-events:none;
+    mask-image:radial-gradient(ellipse 90% 90% at 50% 30%,rgba(0,0,0,.55) 0%,transparent 100%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 90% at 50% 30%,rgba(0,0,0,.55) 0%,transparent 100%);
+  }
+  .mmenu::after{
+    content:""; position:absolute;
+    width:60vw; height:60vw; border-radius:50%;
+    background:radial-gradient(circle,var(--accent) 0%,transparent 70%);
+    filter:blur(100px); opacity:.05;
+    top:-15%; right:-10%; pointer-events:none;
+  }
+  .mmenu__head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:clamp(18px,3vw,28px) clamp(20px,5vw,32px);
+    border-bottom:1px solid var(--line);
+    position:relative; z-index:1; flex-shrink:0;
+  }
+  .mmenu__brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:1.2rem; color:var(--cream); text-decoration:none;
+  }
+  .mmenu__brand img{
+    width:28px; height:28px; object-fit:contain;
+    filter:drop-shadow(0 0 10px var(--accent-glow));
+  }
+  .mmenu__close{
+    width:38px; height:38px; background:transparent;
+    border:1px solid var(--line-strong); border-radius:50%;
+    color:var(--muted); font-size:.85rem;
+    font-family:'JetBrains Mono',monospace;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all .3s var(--e-expo);
+  }
+  .mmenu__close:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .mmenu__nav{
+    flex:1; overflow-y:auto;
+    display:flex; flex-direction:column; justify-content:center;
+    padding:0 clamp(24px,7vw,48px);
+    position:relative; z-index:1;
+  }
+  .mmenu__link{
+    display:flex; align-items:baseline; gap:14px;
+    text-decoration:none;
+    padding:clamp(13px,3vw,19px) 0;
+    border-bottom:1px solid var(--line);
+    position:relative; overflow:hidden;
+    opacity:0; transform:translateY(28px);
+    transition:opacity .55s var(--e-expo),transform .55s var(--e-expo),color .3s;
+  }
+  .mmenu.is-open .mmenu__link{ opacity:1; transform:translateY(0); }
+  .mmenu.is-open .mmenu__link:nth-child(1){ transition-delay:.06s; }
+  .mmenu.is-open .mmenu__link:nth-child(2){ transition-delay:.13s; }
+  .mmenu.is-open .mmenu__link:nth-child(3){ transition-delay:.20s; }
+  .mmenu.is-open .mmenu__link:nth-child(4){ transition-delay:.27s; }
+  .mmenu.is-open .mmenu__link:nth-child(5){ transition-delay:.34s; }
+  .mmenu__link::before{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to right,var(--accent-soft),transparent 55%);
+    transform:scaleX(0); transform-origin:left;
+    transition:transform .5s var(--e-expo);
+  }
+  .mmenu__link:hover::before{ transform:scaleX(1); }
+  .mmenu__link.is-active::before{ transform:scaleX(.5); opacity:.7; }
+  .mmenu__num{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.58rem; letter-spacing:2px; text-transform:uppercase;
+    color:var(--muted); transition:color .3s;
+    flex-shrink:0; position:relative; z-index:1;
+  }
+  .mmenu__text{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(2rem,9vw,3.4rem);
+    line-height:1; letter-spacing:-.02em;
+    color:var(--cream-soft);
+    transition:color .4s var(--e-expo);
+    position:relative; z-index:1; flex:1;
+  }
+  .mmenu__arrow{
+    font-family:'JetBrains Mono',monospace; font-style:normal;
+    font-size:.85rem; color:var(--accent);
+    opacity:0; transform:translateX(-10px);
+    transition:opacity .35s var(--e-expo),transform .35s var(--e-expo);
+    position:relative; z-index:1;
+  }
+  .mmenu__link:hover .mmenu__num,
+  .mmenu__link.is-active .mmenu__num{ color:var(--accent); }
+  .mmenu__link:hover .mmenu__text,
+  .mmenu__link.is-active .mmenu__text{ color:var(--accent); }
+  .mmenu__link:hover .mmenu__arrow{ opacity:1; transform:translateX(0); }
+  .mmenu__link.is-active .mmenu__arrow{ opacity:.5; transform:translateX(0); }
+  .mmenu__foot{
+    border-top:1px solid var(--line);
+    padding:clamp(20px,4vw,28px) clamp(24px,7vw,48px);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
+    position:relative; z-index:1; flex-shrink:0;
+    opacity:0; transform:translateY(14px);
+    transition:opacity .55s var(--e-expo) .38s,transform .55s var(--e-expo) .38s;
+  }
+  .mmenu.is-open .mmenu__foot{ opacity:1; transform:translateY(0); }
+  .mmenu__status{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.66rem; text-transform:uppercase; letter-spacing:2px;
+    color:var(--cream-soft); display:flex; align-items:center; gap:8px;
+  }
+  .mmenu__dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 8px var(--accent);
+    animation:pulse 2s ease-in-out infinite;
+  }
+  .mmenu__login{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.7rem; text-transform:uppercase; letter-spacing:2px;
+    padding:10px 22px; border:1px solid var(--accent); border-radius:999px;
+    color:var(--accent); background:var(--accent-soft); cursor:pointer;
+    transition:all .4s var(--e-expo); box-shadow:0 0 16px -4px var(--accent-glow);
+  }
+  .mmenu__login:hover{ background:var(--accent); color:var(--bg); }
+  .mmenu__user-info{ display:flex; align-items:center; gap:10px; }
+  .mmenu__avatar{
+    width:32px; height:32px; border-radius:50%;
+    object-fit:cover; border:1.5px solid var(--accent);
+    box-shadow:0 0 8px var(--accent-glow); flex-shrink:0;
+  }
+  .mmenu__uname{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.66rem; letter-spacing:1px; color:var(--cream-soft);
+    max-width:160px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+  }
+  .mmenu__mlogout{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.62rem; text-transform:uppercase; letter-spacing:1.5px;
+    background:transparent; border:1px solid var(--line-strong);
+    color:var(--muted); padding:6px 14px; border-radius:999px;
+    cursor:pointer; transition:all .3s var(--e-expo);
+  }
+  .mmenu__mlogout:hover{ border-color:#ff6b6b; color:#ff6b6b; background:rgba(255,107,107,.06); }
 </style>
 </head>
 <body>
@@ -676,7 +860,7 @@
     <a href="proyectos.html" class="active">Proyectos</a>
     <a href="index.html#contacto">Contacto</a>
   </nav>
-  <div style="display:flex;align-items:center;gap:clamp(12px,2vw,24px)">
+  <div class="nav__right">
     <div class="nav__meta"><span><span class="dot"></span>EN LÍNEA</span></div>
     <div id="navAuth">
       <button class="nav__login-btn" id="navLoginBtn">Acceder</button>
@@ -686,6 +870,10 @@
         <button class="nav__logout" id="navLogout">Salir</button>
       </div>
     </div>
+    <button class="nav__hamburger" id="hamburger"
+            aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
   </div>
 </header>
 
@@ -887,6 +1075,58 @@
   </div>
 </footer>
 
+<!-- ══ MOBILE MENU ══ -->
+<div class="mmenu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+  <div class="mmenu__head">
+    <a class="mmenu__brand" href="index.html">
+      <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logidma" />
+      <span>Logidma</span>
+    </a>
+    <button class="mmenu__close" id="menuClose" aria-label="Cerrar menú">✕</button>
+  </div>
+  <nav class="mmenu__nav" aria-label="Secciones">
+    <a class="mmenu__link" href="index.html#etimologia">
+      <span class="mmenu__num">01 /</span>
+      <span class="mmenu__text">Concepto</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link" href="index.html#filosofia">
+      <span class="mmenu__num">02 /</span>
+      <span class="mmenu__text">Filosofía</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link is-active" href="proyectos.html">
+      <span class="mmenu__num">03 /</span>
+      <span class="mmenu__text">Proyectos</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link" href="index.html#arquitecto">
+      <span class="mmenu__num">04 /</span>
+      <span class="mmenu__text">Arquitecto</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link" href="index.html#contacto">
+      <span class="mmenu__num">05 /</span>
+      <span class="mmenu__text">Contacto</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+  </nav>
+  <div class="mmenu__foot">
+    <div class="mmenu__status">
+      <span class="mmenu__dot"></span>
+      EN LÍNEA
+    </div>
+    <div id="mmenuAuth">
+      <button class="mmenu__login" id="mmenuLoginBtn">Acceder</button>
+      <div class="mmenu__user-info" id="mmenuUser" style="display:none">
+        <img class="mmenu__avatar" id="mmenuAvatar" alt="" src="" />
+        <span class="mmenu__uname" id="mmenuUname"></span>
+        <button class="mmenu__mlogout" id="mmenuLogout">Salir</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- ══ FIREBASE AUTH ══ -->
 <script type="module">
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
@@ -934,6 +1174,44 @@ guestLoginBtn && guestLoginBtn.addEventListener('click', () => toIndex('login'))
 navLoginBtn   && navLoginBtn.addEventListener('click',  () => toIndex('login'));
 navLogout     && navLogout.addEventListener('click',    () => signOut(auth));
 
+/* Mobile menu */
+const hamburger  = document.getElementById('hamburger');
+const mobileMenu = document.getElementById('mobileMenu');
+const menuClose  = document.getElementById('menuClose');
+const mmLoginBtn = document.getElementById('mmenuLoginBtn');
+const mmUser     = document.getElementById('mmenuUser');
+const mmAvatar   = document.getElementById('mmenuAvatar');
+const mmUname    = document.getElementById('mmenuUname');
+const mmLogout   = document.getElementById('mmenuLogout');
+
+function openMobileMenu() {
+  hamburger.classList.add('is-open');
+  mobileMenu.classList.add('is-open');
+  document.body.style.overflow = 'hidden';
+  hamburger.setAttribute('aria-expanded', 'true');
+}
+function closeMobileMenu() {
+  hamburger.classList.remove('is-open');
+  mobileMenu.classList.remove('is-open');
+  document.body.style.overflow = '';
+  hamburger.setAttribute('aria-expanded', 'false');
+}
+
+hamburger && hamburger.addEventListener('click', () =>
+  mobileMenu.classList.contains('is-open') ? closeMobileMenu() : openMobileMenu()
+);
+menuClose && menuClose.addEventListener('click', closeMobileMenu);
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('is-open'))
+    closeMobileMenu();
+});
+
+mmLoginBtn && mmLoginBtn.addEventListener('click', () => {
+  closeMobileMenu();
+  setTimeout(() => toIndex('login'), 100);
+});
+mmLogout && mmLogout.addEventListener('click', () => signOut(auth));
+
 /* Scroll / progress */
 const nav = document.getElementById('nav');
 const pBar = document.getElementById('progressBar');
@@ -948,19 +1226,34 @@ window.addEventListener('scroll', () => {
 onAuthStateChanged(auth, user => {
   if (user) {
     showState(stateAuthed);
-    if (navLoginBtn)  navLoginBtn.style.display  = 'none';
-    if (navUser)      navUser.style.display      = 'flex';
+    // Desktop nav
+    if (navLoginBtn)   navLoginBtn.style.display   = 'none';
+    if (navUser)       navUser.style.display       = 'flex';
     const name = user.displayName ? user.displayName.split(' ')[0] : user.email.split('@')[0];
-    if (navUserName)  navUserName.textContent    = user.displayName || user.email.split('@')[0];
-    if (userNameEl)   userNameEl.textContent     = name;
+    if (navUserName)   navUserName.textContent     = user.displayName || user.email.split('@')[0];
+    if (userNameEl)    userNameEl.textContent      = name;
     if (navUserAvatar) {
       navUserAvatar.src           = user.photoURL || '';
       navUserAvatar.style.display = user.photoURL ? 'block' : 'none';
     }
+    // Mobile menu
+    if (mmLoginBtn) mmLoginBtn.style.display = 'none';
+    if (mmUser)     mmUser.style.display     = 'flex';
+    if (mmUname)    mmUname.textContent      = user.displayName || user.email.split('@')[0];
+    if (mmAvatar) {
+      mmAvatar.src           = user.photoURL || '';
+      mmAvatar.style.display = user.photoURL ? 'block' : 'none';
+    }
+    hamburger && hamburger.setAttribute('data-authed', 'true');
   } else {
     showState(stateGuest);
+    // Desktop nav
     if (navLoginBtn) navLoginBtn.style.display = '';
     if (navUser)     navUser.style.display     = 'none';
+    // Mobile menu
+    if (mmLoginBtn) mmLoginBtn.style.display = '';
+    if (mmUser)     mmUser.style.display     = 'none';
+    hamburger && hamburger.removeAttribute('data-authed');
   }
 });
 </script>
