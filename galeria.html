@@ -584,13 +584,14 @@
 
   /* ── PHOTO GRID ── */
   .photo-grid{
-    columns:3; column-gap:20px;
+    columns: auto;
+    column-width: clamp(240px, 28vw, 380px);
+    column-gap: clamp(14px, 1.8vw, 22px);
   }
-  @media(max-width:900px){ .photo-grid{ columns:2; column-gap:16px; } }
-  @media(max-width:520px){ .photo-grid{ columns:1; } }
 
   .photo-card{
-    break-inside:avoid; margin-bottom:20px;
+    break-inside:avoid;
+    margin-bottom: clamp(14px, 1.8vw, 22px);
     border-radius:2px; overflow:hidden;
     background:var(--bg);
     border:1px solid rgba(176,141,87,.07);
@@ -598,7 +599,6 @@
     transition:transform .35s var(--e-expo), box-shadow .6s var(--e-expo), border-color .5s var(--e-expo);
     opacity:0; transform:translateY(28px);
     will-change:transform, opacity;
-    transform-style:preserve-3d;
   }
   .photo-card.is-visible{
     opacity:1; transform:translateY(0);
@@ -654,13 +654,6 @@
     opacity:1; transition:opacity .5s var(--e-expo);
   }
   .photo-card__imgwrap.loaded::before{ opacity:0; }
-  /* Soft inner vignette — appears on hover for depth */
-  .photo-card__imgwrap::after{
-    content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
-    box-shadow:inset 0 0 55px rgba(10,9,8,.32);
-    opacity:0; transition:opacity .6s var(--e-expo);
-  }
-  .photo-card:hover .photo-card__imgwrap::after{ opacity:1; }
   @keyframes shimmer{
     from{ background-position:-200% 0; }
     to{ background-position:200% 0; }
@@ -669,15 +662,15 @@
   .photo-card__img{
     display:block; width:100%; height:auto;
     transition:transform 1.6s var(--e-expo), filter 1s var(--e-expo), opacity .8s var(--e-expo);
-    filter:brightness(.9) saturate(1.05);
+    filter:brightness(.9) saturate(1.04);
     opacity:0; position:relative; z-index:2;
   }
   .photo-card__img.loaded{ opacity:1; }
-  .photo-card:hover .photo-card__img{ transform:scale(1.06); filter:brightness(1.04) saturate(1.1); }
+  .photo-card:hover .photo-card__img{ transform:scale(1.05); filter:brightness(1.03) saturate(1.08); }
 
   /* Zoom hint — appears on hover */
   .photo-card__zoom{
-    position:absolute; right:14px; bottom:96px; z-index:4;
+    position:absolute; right:12px; bottom:12px; z-index:4;
     width:38px; height:38px; border-radius:50%;
     background:var(--accent); color:var(--bg);
     display:flex; align-items:center; justify-content:center;
@@ -982,11 +975,13 @@
   }
 
   /* Skeleton cards (loading state) */
-  .skeleton-grid{ columns:3; column-gap:20px; }
-  @media(max-width:900px){ .skeleton-grid{ columns:2; column-gap:16px; } }
-  @media(max-width:520px){ .skeleton-grid{ columns:1; } }
+  .skeleton-grid{
+    columns: auto;
+    column-width: clamp(240px, 28vw, 380px);
+    column-gap: clamp(14px, 1.8vw, 22px);
+  }
   .skeleton{
-    break-inside:avoid; margin-bottom:20px;
+    break-inside:avoid; margin-bottom:clamp(14px,1.8vw,22px);
     background:var(--bg-2); border-radius:2px;
     overflow:hidden;
   }
@@ -2173,17 +2168,21 @@ if (supportsHover && !reducedMotion) {
     const r = card.getBoundingClientRect();
     const px = (e.clientX - r.left) / r.width  - 0.5;
     const py = (e.clientY - r.top)  / r.height - 0.5;
-    /* Subtle: max 3deg */
-    card.style.transform = `translateY(0) perspective(800px) rotateX(${(-py * 3).toFixed(2)}deg) rotateY(${(px * 3).toFixed(2)}deg)`;
+    card.style.transition = 'box-shadow .6s var(--e-expo), border-color .5s var(--e-expo)';
+    card.style.transform = `perspective(800px) rotateX(${(-py * 2.5).toFixed(2)}deg) rotateY(${(px * 2.5).toFixed(2)}deg)`;
   });
+  const resetTilt = card => {
+    card.style.transition = '';
+    card.style.transform = '';
+  };
   photoGrid.addEventListener('mouseleave', () => {
-    photoGrid.querySelectorAll('.photo-card').forEach(c => { c.style.transform = ''; });
+    photoGrid.querySelectorAll('.photo-card').forEach(resetTilt);
   });
   /* Reset on leaving an individual card too */
   photoGrid.addEventListener('mouseout', e => {
     const card = e.target.closest('.photo-card');
     if (card && !card.contains(e.relatedTarget)) {
-      card.style.transform = '';
+      resetTilt(card);
     }
   });
 }
