@@ -1179,7 +1179,7 @@ uploadSubmit.addEventListener('click', async () => {
     const ext  = selectedFile.name.split('.').pop();
     const path = `galeria/${currentUser.uid}/${Date.now()}.${ext}`;
     const sRef = ref(stor, path);
-    const task = uploadBytesResumable(sRef, selectedFile);
+    const task = uploadBytesResumable(sRef, selectedFile, { contentType: selectedFile.type });
 
     const url = await new Promise((resolve, reject) => {
       task.on('state_changed', null, reject,
