@@ -592,9 +592,10 @@
   .photo-card{
     break-inside:avoid; margin-bottom:20px;
     border-radius:2px; overflow:hidden;
-    background:var(--bg-2);
+    background:var(--bg);
+    border:1px solid rgba(176,141,87,.07);
     position:relative; cursor:zoom-in;
-    transition:transform .35s var(--e-expo), box-shadow .6s var(--e-expo);
+    transition:transform .35s var(--e-expo), box-shadow .6s var(--e-expo), border-color .5s var(--e-expo);
     opacity:0; transform:translateY(28px);
     will-change:transform, opacity;
     transform-style:preserve-3d;
@@ -604,7 +605,8 @@
     transition:opacity 1s var(--e-expo), transform 1s var(--e-expo);
   }
   .photo-card.is-visible:hover{
-    box-shadow:0 30px 80px -14px rgba(0,0,0,.78), 0 0 0 1px rgba(176,141,87,.18);
+    box-shadow:0 32px 80px -14px rgba(0,0,0,.82), 0 0 0 1px rgba(176,141,87,.32);
+    border-color:rgba(176,141,87,.26);
   }
 
   /* Bronze frame corners on hover */
@@ -616,8 +618,8 @@
   }
   .photo-card__corner--tl{ top:8px; left:8px; border-width:1px 0 0 1px; transform:translate(-6px,-6px); }
   .photo-card__corner--tr{ top:8px; right:8px; border-width:1px 1px 0 0; transform:translate(6px,-6px); }
-  .photo-card__corner--bl{ bottom:74px; left:8px; border-width:0 0 1px 1px; transform:translate(-6px,6px); }
-  .photo-card__corner--br{ bottom:74px; right:8px; border-width:0 1px 1px 0; transform:translate(6px,6px); }
+  .photo-card__corner--bl{ bottom:8px; left:8px; border-width:0 0 1px 1px; transform:translate(-6px,6px); }
+  .photo-card__corner--br{ bottom:8px; right:8px; border-width:0 1px 1px 0; transform:translate(6px,6px); }
   .photo-card:hover .photo-card__corner{ opacity:1; transform:translate(0,0); }
 
   /* Number badge — top-left wall label */
@@ -652,6 +654,13 @@
     opacity:1; transition:opacity .5s var(--e-expo);
   }
   .photo-card__imgwrap.loaded::before{ opacity:0; }
+  /* Soft inner vignette — appears on hover for depth */
+  .photo-card__imgwrap::after{
+    content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
+    box-shadow:inset 0 0 55px rgba(10,9,8,.32);
+    opacity:0; transition:opacity .6s var(--e-expo);
+  }
+  .photo-card:hover .photo-card__imgwrap::after{ opacity:1; }
   @keyframes shimmer{
     from{ background-position:-200% 0; }
     to{ background-position:200% 0; }
@@ -679,39 +688,31 @@
   .photo-card:hover .photo-card__zoom{ opacity:1; transform:scale(1) rotate(0); }
   .photo-card__zoom svg{ width:14px; height:14px; }
 
-  /* Wall-label body */
+  /* Wall-label body — gallery placard */
   .photo-card__body{
-    padding:14px 16px 14px;
-    border-top:1px solid var(--line);
-    background:var(--bg-2);
+    padding:10px 14px 12px;
+    border-top:1px solid rgba(176,141,87,.2);
+    background:var(--bg);
     position:relative; z-index:2;
   }
-  .photo-card__author{
-    display:flex; align-items:center; gap:9px; margin-bottom:10px;
-  }
-  .photo-card__avatar{
-    width:22px; height:22px; border-radius:50%; object-fit:cover;
-    border:1px solid var(--bronze); flex-shrink:0;
-    background:var(--bg-2);
-    display:flex; align-items:center; justify-content:center;
-    font-family:'JetBrains Mono',monospace; font-size:.6rem;
-    color:var(--bronze); text-transform:uppercase;
+  .photo-card__label{
+    display:flex; align-items:center; justify-content:space-between;
+    gap:10px; margin-bottom:5px;
   }
   .photo-card__name{
-    font-family:'JetBrains Mono',monospace; font-size:.62rem;
-    letter-spacing:1.5px; color:var(--cream-soft); text-transform:uppercase;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:.9rem; line-height:1.1; letter-spacing:.2px;
+    color:var(--cream); min-width:0; overflow:hidden;
+    text-overflow:ellipsis; white-space:nowrap;
   }
   .photo-card__desc{
     font-family:'Instrument Serif',serif; font-style:italic;
-    font-size:.95rem; color:var(--cream-soft); line-height:1.5;
-    margin-bottom:14px; display:-webkit-box;
-    -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
-  }
-  .photo-card__footer{
-    display:flex; align-items:center; justify-content:space-between;
+    font-size:.8rem; color:var(--cream-soft); line-height:1.5;
+    margin-bottom:7px; display:-webkit-box;
+    -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden;
   }
   .photo-card__time{
-    font-family:'JetBrains Mono',monospace; font-size:.56rem;
+    font-family:'JetBrains Mono',monospace; font-size:.52rem;
     color:var(--muted); letter-spacing:1.5px; text-transform:uppercase;
   }
 
@@ -767,42 +768,6 @@
   .photo-card.is-removing{
     opacity:0; transform:scale(.95) translateY(-8px);
     transition:opacity .35s var(--e-expo), transform .35s var(--e-expo);
-  }
-
-  /* ── FIRMA DEL CREADOR (watermark overlay) ── */
-  .photo-card__firma{
-    position:absolute; bottom:0; right:0; z-index:3;
-    padding:36px 12px 9px 40px;
-    background:linear-gradient(
-      to top left,
-      rgba(10,9,8,.84) 0%,
-      rgba(10,9,8,.55) 48%,
-      transparent 100%
-    );
-    display:flex; flex-direction:column; align-items:flex-end; gap:4px;
-    pointer-events:none;
-    opacity:0.42;
-    transition:opacity .55s var(--e-expo);
-  }
-  .photo-card:hover .photo-card__firma{ opacity:0.92; }
-  .firma__name{
-    font-family:'Instrument Serif',serif; font-style:italic;
-    font-size:.74rem; line-height:1; letter-spacing:.3px;
-    color:var(--cream);
-    text-shadow:0 1px 6px rgba(0,0,0,.95), 0 0 20px rgba(0,0,0,.6);
-  }
-  .firma__row{
-    display:flex; align-items:center; gap:5px;
-    font-family:'JetBrains Mono',monospace; font-size:.52rem; letter-spacing:1px;
-  }
-  .firma__likes{
-    color:var(--bronze);
-    text-shadow:0 1px 5px rgba(0,0,0,.9);
-  }
-  .firma__sep{ color:var(--muted); opacity:.55; }
-  .firma__date{
-    color:var(--cream-soft); opacity:.75;
-    text-shadow:0 1px 4px rgba(0,0,0,.9);
   }
 
   /* ── EMPTY STATE ── */
@@ -919,36 +884,6 @@
   .lightbox__frame--tr{ top:-12px; right:-12px; border-width:1px 1px 0 0; }
   .lightbox__frame--bl{ bottom:-12px; left:-12px; border-width:0 0 1px 1px; }
   .lightbox__frame--br{ bottom:-12px; right:-12px; border-width:0 1px 1px 0; }
-
-  /* Firma overlay inside lightbox image */
-  .lightbox__firma{
-    position:absolute; bottom:0; left:0; z-index:4;
-    padding:40px 24px 14px 16px;
-    background:linear-gradient(
-      to top right,
-      rgba(10,9,8,.78) 0%,
-      rgba(10,9,8,.45) 52%,
-      transparent 100%
-    );
-    display:flex; flex-direction:column; align-items:flex-start; gap:4px;
-    pointer-events:none;
-    opacity:0; transition:opacity .6s var(--e-expo) .35s;
-  }
-  .lightbox.open .lightbox__firma{ opacity:0.55; }
-  .lightbox__imgwrap:hover .lightbox__firma{ opacity:0.85; }
-  .lbfirma__name{
-    font-family:'Instrument Serif',serif; font-style:italic;
-    font-size:.82rem; line-height:1; letter-spacing:.3px;
-    color:var(--cream);
-    text-shadow:0 1px 8px rgba(0,0,0,.95), 0 0 24px rgba(0,0,0,.7);
-  }
-  .lbfirma__row{
-    display:flex; align-items:center; gap:6px;
-    font-family:'JetBrains Mono',monospace; font-size:.56rem; letter-spacing:1.2px;
-  }
-  .lbfirma__likes{ color:var(--bronze); text-shadow:0 1px 5px rgba(0,0,0,.9); }
-  .lbfirma__sep{ color:var(--muted); opacity:.55; }
-  .lbfirma__date{ color:var(--cream-soft); opacity:.75; text-shadow:0 1px 4px rgba(0,0,0,.9); }
 
   /* Nav arrows — prev / next */
   .lightbox__nav{
@@ -1439,14 +1374,6 @@
       <span class="lightbox__frame lightbox__frame--bl"></span>
       <span class="lightbox__frame lightbox__frame--br"></span>
       <img class="lightbox__img" id="lightboxImg" alt="" />
-      <div class="lightbox__firma" id="lightboxFirma" aria-hidden="true">
-        <span class="lbfirma__name" id="lightboxFirmaName"></span>
-        <span class="lbfirma__row">
-          <span class="lbfirma__likes">♥ <span id="lightboxFirmaLikes">0</span></span>
-          <span class="lbfirma__sep">·</span>
-          <span class="lbfirma__date" id="lightboxFirmaDate"></span>
-        </span>
-      </div>
     </div>
 
     <button class="lightbox__nav lightbox__nav--next" id="lightboxNext" aria-label="Siguiente">
@@ -1795,24 +1722,16 @@ function render() {
 
 /* ── BUILD CARD ── */
 function buildCard(post, idx) {
-  const isOwner   = currentUser && currentUser.uid === post.userId;
-  const liked     = likedPosts.has(post.id);
-  const time      = post.createdAt ? formatTime(post.createdAt.toDate()) : '';
-  const firmaDate = post.createdAt
-    ? post.createdAt.toDate().toLocaleDateString('es-MX', { day:'numeric', month:'short' })
-    : '';
+  const isOwner = currentUser && currentUser.uid === post.userId;
+  const liked   = likedPosts.has(post.id);
+  const time    = post.createdAt ? formatTime(post.createdAt.toDate()) : '';
   const num     = String(idx + 1).padStart(3, '0');
-  const initial = (post.userName || '?')[0].toUpperCase();
 
   const card = document.createElement('article');
   card.className = 'photo-card';
   card.setAttribute('role', 'listitem');
   card.dataset.id  = post.id;
   card.dataset.idx = idx;
-
-  const avatarHtml = post.userAvatar
-    ? `<img class="photo-card__avatar" src="${escAttr(post.userAvatar)}" alt="${escAttr(post.userName)}" />`
-    : `<div class="photo-card__avatar" aria-hidden="true">${escHtml(initial)}</div>`;
 
   card.innerHTML = `
     <span class="photo-card__corner photo-card__corner--tl" aria-hidden="true"></span>
@@ -1833,24 +1752,11 @@ function buildCard(post, idx) {
           <line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/>
         </svg>
       </div>
-      <div class="photo-card__firma" aria-hidden="true">
-        <span class="firma__name">${escHtml(post.userName)}</span>
-        <span class="firma__row">
-          <span class="firma__likes">♥ <span class="firma__likes-count">${post.likesCount || 0}</span></span>
-          <span class="firma__sep">·</span>
-          <span class="firma__date">${escHtml(firmaDate)}</span>
-        </span>
-      </div>
     </div>
 
     <div class="photo-card__body">
-      <div class="photo-card__author">
-        ${avatarHtml}
+      <div class="photo-card__label">
         <span class="photo-card__name">${escHtml(post.userName)}</span>
-      </div>
-      ${post.description ? `<p class="photo-card__desc">"${escHtml(post.description)}"</p>` : ''}
-      <div class="photo-card__footer">
-        <span class="photo-card__time">${escHtml(time)}</span>
         <button class="like-btn ${liked ? 'liked' : ''}" aria-label="Me gusta" aria-pressed="${liked}">
           <span class="ring" aria-hidden="true"></span>
           <span class="ring" aria-hidden="true"></span>
@@ -1860,6 +1766,8 @@ function buildCard(post, idx) {
           <span class="like-btn__count">${post.likesCount || 0}</span>
         </button>
       </div>
+      ${post.description ? `<p class="photo-card__desc">${escHtml(post.description)}</p>` : ''}
+      <span class="photo-card__time">${escHtml(time)}</span>
     </div>
 
     ${isOwner ? `
@@ -2018,16 +1926,12 @@ function applyLikeVisuals(postId) {
     btn.setAttribute('aria-pressed', liked);
     svg.setAttribute('fill', liked ? 'currentColor' : 'none');
     count.textContent = post.likesCount || 0;
-    const firmaCount = card.querySelector('.firma__likes-count');
-    if (firmaCount) firmaCount.textContent = post.likesCount || 0;
   });
 
   if (lightboxIdxN >= 0 && sortedPosts[lightboxIdxN]?.id === postId) {
     lightboxLike.classList.toggle('liked', liked);
     lightboxLike.querySelector('svg').setAttribute('fill', liked ? 'currentColor' : 'none');
     lightboxLikeCount.textContent = post.likesCount || 0;
-    const lbFirmaLikes = document.getElementById('lightboxFirmaLikes');
-    if (lbFirmaLikes) lbFirmaLikes.textContent = post.likesCount || 0;
   }
 }
 
@@ -2109,16 +2013,6 @@ function openLightbox(idx) {
 
   /* Description */
   lightboxDesc.textContent = post.description || '';
-
-  /* Firma overlay */
-  const firmaNameEl  = document.getElementById('lightboxFirmaName');
-  const firmaLikesEl = document.getElementById('lightboxFirmaLikes');
-  const firmaDateEl  = document.getElementById('lightboxFirmaDate');
-  if (firmaNameEl)  firmaNameEl.textContent  = post.userName || '';
-  if (firmaLikesEl) firmaLikesEl.textContent = post.likesCount || 0;
-  if (firmaDateEl)  firmaDateEl.textContent  = post.createdAt
-    ? post.createdAt.toDate().toLocaleDateString('es-MX', { day:'numeric', month:'short' })
-    : '';
 
   /* Like state */
   applyLikeVisuals(post.id);
