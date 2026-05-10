@@ -1081,7 +1081,7 @@ const firebaseConfig = {
 
 const app  = initializeApp(firebaseConfig);
 const auth = getAuth(app);
-const db   = getFirestore(app);
+const db   = getFirestore(app, 'galeria');
 const stor = getStorage(app);
 
 /* ── DOM ── */
