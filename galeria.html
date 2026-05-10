@@ -370,22 +370,48 @@
   .gallery-page{ padding-bottom:80px; }
 
   .gallery-hero{
-    padding:clamp(48px,8vw,80px) 0 clamp(32px,5vw,56px);
+    padding:clamp(56px,10vw,100px) 0 clamp(36px,6vw,72px);
+    position:relative;
   }
-  .gallery-hero__eyebrow{
-    font-family:'JetBrains Mono',monospace; font-size:.68rem;
+  .gallery-hero__edition{
+    display:inline-flex; align-items:center; gap:14px;
+    font-family:'JetBrains Mono',monospace; font-size:.6rem;
     text-transform:uppercase; letter-spacing:3px; color:var(--muted);
-    margin-bottom:20px;
+    margin-bottom:32px;
+    opacity:0; animation:heroFade .8s var(--e-expo) .1s forwards;
   }
+  .gallery-hero__edition::before{
+    content:""; width:32px; height:1px; background:var(--bronze);
+    display:block;
+  }
+  .gallery-hero__edition strong{ color:var(--bronze); font-weight:500; letter-spacing:3px; }
+
   .gallery-hero__title{
     font-family:'Instrument Serif',serif;
-    font-size:clamp(2.8rem,7vw,5rem);
-    line-height:0.95; margin-bottom:20px;
+    font-size:clamp(3rem,9vw,6.4rem);
+    line-height:0.92; margin-bottom:32px;
+    letter-spacing:-0.01em;
+    opacity:0; animation:heroFade 1s var(--e-expo) .25s forwards;
   }
   .gallery-hero__title em{ font-style:italic; color:var(--accent); }
-  .gallery-hero__desc{
-    font-size:clamp(.95rem,2vw,1.05rem); color:var(--cream-soft);
-    max-width:560px; line-height:1.7;
+
+  .gallery-hero__quote{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(1.05rem,2.2vw,1.3rem); color:var(--cream-soft);
+    max-width:540px; line-height:1.55; margin-bottom:14px;
+    padding-left:20px; border-left:1px solid var(--bronze);
+    opacity:0; animation:heroFade .9s var(--e-expo) .45s forwards;
+  }
+  .gallery-hero__sig{
+    font-family:'JetBrains Mono',monospace; font-size:.62rem;
+    text-transform:uppercase; letter-spacing:2.5px; color:var(--muted);
+    padding-left:20px;
+    opacity:0; animation:heroFade .8s var(--e-expo) .6s forwards;
+  }
+  .gallery-hero__sig::before{ content:"— "; color:var(--bronze); }
+  @keyframes heroFade{
+    from{ opacity:0; transform:translateY(14px); }
+    to{ opacity:1; transform:translateY(0); }
   }
 
   .section-divider{
@@ -503,103 +529,223 @@
   /* ── FILTER BAR ── */
   .filter-bar{
     display:flex; align-items:center; justify-content:space-between;
-    gap:16px; flex-wrap:wrap; margin-bottom:clamp(24px,4vw,36px);
+    gap:20px; flex-wrap:wrap; margin-bottom:clamp(28px,4vw,44px);
+    padding:18px 0;
+    border-top:1px solid var(--line); border-bottom:1px solid var(--line);
   }
+  .filter-bar__left{ display:flex; align-items:center; gap:18px; flex-wrap:wrap; }
   .filter-bar__label{
-    font-family:'JetBrains Mono',monospace; font-size:.66rem;
-    text-transform:uppercase; letter-spacing:2px; color:var(--muted);
+    font-family:'JetBrains Mono',monospace; font-size:.6rem;
+    text-transform:uppercase; letter-spacing:2.5px; color:var(--muted);
   }
   .filter-bar__count{
-    font-family:'JetBrains Mono',monospace; font-size:.78rem;
-    color:var(--accent);
+    font-family:'JetBrains Mono',monospace; font-size:.66rem;
+    color:var(--cream-soft); letter-spacing:1.5px;
   }
+  .filter-bar__count strong{ color:var(--accent); font-weight:500; }
+
+  .sort-toggle{
+    display:flex; gap:0;
+    border:1px solid var(--line-strong); border-radius:999px; padding:3px;
+  }
+  .sort-toggle__btn{
+    font-family:'JetBrains Mono',monospace; font-size:.6rem;
+    text-transform:uppercase; letter-spacing:2px;
+    background:transparent; border:none; color:var(--muted);
+    padding:6px 14px; border-radius:999px; cursor:pointer;
+    transition:all .35s var(--e-expo);
+  }
+  .sort-toggle__btn.active{
+    background:var(--accent); color:var(--bg);
+    box-shadow:0 0 12px -4px var(--accent-glow);
+  }
+  .sort-toggle__btn:not(.active):hover{ color:var(--cream); }
 
   /* ── PHOTO GRID ── */
   .photo-grid{
-    columns:3; column-gap:16px;
+    columns:3; column-gap:20px;
   }
-  @media(max-width:900px){ .photo-grid{ columns:2; } }
-  @media(max-width:500px){ .photo-grid{ columns:1; } }
+  @media(max-width:900px){ .photo-grid{ columns:2; column-gap:16px; } }
+  @media(max-width:520px){ .photo-grid{ columns:1; } }
 
   .photo-card{
-    break-inside:avoid; margin-bottom:16px;
-    border-radius:12px; overflow:hidden;
-    background:var(--surface); border:1px solid var(--line);
-    position:relative; cursor:pointer;
-    transition:transform .4s var(--e-expo), box-shadow .4s var(--e-expo), border-color .4s;
-    animation:cardIn .5s var(--e-expo) both;
+    break-inside:avoid; margin-bottom:20px;
+    border-radius:2px; overflow:hidden;
+    background:var(--bg-2);
+    position:relative; cursor:zoom-in;
+    transition:transform .6s var(--e-expo), box-shadow .6s var(--e-expo);
+    opacity:0; transform:translateY(28px);
+    will-change:transform, opacity;
   }
-  @keyframes cardIn{
-    from{ opacity:0; transform:translateY(16px) scale(.97); }
-    to{ opacity:1; transform:translateY(0) scale(1); }
+  .photo-card.is-visible{
+    opacity:1; transform:translateY(0);
+    transition:opacity .9s var(--e-expo), transform .9s var(--e-expo);
   }
   .photo-card:hover{
-    transform:translateY(-4px);
-    box-shadow:0 16px 48px -8px rgba(0,0,0,0.6);
-    border-color:var(--line-strong);
+    box-shadow:0 28px 70px -14px rgba(0,0,0,.75);
+  }
+
+  /* Bronze frame corners on hover */
+  .photo-card__corner{
+    position:absolute; pointer-events:none; z-index:3;
+    width:18px; height:18px;
+    border-color:var(--bronze); border-style:solid;
+    opacity:0; transition:opacity .5s var(--e-expo), transform .5s var(--e-expo);
+  }
+  .photo-card__corner--tl{ top:8px; left:8px; border-width:1px 0 0 1px; transform:translate(-6px,-6px); }
+  .photo-card__corner--tr{ top:8px; right:8px; border-width:1px 1px 0 0; transform:translate(6px,-6px); }
+  .photo-card__corner--bl{ bottom:74px; left:8px; border-width:0 0 1px 1px; transform:translate(-6px,6px); }
+  .photo-card__corner--br{ bottom:74px; right:8px; border-width:0 1px 1px 0; transform:translate(6px,6px); }
+  .photo-card:hover .photo-card__corner{ opacity:1; transform:translate(0,0); }
+
+  /* Number badge — top-left wall label */
+  .photo-card__num{
+    position:absolute; top:14px; left:14px; z-index:3;
+    font-family:'JetBrains Mono',monospace; font-size:.55rem;
+    letter-spacing:2.5px; color:var(--cream-soft);
+    background:rgba(10,9,8,.6); backdrop-filter:blur(10px);
+    padding:5px 9px; border-radius:2px;
+    border:1px solid rgba(235,229,214,.1);
+    opacity:0; transform:translateY(-6px);
+    transition:opacity .6s var(--e-expo) .15s, transform .6s var(--e-expo) .15s;
+  }
+  .photo-card.is-visible .photo-card__num{ opacity:.85; transform:translateY(0); }
+  .photo-card:hover .photo-card__num{ opacity:1; }
+
+  /* Image wrap — overflow hidden, shimmer loader */
+  .photo-card__imgwrap{
+    position:relative; overflow:hidden;
+    background:var(--surface);
+    min-height:140px;
+  }
+  .photo-card__imgwrap::before{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(90deg,
+      var(--surface) 0%,
+      var(--bg-2) 45%,
+      var(--surface) 100%);
+    background-size:200% 100%;
+    animation:shimmer 1.8s linear infinite;
+    z-index:1; pointer-events:none;
+    opacity:1; transition:opacity .5s var(--e-expo);
+  }
+  .photo-card__imgwrap.loaded::before{ opacity:0; }
+  @keyframes shimmer{
+    from{ background-position:-200% 0; }
+    to{ background-position:200% 0; }
   }
 
   .photo-card__img{
     display:block; width:100%; height:auto;
-    transition:transform .6s var(--e-expo);
+    transition:transform 1.4s var(--e-expo), filter 1s var(--e-expo), opacity .8s var(--e-expo);
+    filter:brightness(.93);
+    opacity:0; position:relative; z-index:2;
   }
-  .photo-card:hover .photo-card__img{ transform:scale(1.03); }
+  .photo-card__img.loaded{ opacity:1; }
+  .photo-card:hover .photo-card__img{ transform:scale(1.05); filter:brightness(1.02); }
 
+  /* Zoom hint — appears on hover */
+  .photo-card__zoom{
+    position:absolute; right:14px; bottom:96px; z-index:4;
+    width:38px; height:38px; border-radius:50%;
+    background:var(--accent); color:var(--bg);
+    display:flex; align-items:center; justify-content:center;
+    opacity:0; transform:scale(.6) rotate(-15deg);
+    transition:all .5s var(--e-back);
+    box-shadow:0 8px 20px -2px var(--accent-glow);
+  }
+  .photo-card:hover .photo-card__zoom{ opacity:1; transform:scale(1) rotate(0); }
+  .photo-card__zoom svg{ width:14px; height:14px; }
+
+  /* Wall-label body */
   .photo-card__body{
-    padding:14px 16px 12px;
+    padding:14px 16px 14px;
+    border-top:1px solid var(--line);
+    background:var(--bg-2);
+    position:relative; z-index:2;
   }
   .photo-card__author{
-    display:flex; align-items:center; gap:8px; margin-bottom:8px;
+    display:flex; align-items:center; gap:9px; margin-bottom:10px;
   }
   .photo-card__avatar{
     width:22px; height:22px; border-radius:50%; object-fit:cover;
-    border:1px solid var(--accent); flex-shrink:0;
+    border:1px solid var(--bronze); flex-shrink:0;
     background:var(--bg-2);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:.6rem;
+    color:var(--bronze); text-transform:uppercase;
   }
   .photo-card__name{
-    font-family:'JetBrains Mono',monospace; font-size:.66rem;
-    letter-spacing:1px; color:var(--cream-soft);
+    font-family:'JetBrains Mono',monospace; font-size:.62rem;
+    letter-spacing:1.5px; color:var(--cream-soft); text-transform:uppercase;
   }
   .photo-card__desc{
-    font-size:.85rem; color:var(--cream-soft); line-height:1.5;
-    margin-bottom:12px; display:-webkit-box;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:.95rem; color:var(--cream-soft); line-height:1.5;
+    margin-bottom:14px; display:-webkit-box;
     -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;
   }
   .photo-card__footer{
     display:flex; align-items:center; justify-content:space-between;
   }
   .photo-card__time{
-    font-family:'JetBrains Mono',monospace; font-size:.6rem;
-    color:var(--muted); letter-spacing:1px;
+    font-family:'JetBrains Mono',monospace; font-size:.56rem;
+    color:var(--muted); letter-spacing:1.5px; text-transform:uppercase;
   }
+
+  /* Like — bloom + ring */
   .like-btn{
     display:flex; align-items:center; gap:6px;
     background:transparent; border:1px solid var(--line-strong);
-    color:var(--muted); border-radius:999px; padding:5px 12px;
-    font-family:'JetBrains Mono',monospace; font-size:.66rem;
-    cursor:pointer; transition:all .3s var(--e-expo);
-    letter-spacing:1px;
+    color:var(--muted); border-radius:999px; padding:5px 11px;
+    font-family:'JetBrains Mono',monospace; font-size:.62rem;
+    cursor:pointer; transition:all .35s var(--e-expo);
+    letter-spacing:1.2px; position:relative;
   }
   .like-btn svg{
-    width:13px; height:13px;
-    transition:transform .3s var(--e-back), fill .3s;
+    width:12px; height:12px;
+    transition:transform .35s var(--e-back), fill .3s;
   }
-  .like-btn:hover{ border-color:var(--accent); color:var(--accent); }
-  .like-btn:hover svg{ transform:scale(1.3); }
+  .like-btn:hover{ border-color:var(--bronze); color:var(--cream); }
+  .like-btn:hover svg{ transform:scale(1.25); }
   .like-btn.liked{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
-  .like-btn.liked svg{ fill:var(--accent); transform:scale(1.2); }
+  .like-btn.liked svg{ fill:var(--accent); }
+  .like-btn.bloom svg{ animation:heartBloom .65s var(--e-back); }
+  @keyframes heartBloom{
+    0%{ transform:scale(1); }
+    35%{ transform:scale(1.7); }
+    65%{ transform:scale(.88); }
+    100%{ transform:scale(1); }
+  }
+  .like-btn .ring{
+    position:absolute; inset:-4px; border-radius:999px;
+    border:1.5px solid var(--accent);
+    opacity:0; pointer-events:none;
+  }
+  .like-btn.bloom .ring{ animation:likeRing .85s var(--e-expo); }
+  .like-btn.bloom .ring:nth-child(2){ animation-delay:.18s; }
+  @keyframes likeRing{
+    0%{ opacity:.7; transform:scale(.92); }
+    100%{ opacity:0; transform:scale(1.55); }
+  }
 
   .photo-card__delete{
-    position:absolute; top:10px; right:10px;
-    width:28px; height:28px; border-radius:50%;
-    background:rgba(10,9,8,.8); border:1px solid var(--line-strong);
+    position:absolute; top:14px; right:14px; z-index:4;
+    width:30px; height:30px; border-radius:2px;
+    background:rgba(10,9,8,.7); border:1px solid var(--line-strong);
     color:var(--muted); display:flex; align-items:center; justify-content:center;
     cursor:pointer; opacity:0; transition:all .3s;
-    backdrop-filter:blur(8px);
+    backdrop-filter:blur(10px);
   }
   .photo-card:hover .photo-card__delete{ opacity:1; }
   .photo-card__delete:hover{ border-color:#ff6b6b; color:#ff6b6b; background:rgba(255,107,107,.12); }
   .photo-card__delete svg{ width:12px; height:12px; }
+
+  /* Removing animation */
+  .photo-card.is-removing{
+    opacity:0; transform:scale(.95) translateY(-8px);
+    transition:opacity .35s var(--e-expo), transform .35s var(--e-expo);
+  }
 
   /* ── EMPTY STATE ── */
   .empty-state{
@@ -619,55 +765,216 @@
     font-size:.9rem; color:var(--muted); max-width:380px; margin:0 auto;
   }
 
-  /* ── LIGHTBOX ── */
+  /* ── LIGHTBOX (viewing room) ── */
   .lightbox{
     position:fixed; inset:0; z-index:200;
-    background:rgba(0,0,0,.92); backdrop-filter:blur(20px);
-    display:flex; align-items:center; justify-content:center;
+    background:rgba(0,0,0,.96);
+    backdrop-filter:blur(28px); -webkit-backdrop-filter:blur(28px);
+    display:flex; flex-direction:column;
     opacity:0; visibility:hidden;
-    transition:opacity .4s var(--e-expo), visibility .4s;
-    padding:clamp(16px,4vw,32px);
+    transition:opacity .55s var(--e-expo), visibility .55s;
   }
   .lightbox.open{ opacity:1; visibility:visible; }
-  .lightbox__inner{
-    max-width:900px; width:100%;
-    display:flex; flex-direction:column;
-    gap:16px;
-    transform:scale(.94);
-    transition:transform .4s var(--e-expo);
+
+  /* Subtle scan-line atmosphere */
+  .lightbox::before{
+    content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(
+      0deg, transparent 0px, transparent 4px,
+      rgba(196,255,58,0.012) 4px, rgba(196,255,58,0.012) 5px);
+    pointer-events:none; z-index:1;
   }
-  .lightbox.open .lightbox__inner{ transform:scale(1); }
-  .lightbox__img{
-    width:100%; max-height:70vh; object-fit:contain; border-radius:12px;
-    display:block;
+
+  /* Top bar — counter + close */
+  .lightbox__topbar{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:clamp(18px,3vw,28px) clamp(20px,4vw,40px);
+    border-bottom:1px solid var(--line);
+    position:relative; z-index:3;
+    opacity:0; transform:translateY(-12px);
+    transition:opacity .55s var(--e-expo) .15s, transform .55s var(--e-expo) .15s;
   }
-  .lightbox__meta{
-    display:flex; align-items:flex-start; justify-content:space-between;
-    gap:16px; flex-wrap:wrap;
+  .lightbox.open .lightbox__topbar{ opacity:1; transform:translateY(0); }
+
+  .lightbox__counter{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    letter-spacing:3px; color:var(--cream-soft); text-transform:uppercase;
+    display:flex; align-items:center; gap:10px;
   }
-  .lightbox__info{ flex:1; }
-  .lightbox__author{
-    display:flex; align-items:center; gap:8px; margin-bottom:8px;
-  }
-  .lightbox__avatar{
-    width:26px; height:26px; border-radius:50%; object-fit:cover;
-    border:1.5px solid var(--accent);
-  }
-  .lightbox__name{
-    font-family:'JetBrains Mono',monospace; font-size:.68rem;
-    color:var(--cream-soft); letter-spacing:1px;
-  }
-  .lightbox__desc{
-    font-size:.95rem; color:var(--cream-soft); line-height:1.6;
-  }
+  .lightbox__counter strong{ color:var(--accent); font-weight:500; min-width:24px; }
+  .lightbox__counter span{ color:var(--muted); }
+  .lightbox__counter em{ font-style:normal; color:var(--bronze); margin-right:14px; padding-right:14px; border-right:1px solid var(--line); }
+
   .lightbox__close{
-    width:36px; height:36px; border-radius:50%; flex-shrink:0;
-    background:var(--surface); border:1px solid var(--line-strong);
+    width:40px; height:40px; border-radius:50%;
+    background:transparent; border:1px solid var(--line-strong);
     color:var(--cream-soft); cursor:pointer;
     display:flex; align-items:center; justify-content:center;
-    transition:all .3s; font-size:1.1rem;
+    transition:all .35s var(--e-expo); font-size:.95rem;
   }
-  .lightbox__close:hover{ border-color:var(--accent); color:var(--accent); }
+  .lightbox__close:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); transform:rotate(90deg); }
+
+  /* Stage — main viewing area */
+  .lightbox__stage{
+    flex:1; display:flex; align-items:center; justify-content:center;
+    position:relative; padding:clamp(16px,3vw,32px);
+    min-height:0; z-index:2;
+  }
+  .lightbox__imgwrap{
+    position:relative; max-width:100%; max-height:100%;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .lightbox__img{
+    max-width:100%; max-height:72vh; object-fit:contain;
+    border-radius:2px; display:block;
+    box-shadow:
+      0 50px 110px -20px rgba(0,0,0,.85),
+      0 0 0 1px rgba(176,141,87,.18);
+    opacity:0; transform:scale(.96);
+    transition:opacity .5s var(--e-expo), transform .6s var(--e-expo);
+  }
+  .lightbox__img.loaded{ opacity:1; transform:scale(1); }
+
+  /* Frame corners around lightbox image */
+  .lightbox__frame{
+    position:absolute; pointer-events:none;
+    width:24px; height:24px;
+    border-color:var(--bronze); border-style:solid;
+    opacity:0; transition:opacity .6s var(--e-expo) .3s;
+  }
+  .lightbox.open .lightbox__frame{ opacity:.7; }
+  .lightbox__frame--tl{ top:-12px; left:-12px; border-width:1px 0 0 1px; }
+  .lightbox__frame--tr{ top:-12px; right:-12px; border-width:1px 1px 0 0; }
+  .lightbox__frame--bl{ bottom:-12px; left:-12px; border-width:0 0 1px 1px; }
+  .lightbox__frame--br{ bottom:-12px; right:-12px; border-width:0 1px 1px 0; }
+
+  /* Nav arrows — prev / next */
+  .lightbox__nav{
+    position:absolute; top:50%; transform:translateY(-50%);
+    width:54px; height:54px; border-radius:50%;
+    background:rgba(22,20,15,.72); backdrop-filter:blur(14px); -webkit-backdrop-filter:blur(14px);
+    border:1px solid var(--line-strong); color:var(--cream-soft);
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:all .4s var(--e-expo); z-index:4;
+  }
+  .lightbox__nav:hover{
+    background:var(--accent); color:var(--bg); border-color:var(--accent);
+    transform:translateY(-50%) scale(1.08);
+    box-shadow:0 0 24px -4px var(--accent-glow);
+  }
+  .lightbox__nav:disabled{ opacity:.3; cursor:not-allowed; }
+  .lightbox__nav:disabled:hover{ background:rgba(22,20,15,.72); color:var(--cream-soft); transform:translateY(-50%); box-shadow:none; }
+  .lightbox__nav--prev{ left:clamp(12px,3vw,32px); }
+  .lightbox__nav--next{ right:clamp(12px,3vw,32px); }
+  .lightbox__nav svg{ width:18px; height:18px; }
+  @media(max-width:680px){
+    .lightbox__nav{ width:42px; height:42px; }
+    .lightbox__nav--prev{ left:8px; }
+    .lightbox__nav--next{ right:8px; }
+    .lightbox__nav svg{ width:14px; height:14px; }
+  }
+
+  /* Wall label — author + description + like */
+  .lightbox__label{
+    border-top:1px solid var(--line);
+    padding:clamp(20px,3vw,32px) clamp(20px,4vw,40px);
+    display:grid; grid-template-columns:auto 1fr auto;
+    gap:clamp(20px,4vw,40px);
+    align-items:center; max-width:1100px; margin:0 auto; width:100%;
+    position:relative; z-index:3;
+    opacity:0; transform:translateY(16px);
+    transition:opacity .6s var(--e-expo) .3s, transform .6s var(--e-expo) .3s;
+  }
+  .lightbox.open .lightbox__label{ opacity:1; transform:translateY(0); }
+
+  .lightbox__author{
+    display:flex; align-items:center; gap:12px;
+  }
+  .lightbox__avatar{
+    width:34px; height:34px; border-radius:50%; object-fit:cover;
+    border:1.5px solid var(--bronze);
+    background:var(--bg-2);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'JetBrains Mono',monospace; font-size:.75rem;
+    color:var(--bronze); text-transform:uppercase;
+  }
+  .lightbox__authortxt{ display:flex; flex-direction:column; gap:3px; }
+  .lightbox__name{
+    font-family:'JetBrains Mono',monospace; font-size:.66rem;
+    color:var(--cream); letter-spacing:1.5px; text-transform:uppercase;
+  }
+  .lightbox__date{
+    font-family:'JetBrains Mono',monospace; font-size:.55rem;
+    color:var(--muted); letter-spacing:1.5px; text-transform:uppercase;
+  }
+
+  .lightbox__desc{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(.95rem,1.8vw,1.18rem); color:var(--cream-soft);
+    line-height:1.55; max-width:600px;
+    padding-left:20px; border-left:1px solid var(--bronze);
+  }
+  .lightbox__desc:empty{ display:none; }
+
+  .lightbox__like{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    letter-spacing:2px; color:var(--cream-soft);
+    display:flex; align-items:center; gap:8px;
+    padding:9px 16px; border:1px solid var(--line-strong); border-radius:999px;
+    background:transparent; cursor:pointer;
+    transition:all .35s var(--e-expo); position:relative;
+  }
+  .lightbox__like svg{ width:14px; height:14px; transition:all .3s; }
+  .lightbox__like:hover{ border-color:var(--bronze); color:var(--cream); }
+  .lightbox__like:hover svg{ transform:scale(1.2); }
+  .lightbox__like.liked{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .lightbox__like.liked svg{ fill:var(--accent); }
+  .lightbox__like.bloom svg{ animation:heartBloom .65s var(--e-back); }
+  .lightbox__like .ring{
+    position:absolute; inset:-4px; border-radius:999px;
+    border:1.5px solid var(--accent);
+    opacity:0; pointer-events:none;
+  }
+  .lightbox__like.bloom .ring{ animation:likeRing .85s var(--e-expo); }
+
+  @media(max-width:680px){
+    .lightbox__label{
+      grid-template-columns:1fr; gap:14px;
+    }
+    .lightbox__desc{ padding-left:14px; }
+  }
+
+  /* Skeleton cards (loading state) */
+  .skeleton-grid{ columns:3; column-gap:20px; }
+  @media(max-width:900px){ .skeleton-grid{ columns:2; column-gap:16px; } }
+  @media(max-width:520px){ .skeleton-grid{ columns:1; } }
+  .skeleton{
+    break-inside:avoid; margin-bottom:20px;
+    background:var(--bg-2); border-radius:2px;
+    overflow:hidden;
+  }
+  .skeleton__img{
+    width:100%;
+    background:linear-gradient(90deg, var(--surface) 0%, var(--bg-2) 50%, var(--surface) 100%);
+    background-size:200% 100%;
+    animation:shimmer 1.8s linear infinite;
+  }
+  .skeleton:nth-child(1) .skeleton__img{ height:280px; }
+  .skeleton:nth-child(2) .skeleton__img{ height:380px; }
+  .skeleton:nth-child(3) .skeleton__img{ height:240px; }
+  .skeleton:nth-child(4) .skeleton__img{ height:340px; }
+  .skeleton:nth-child(5) .skeleton__img{ height:200px; }
+  .skeleton:nth-child(6) .skeleton__img{ height:300px; }
+  .skeleton__body{
+    padding:14px 16px; border-top:1px solid var(--line);
+  }
+  .skeleton__line{
+    height:8px; border-radius:2px; margin-bottom:8px;
+    background:linear-gradient(90deg, var(--surface) 0%, var(--bg-2) 50%, var(--surface) 100%);
+    background-size:200% 100%;
+    animation:shimmer 1.8s linear infinite;
+  }
+  .skeleton__line--short{ width:40%; }
 
   /* ── FOOTER ── */
   footer{
@@ -907,12 +1214,16 @@
     <div class="gallery-page">
 
       <div class="gallery-hero wrap">
-        <div class="gallery-hero__eyebrow">Comunidad · Miembros</div>
+        <div class="gallery-hero__edition">
+          <strong>Edición Continua</strong>
+          <span>Vol. 01 · Comunidad Logidma</span>
+        </div>
         <h1 class="gallery-hero__title"><em>Galería</em></h1>
-        <p class="gallery-hero__desc">
-          Lo que los miembros crean, construyen y comparten.
-          Sube tu trabajo y descubre el de la comunidad.
+        <p class="gallery-hero__quote">
+          Un espacio donde lo que construimos, capturamos y vivimos
+          se vuelve obra. Cada imagen es un fragmento del lente colectivo.
         </p>
+        <p class="gallery-hero__sig">Curaduría abierta a miembros</p>
       </div>
 
       <div class="wrap">
@@ -955,12 +1266,28 @@
 
         <!-- FILTER BAR -->
         <div class="filter-bar">
-          <span class="filter-bar__label">// Publicaciones recientes</span>
-          <span class="filter-bar__count" id="postCount">—</span>
+          <div class="filter-bar__left">
+            <span class="filter-bar__label">// Catálogo</span>
+            <span class="filter-bar__count" id="postCount"><strong>—</strong> piezas</span>
+          </div>
+          <div class="sort-toggle" role="tablist" aria-label="Ordenar">
+            <button class="sort-toggle__btn active" data-sort="recent" role="tab" aria-selected="true">Recientes</button>
+            <button class="sort-toggle__btn" data-sort="popular" role="tab" aria-selected="false">Populares</button>
+          </div>
+        </div>
+
+        <!-- SKELETON LOADER -->
+        <div class="skeleton-grid" id="skeletonGrid" aria-hidden="true">
+          <div class="skeleton"><div class="skeleton__img"></div><div class="skeleton__body"><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></div></div>
+          <div class="skeleton"><div class="skeleton__img"></div><div class="skeleton__body"><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></div></div>
+          <div class="skeleton"><div class="skeleton__img"></div><div class="skeleton__body"><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></div></div>
+          <div class="skeleton"><div class="skeleton__img"></div><div class="skeleton__body"><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></div></div>
+          <div class="skeleton"><div class="skeleton__img"></div><div class="skeleton__body"><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></div></div>
+          <div class="skeleton"><div class="skeleton__img"></div><div class="skeleton__body"><div class="skeleton__line"></div><div class="skeleton__line skeleton__line--short"></div></div></div>
         </div>
 
         <!-- GRID -->
-        <div class="photo-grid" id="photoGrid" role="list" aria-label="Galería de fotos"></div>
+        <div class="photo-grid" id="photoGrid" role="list" aria-label="Galería de fotos" style="display:none"></div>
 
         <!-- EMPTY STATE -->
         <div class="empty-state" id="emptyState" style="display:none" aria-live="polite">
@@ -968,8 +1295,8 @@
             <rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/>
             <polyline points="21 15 16 10 5 21"/>
           </svg>
-          <p class="empty-state__title">Aún no hay fotos</p>
-          <p class="empty-state__desc">Sé el primero en compartir algo con la comunidad.</p>
+          <p class="empty-state__title">La sala está en silencio</p>
+          <p class="empty-state__desc">Aún no hay piezas en exhibición. Sé el primero en compartir tu lente.</p>
         </div>
 
       </div>
@@ -978,21 +1305,58 @@
 
 </main>
 
-<!-- LIGHTBOX -->
+<!-- LIGHTBOX (viewing room) -->
 <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Imagen ampliada">
-  <div class="lightbox__inner">
-    <img class="lightbox__img" id="lightboxImg" alt="" />
-    <div class="lightbox__meta">
-      <div class="lightbox__info">
-        <div class="lightbox__author">
-          <img class="lightbox__avatar" id="lightboxAvatar" alt="" src="" />
-          <span class="lightbox__name" id="lightboxName"></span>
-        </div>
-        <p class="lightbox__desc" id="lightboxDesc"></p>
-      </div>
-      <button class="lightbox__close" id="lightboxClose" aria-label="Cerrar">✕</button>
+
+  <div class="lightbox__topbar">
+    <div class="lightbox__counter">
+      <em>Pieza</em>
+      <strong id="lightboxIdx">—</strong>
+      <span>/ <span id="lightboxTotal">—</span></span>
     </div>
+    <button class="lightbox__close" id="lightboxClose" aria-label="Cerrar">✕</button>
   </div>
+
+  <div class="lightbox__stage">
+    <button class="lightbox__nav lightbox__nav--prev" id="lightboxPrev" aria-label="Anterior">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6"/>
+      </svg>
+    </button>
+
+    <div class="lightbox__imgwrap">
+      <span class="lightbox__frame lightbox__frame--tl"></span>
+      <span class="lightbox__frame lightbox__frame--tr"></span>
+      <span class="lightbox__frame lightbox__frame--bl"></span>
+      <span class="lightbox__frame lightbox__frame--br"></span>
+      <img class="lightbox__img" id="lightboxImg" alt="" />
+    </div>
+
+    <button class="lightbox__nav lightbox__nav--next" id="lightboxNext" aria-label="Siguiente">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  </div>
+
+  <div class="lightbox__label">
+    <div class="lightbox__author">
+      <div class="lightbox__avatar" id="lightboxAvatar"></div>
+      <div class="lightbox__authortxt">
+        <span class="lightbox__name" id="lightboxName"></span>
+        <span class="lightbox__date" id="lightboxDate"></span>
+      </div>
+    </div>
+    <p class="lightbox__desc" id="lightboxDesc"></p>
+    <button class="lightbox__like" id="lightboxLike" aria-label="Me gusta">
+      <span class="ring"></span>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+      </svg>
+      <span id="lightboxLikeCount">0</span>
+    </button>
+  </div>
+
 </div>
 
 <footer>
@@ -1085,39 +1449,55 @@ const db   = getFirestore(app, 'galeria');
 const stor = getStorage(app);
 
 /* ── DOM ── */
-const stateLoading  = document.getElementById('stateLoading');
-const stateGuest    = document.getElementById('stateGuest');
-const stateAuthed   = document.getElementById('stateAuthed');
-const navLoginBtn   = document.getElementById('navLoginBtn');
-const navUser       = document.getElementById('navUser');
-const navUserAvatar = document.getElementById('navUserAvatar');
-const navUserName   = document.getElementById('navUserName');
-const navLogout     = document.getElementById('navLogout');
-const guestRegBtn   = document.getElementById('guestRegisterBtn');
-const guestLoginBtn = document.getElementById('guestLoginBtn');
+const stateLoading   = document.getElementById('stateLoading');
+const stateGuest     = document.getElementById('stateGuest');
+const stateAuthed    = document.getElementById('stateAuthed');
+const navLoginBtn    = document.getElementById('navLoginBtn');
+const navUser        = document.getElementById('navUser');
+const navUserAvatar  = document.getElementById('navUserAvatar');
+const navUserName    = document.getElementById('navUserName');
+const navLogout      = document.getElementById('navLogout');
+const guestRegBtn    = document.getElementById('guestRegisterBtn');
+const guestLoginBtn  = document.getElementById('guestLoginBtn');
 
-const uploadToggle  = document.getElementById('uploadToggle');
-const uploadPanel   = document.getElementById('uploadPanel');
-const dropzone      = document.getElementById('dropzone');
-const fileInput     = document.getElementById('fileInput');
-const imgPreview    = document.getElementById('imgPreview');
-const uploadDesc    = document.getElementById('uploadDesc');
-const charCount     = document.getElementById('charCount');
-const uploadSubmit  = document.getElementById('uploadSubmit');
-const uploadMsg     = document.getElementById('uploadMsg');
-const photoGrid     = document.getElementById('photoGrid');
-const emptyState    = document.getElementById('emptyState');
-const postCount     = document.getElementById('postCount');
-const lightbox      = document.getElementById('lightbox');
-const lightboxImg   = document.getElementById('lightboxImg');
-const lightboxAvatar= document.getElementById('lightboxAvatar');
-const lightboxName  = document.getElementById('lightboxName');
-const lightboxDesc  = document.getElementById('lightboxDesc');
-const lightboxClose = document.getElementById('lightboxClose');
+const uploadToggle   = document.getElementById('uploadToggle');
+const uploadPanel    = document.getElementById('uploadPanel');
+const dropzone       = document.getElementById('dropzone');
+const fileInput      = document.getElementById('fileInput');
+const imgPreview     = document.getElementById('imgPreview');
+const uploadDesc     = document.getElementById('uploadDesc');
+const charCount      = document.getElementById('charCount');
+const uploadSubmit   = document.getElementById('uploadSubmit');
+const uploadMsg      = document.getElementById('uploadMsg');
 
-let currentUser = null;
-let selectedFile = null;
-let likedPosts = new Set();
+const skeletonGrid   = document.getElementById('skeletonGrid');
+const photoGrid      = document.getElementById('photoGrid');
+const emptyState     = document.getElementById('emptyState');
+const postCount      = document.getElementById('postCount');
+const sortBtns       = document.querySelectorAll('.sort-toggle__btn');
+
+const lightbox       = document.getElementById('lightbox');
+const lightboxImg    = document.getElementById('lightboxImg');
+const lightboxAvatar = document.getElementById('lightboxAvatar');
+const lightboxName   = document.getElementById('lightboxName');
+const lightboxDate   = document.getElementById('lightboxDate');
+const lightboxDesc   = document.getElementById('lightboxDesc');
+const lightboxClose  = document.getElementById('lightboxClose');
+const lightboxPrev   = document.getElementById('lightboxPrev');
+const lightboxNext   = document.getElementById('lightboxNext');
+const lightboxIdx    = document.getElementById('lightboxIdx');
+const lightboxTotal  = document.getElementById('lightboxTotal');
+const lightboxLike   = document.getElementById('lightboxLike');
+const lightboxLikeCount = document.getElementById('lightboxLikeCount');
+
+let currentUser   = null;
+let selectedFile  = null;
+let likedPosts    = new Set();
+let allPosts      = [];          // Cache of all posts (raw)
+let sortedPosts   = [];          // Currently sorted/displayed
+let currentSort   = 'recent';    // 'recent' | 'popular'
+let lightboxIdxN  = -1;          // Current lightbox index in sortedPosts
+let scrollObserver= null;        // IntersectionObserver for fade-in
 
 /* ── STATE ── */
 function showState(el) {
@@ -1200,8 +1580,16 @@ uploadSubmit.addEventListener('click', async () => {
       createdAt:   serverTimestamp()
     });
 
-    showMsg('¡Foto publicada!', 'success');
+    showMsg('Pieza añadida a la galería', 'success');
     resetUpload();
+    /* Cierra el panel para revelar la nueva foto */
+    setTimeout(() => {
+      uploadPanel.classList.remove('open');
+      uploadToggle.classList.remove('open');
+      uploadToggle.setAttribute('aria-expanded', 'false');
+      uploadPanel.setAttribute('aria-hidden', 'true');
+      hideMsg();
+    }, 1100);
     await loadPosts();
   } catch(err) {
     console.error('Upload error:', err);
@@ -1235,65 +1623,119 @@ async function loadPosts() {
     const q = query(collection(db, 'posts'), orderBy('createdAt', 'desc'));
     const snap = await getDocs(q);
 
-    /* Load user's liked posts */
-    if (currentUser) {
+    /* Cache all posts */
+    allPosts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    /* Load user's liked posts in parallel */
+    if (currentUser && allPosts.length) {
       likedPosts.clear();
-      for (const docSnap of snap.docs) {
-        const likeRef = doc(db, 'posts', docSnap.id, 'likes', currentUser.uid);
-        const likeSnap = await getDoc(likeRef);
-        if (likeSnap.exists()) likedPosts.add(docSnap.id);
-      }
+      const checks = allPosts.map(p =>
+        getDoc(doc(db, 'posts', p.id, 'likes', currentUser.uid))
+          .then(s => { if (s.exists()) likedPosts.add(p.id); })
+          .catch(()=>{})
+      );
+      await Promise.all(checks);
     }
 
-    photoGrid.innerHTML = '';
-    const posts = snap.docs;
-    postCount.textContent = posts.length + (posts.length === 1 ? ' foto' : ' fotos');
-    emptyState.style.display = posts.length ? 'none' : 'block';
-
-    posts.forEach((docSnap, i) => {
-      const data = docSnap.id && docSnap.data();
-      const card = buildCard(docSnap.id, data, i);
-      photoGrid.appendChild(card);
-    });
+    /* Hide skeleton, render */
+    if (skeletonGrid) skeletonGrid.style.display = 'none';
+    photoGrid.style.display = '';
+    render();
   } catch(err) {
     console.error('Error cargando galería:', err);
+    if (skeletonGrid) skeletonGrid.style.display = 'none';
   }
 }
 
+/* ── RENDER ── */
+function render() {
+  /* Sort */
+  sortedPosts = [...allPosts].sort((a, b) => {
+    if (currentSort === 'popular') {
+      const lk = (b.likesCount || 0) - (a.likesCount || 0);
+      if (lk !== 0) return lk;
+    }
+    const ta = a.createdAt?.seconds || 0;
+    const tb = b.createdAt?.seconds || 0;
+    return tb - ta;
+  });
+
+  /* Render cards */
+  photoGrid.innerHTML = '';
+  sortedPosts.forEach((post, i) => {
+    photoGrid.appendChild(buildCard(post, i));
+  });
+
+  /* Update count + empty */
+  const n = sortedPosts.length;
+  postCount.innerHTML = `<strong>${String(n).padStart(2,'0')}</strong> ${n === 1 ? 'pieza' : 'piezas'}`;
+  emptyState.style.display = n ? 'none' : 'block';
+  photoGrid.style.display  = n ? '' : 'none';
+
+  /* Setup scroll-reveal */
+  setupScrollReveal();
+}
+
 /* ── BUILD CARD ── */
-function buildCard(id, data, idx) {
-  const isOwner = currentUser && currentUser.uid === data.userId;
-  const liked   = likedPosts.has(id);
-  const time    = data.createdAt ? formatTime(data.createdAt.toDate()) : '';
+function buildCard(post, idx) {
+  const isOwner = currentUser && currentUser.uid === post.userId;
+  const liked   = likedPosts.has(post.id);
+  const time    = post.createdAt ? formatTime(post.createdAt.toDate()) : '';
+  const num     = String(idx + 1).padStart(3, '0');
+  const initial = (post.userName || '?')[0].toUpperCase();
 
   const card = document.createElement('article');
   card.className = 'photo-card';
   card.setAttribute('role', 'listitem');
-  card.style.animationDelay = (idx * 0.06) + 's';
+  card.dataset.id  = post.id;
+  card.dataset.idx = idx;
+
+  const avatarHtml = post.userAvatar
+    ? `<img class="photo-card__avatar" src="${escAttr(post.userAvatar)}" alt="${escAttr(post.userName)}" />`
+    : `<div class="photo-card__avatar" aria-hidden="true">${escHtml(initial)}</div>`;
 
   card.innerHTML = `
-    <img class="photo-card__img" src="${data.imageUrl}" alt="${escHtml(data.description || 'Foto de la galería')}" loading="lazy" />
+    <span class="photo-card__corner photo-card__corner--tl" aria-hidden="true"></span>
+    <span class="photo-card__corner photo-card__corner--tr" aria-hidden="true"></span>
+    <span class="photo-card__corner photo-card__corner--bl" aria-hidden="true"></span>
+    <span class="photo-card__corner photo-card__corner--br" aria-hidden="true"></span>
+
+    <span class="photo-card__num">№ ${num}</span>
+
+    <div class="photo-card__imgwrap">
+      <img class="photo-card__img"
+           src="${escAttr(post.imageUrl)}"
+           alt="${escAttr(post.description || 'Pieza de la galería')}"
+           loading="lazy" />
+      <div class="photo-card__zoom" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.5" y2="16.5"/>
+          <line x1="8" y1="11" x2="14" y2="11"/><line x1="11" y1="8" x2="11" y2="14"/>
+        </svg>
+      </div>
+    </div>
+
     <div class="photo-card__body">
       <div class="photo-card__author">
-        ${data.userAvatar
-          ? `<img class="photo-card__avatar" src="${data.userAvatar}" alt="${escHtml(data.userName)}" />`
-          : `<div class="photo-card__avatar" style="display:flex;align-items:center;justify-content:center;font-size:.6rem;color:var(--muted)">${(data.userName||'?')[0].toUpperCase()}</div>`
-        }
-        <span class="photo-card__name">${escHtml(data.userName)}</span>
+        ${avatarHtml}
+        <span class="photo-card__name">${escHtml(post.userName)}</span>
       </div>
-      ${data.description ? `<p class="photo-card__desc">${escHtml(data.description)}</p>` : ''}
+      ${post.description ? `<p class="photo-card__desc">"${escHtml(post.description)}"</p>` : ''}
       <div class="photo-card__footer">
-        <span class="photo-card__time">${time}</span>
-        <button class="like-btn ${liked ? 'liked' : ''}" data-id="${id}" aria-label="Me gusta">
+        <span class="photo-card__time">${escHtml(time)}</span>
+        <button class="like-btn ${liked ? 'liked' : ''}" aria-label="Me gusta" aria-pressed="${liked}">
+          <span class="ring" aria-hidden="true"></span>
+          <span class="ring" aria-hidden="true"></span>
           <svg viewBox="0 0 24 24" fill="${liked ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="2">
             <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
           </svg>
-          ${data.likesCount || 0}
+          <span class="like-btn__count">${post.likesCount || 0}</span>
         </button>
       </div>
     </div>
+
     ${isOwner ? `
-      <button class="photo-card__delete" data-id="${id}" data-path="${data.storagePath}" aria-label="Eliminar foto">
+      <button class="photo-card__delete" aria-label="Eliminar pieza">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/>
           <path d="M10 11v6"/><path d="M14 11v6"/>
@@ -1301,15 +1743,33 @@ function buildCard(id, data, idx) {
       </button>` : ''}
   `;
 
-  /* Click image → lightbox */
-  card.querySelector('.photo-card__img').addEventListener('click', () => {
-    openLightbox(data);
+  /* Image fade-in */
+  const imgEl = card.querySelector('.photo-card__img');
+  const wrap  = card.querySelector('.photo-card__imgwrap');
+  if (imgEl.complete && imgEl.naturalWidth) {
+    imgEl.classList.add('loaded');
+    wrap.classList.add('loaded');
+  } else {
+    imgEl.addEventListener('load', () => {
+      imgEl.classList.add('loaded');
+      wrap.classList.add('loaded');
+    }, { once: true });
+    imgEl.addEventListener('error', () => {
+      imgEl.classList.add('loaded');
+      wrap.classList.add('loaded');
+    }, { once: true });
+  }
+
+  /* Click image / wrap → lightbox */
+  wrap.addEventListener('click', e => {
+    if (e.target.closest('.photo-card__delete')) return;
+    openLightbox(idx);
   });
 
   /* Like */
   card.querySelector('.like-btn').addEventListener('click', async e => {
     e.stopPropagation();
-    await toggleLike(id, card);
+    await toggleLike(post.id);
   });
 
   /* Delete */
@@ -1317,99 +1777,283 @@ function buildCard(id, data, idx) {
   if (delBtn) {
     delBtn.addEventListener('click', async e => {
       e.stopPropagation();
-      if (!confirm('¿Eliminar esta foto?')) return;
-      await deletePost(id, data.storagePath, card);
+      if (!confirm('¿Eliminar esta pieza de la galería?')) return;
+      await deletePost(post.id, post.storagePath);
     });
   }
 
   return card;
 }
 
-/* ── LIKE ── */
-async function toggleLike(postId, card) {
-  if (!currentUser) return;
-  const likeRef  = doc(db, 'posts', postId, 'likes', currentUser.uid);
-  const postRef  = doc(db, 'posts', postId);
-  const btn      = card.querySelector('.like-btn');
-  const isLiked  = likedPosts.has(postId);
+/* ── SCROLL REVEAL ── */
+function setupScrollReveal() {
+  if (scrollObserver) scrollObserver.disconnect();
 
+  const cards = photoGrid.querySelectorAll('.photo-card');
+
+  if (!('IntersectionObserver' in window)) {
+    cards.forEach(c => c.classList.add('is-visible'));
+    return;
+  }
+
+  scrollObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        const card = entry.target;
+        const delay = (parseInt(card.dataset.idx) % 6) * 90;
+        setTimeout(() => card.classList.add('is-visible'), delay);
+        scrollObserver.unobserve(card);
+      }
+    });
+  }, { rootMargin: '0px 0px -40px 0px', threshold: 0.05 });
+
+  cards.forEach(c => scrollObserver.observe(c));
+
+  /* Fallback: any card already in viewport on load — reveal it immediately */
+  requestAnimationFrame(() => {
+    cards.forEach(card => {
+      const rect = card.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0 && !card.classList.contains('is-visible')) {
+        const delay = (parseInt(card.dataset.idx) % 6) * 90;
+        setTimeout(() => card.classList.add('is-visible'), delay);
+      }
+    });
+  });
+}
+
+/* ── LIKE (optimistic) ── */
+async function toggleLike(postId) {
+  if (!currentUser) return;
+  const likeRef = doc(db, 'posts', postId, 'likes', currentUser.uid);
+  const postRef = doc(db, 'posts', postId);
+  const wasLiked = likedPosts.has(postId);
+  const post     = allPosts.find(p => p.id === postId);
+  if (!post) return;
+
+  /* Optimistic UI */
+  if (wasLiked) {
+    likedPosts.delete(postId);
+    post.likesCount = Math.max(0, (post.likesCount || 0) - 1);
+  } else {
+    likedPosts.add(postId);
+    post.likesCount = (post.likesCount || 0) + 1;
+  }
+
+  /* Apply visuals to all visible UI for this post */
+  applyLikeVisuals(postId);
+
+  /* Bloom animation on the clicked button */
+  document.querySelectorAll(`.photo-card[data-id="${postId}"] .like-btn`).forEach(b => {
+    b.classList.remove('bloom');
+    void b.offsetWidth;
+    b.classList.add('bloom');
+  });
+  if (lightboxIdxN >= 0 && sortedPosts[lightboxIdxN]?.id === postId) {
+    lightboxLike.classList.remove('bloom');
+    void lightboxLike.offsetWidth;
+    lightboxLike.classList.add('bloom');
+  }
+
+  /* Server */
   try {
-    if (isLiked) {
+    if (wasLiked) {
       await deleteDoc(likeRef);
       await updateDoc(postRef, { likesCount: increment(-1) });
-      likedPosts.delete(postId);
-      btn.classList.remove('liked');
-      btn.querySelector('svg').setAttribute('fill', 'none');
     } else {
       await setDoc(likeRef, { likedAt: serverTimestamp() });
       await updateDoc(postRef, { likesCount: increment(1) });
-      likedPosts.add(postId);
-      btn.classList.add('liked');
-      btn.querySelector('svg').setAttribute('fill', 'currentColor');
     }
-    /* Update count optimistically */
-    const snap = await getDocs(collection(db, 'posts', postId, 'likes'));
-    btn.childNodes[btn.childNodes.length - 1].textContent = ' ' + snap.size;
   } catch(err) {
     console.error('Error al dar like:', err);
+    /* Revert on failure */
+    if (wasLiked) {
+      likedPosts.add(postId);
+      post.likesCount = (post.likesCount || 0) + 1;
+    } else {
+      likedPosts.delete(postId);
+      post.likesCount = Math.max(0, (post.likesCount || 0) - 1);
+    }
+    applyLikeVisuals(postId);
+  }
+}
+
+function applyLikeVisuals(postId) {
+  const post = allPosts.find(p => p.id === postId);
+  if (!post) return;
+  const liked = likedPosts.has(postId);
+
+  document.querySelectorAll(`.photo-card[data-id="${postId}"]`).forEach(card => {
+    const btn   = card.querySelector('.like-btn');
+    const svg   = btn.querySelector('svg');
+    const count = btn.querySelector('.like-btn__count');
+    btn.classList.toggle('liked', liked);
+    btn.setAttribute('aria-pressed', liked);
+    svg.setAttribute('fill', liked ? 'currentColor' : 'none');
+    count.textContent = post.likesCount || 0;
+  });
+
+  if (lightboxIdxN >= 0 && sortedPosts[lightboxIdxN]?.id === postId) {
+    lightboxLike.classList.toggle('liked', liked);
+    lightboxLike.querySelector('svg').setAttribute('fill', liked ? 'currentColor' : 'none');
+    lightboxLikeCount.textContent = post.likesCount || 0;
   }
 }
 
 /* ── DELETE ── */
-async function deletePost(postId, storagePath, card) {
+async function deletePost(postId, storagePath) {
+  const card = photoGrid.querySelector(`.photo-card[data-id="${postId}"]`);
   try {
     await deleteDoc(doc(db, 'posts', postId));
     if (storagePath) {
       try { await deleteObject(ref(stor, storagePath)); } catch(_) {}
     }
-    card.style.animation = 'none';
-    card.style.transition = 'opacity .3s, transform .3s';
-    card.style.opacity = '0';
-    card.style.transform = 'scale(.95)';
-    setTimeout(() => { card.remove(); updatePostCount(); }, 320);
+    /* Remove from cache + animate out */
+    allPosts = allPosts.filter(p => p.id !== postId);
+    if (card) {
+      card.classList.add('is-removing');
+      setTimeout(() => { card.remove(); render(); }, 360);
+    } else {
+      render();
+    }
+    if (lightbox.classList.contains('open')) closeLightbox();
   } catch(err) {
     console.error('Error eliminando post:', err);
     alert('No se pudo eliminar. Intenta de nuevo.');
   }
 }
 
-function updatePostCount() {
-  const n = photoGrid.querySelectorAll('.photo-card').length;
-  postCount.textContent = n + (n === 1 ? ' foto' : ' fotos');
-  emptyState.style.display = n ? 'none' : 'block';
-}
+/* ── SORT TOGGLE ── */
+sortBtns.forEach(btn => {
+  btn.addEventListener('click', () => {
+    const sort = btn.dataset.sort;
+    if (sort === currentSort) return;
+    currentSort = sort;
+    sortBtns.forEach(b => {
+      const isActive = b.dataset.sort === sort;
+      b.classList.toggle('active', isActive);
+      b.setAttribute('aria-selected', isActive);
+    });
+    render();
+  });
+});
 
 /* ── LIGHTBOX ── */
-function openLightbox(data) {
-  lightboxImg.src = data.imageUrl;
-  lightboxName.textContent = data.userName;
-  lightboxDesc.textContent = data.description || '';
-  if (data.userAvatar) {
-    lightboxAvatar.src = data.userAvatar;
-    lightboxAvatar.style.display = 'block';
+function openLightbox(idx) {
+  if (idx < 0 || idx >= sortedPosts.length) return;
+  lightboxIdxN = idx;
+  const post = sortedPosts[idx];
+
+  /* Image with fade-in */
+  lightboxImg.classList.remove('loaded');
+  lightboxImg.src = post.imageUrl;
+  lightboxImg.alt = post.description || 'Pieza de la galería';
+  if (lightboxImg.complete && lightboxImg.naturalWidth) {
+    lightboxImg.classList.add('loaded');
   } else {
-    lightboxAvatar.style.display = 'none';
+    lightboxImg.addEventListener('load', () => lightboxImg.classList.add('loaded'), { once: true });
+    lightboxImg.addEventListener('error', () => lightboxImg.classList.add('loaded'), { once: true });
   }
+
+  /* Counter */
+  lightboxIdx.textContent   = String(idx + 1).padStart(2, '0');
+  lightboxTotal.textContent = String(sortedPosts.length).padStart(2, '0');
+
+  /* Author + date */
+  lightboxName.textContent = post.userName || 'Anónimo';
+  lightboxDate.textContent = post.createdAt
+    ? post.createdAt.toDate().toLocaleDateString('es-MX', {
+        day:'numeric', month:'long', year:'numeric'
+      })
+    : '';
+
+  /* Avatar */
+  if (post.userAvatar) {
+    lightboxAvatar.style.background     = `center/cover no-repeat url("${post.userAvatar}")`;
+    lightboxAvatar.textContent          = '';
+  } else {
+    lightboxAvatar.style.background     = '';
+    lightboxAvatar.textContent          = (post.userName || '?')[0].toUpperCase();
+  }
+
+  /* Description */
+  lightboxDesc.textContent = post.description || '';
+
+  /* Like state */
+  applyLikeVisuals(post.id);
+
+  /* Nav arrow states */
+  lightboxPrev.disabled = (idx === 0);
+  lightboxNext.disabled = (idx === sortedPosts.length - 1);
+
   lightbox.classList.add('open');
   document.body.style.overflow = 'hidden';
 }
+
 function closeLightbox() {
   lightbox.classList.remove('open');
   document.body.style.overflow = '';
-  setTimeout(() => { lightboxImg.src = ''; }, 400);
+  lightboxIdxN = -1;
+  setTimeout(() => {
+    lightboxImg.src = '';
+    lightboxImg.classList.remove('loaded');
+  }, 500);
 }
+
+function navLightbox(dir) {
+  const next = lightboxIdxN + dir;
+  if (next < 0 || next >= sortedPosts.length) return;
+  openLightbox(next);
+}
+
 lightboxClose.addEventListener('click', closeLightbox);
-lightbox.addEventListener('click', e => { if (e.target === lightbox) closeLightbox(); });
+lightboxPrev.addEventListener('click', () => navLightbox(-1));
+lightboxNext.addEventListener('click', () => navLightbox(1));
+
+/* Click backdrop (only when clicking outside image / controls) */
+lightbox.addEventListener('click', e => {
+  if (e.target.closest('.lightbox__imgwrap, .lightbox__nav, .lightbox__label, .lightbox__topbar')) return;
+  closeLightbox();
+});
+
+/* Keyboard navigation */
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape') {
-    if (lightbox.classList.contains('open')) closeLightbox();
-    if (mobileMenu.classList.contains('is-open')) closeMobileMenu();
+  if (lightbox.classList.contains('open')) {
+    if (e.key === 'Escape')     closeLightbox();
+    if (e.key === 'ArrowLeft')  navLightbox(-1);
+    if (e.key === 'ArrowRight') navLightbox(1);
+    return;
   }
+  if (e.key === 'Escape' && mobileMenu.classList.contains('is-open')) closeMobileMenu();
+});
+
+/* Touch swipe on lightbox (mobile) */
+let touchStartX = 0, touchStartY = 0;
+lightbox.addEventListener('touchstart', e => {
+  touchStartX = e.touches[0].clientX;
+  touchStartY = e.touches[0].clientY;
+}, { passive: true });
+lightbox.addEventListener('touchend', e => {
+  const dx = e.changedTouches[0].clientX - touchStartX;
+  const dy = e.changedTouches[0].clientY - touchStartY;
+  if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy)) {
+    navLightbox(dx > 0 ? -1 : 1);
+  }
+}, { passive: true });
+
+/* Lightbox like button */
+lightboxLike.addEventListener('click', async () => {
+  if (lightboxIdxN < 0) return;
+  await toggleLike(sortedPosts[lightboxIdxN].id);
 });
 
 /* ── UTILS ── */
 function escHtml(str) {
+  if (str == null) return '';
   return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function escAttr(str) {
+  if (str == null) return '';
+  return String(str).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
 function formatTime(date) {
@@ -1490,6 +2134,9 @@ onAuthStateChanged(auth, async user => {
     }
     hamburger && hamburger.setAttribute('data-authed', 'true');
 
+    /* Show skeleton while we fetch */
+    if (skeletonGrid) skeletonGrid.style.display = '';
+    photoGrid.style.display = 'none';
     await loadPosts();
   } else {
     showState(stateGuest);
