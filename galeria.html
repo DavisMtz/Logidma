@@ -1202,8 +1202,9 @@ uploadSubmit.addEventListener('click', async () => {
     resetUpload();
     await loadPosts();
   } catch(err) {
-    console.error(err);
-    showMsg('Error al publicar. Intenta de nuevo.', 'error');
+    console.error('Upload error:', err);
+    const code = err?.code || err?.message || 'unknown';
+    showMsg('Error al publicar: ' + code, 'error');
   } finally {
     uploadSubmit.classList.remove('loading');
     uploadSubmit.disabled = false;
