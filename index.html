@@ -1360,6 +1360,242 @@
     .pform__submit{ width: 100%; justify-content: center; }
   }
 
+  /* ══════════════════════════════════════
+     GALERÍA TEASER
+  ══════════════════════════════════════ */
+  #galeria-teaser{ position:relative; }
+
+  .gt-intro{
+    font-size: clamp(.95rem, 2vw, 1.05rem);
+    color: var(--cream-soft);
+    max-width: 580px;
+    line-height: 1.7;
+    margin-bottom: clamp(36px, 5vw, 56px);
+  }
+  .gt-intro strong{ color: var(--cream); font-weight: 500; }
+
+  .gt-frame{
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    min-height: clamp(440px, 56vw, 600px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    isolation: isolate;
+  }
+
+  /* Blurred wall — decorative gradient tiles, no real photos */
+  .gt-wall{
+    position: absolute; inset: 0;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: 1fr;
+    gap: 14px;
+    padding: 18px;
+    filter: blur(28px) saturate(0.55) brightness(0.7);
+    opacity: 0.85;
+    pointer-events: none;
+    user-select: none;
+    z-index: 0;
+  }
+  @media (max-width: 680px){
+    .gt-wall{ grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 12px; filter: blur(34px) saturate(0.5) brightness(0.65); }
+    .gt-tile:nth-child(n+5){ display: none; }
+  }
+  @media (max-width: 420px){
+    .gt-wall{ grid-template-columns: 1fr; }
+    .gt-tile:nth-child(n+3){ display: none; }
+  }
+
+  .gt-tile{
+    position: relative;
+    border-radius: 2px;
+    overflow: hidden;
+    box-shadow: 0 8px 28px -10px rgba(0,0,0,0.6);
+  }
+  .gt-tile::before{
+    content: ""; position: absolute; inset: 0;
+    background:
+      radial-gradient(circle at 30% 20%, rgba(196,255,58,.15), transparent 50%),
+      radial-gradient(circle at 70% 70%, rgba(176,141,87,.18), transparent 55%);
+    z-index: 1;
+  }
+  .gt-tile__num{
+    position: absolute; top: 10px; left: 10px;
+    font-family: 'JetBrains Mono', monospace; font-size: .55rem;
+    color: rgba(235,229,214,.5); letter-spacing: 2px;
+    z-index: 2;
+  }
+  .gt-tile--a{
+    background: linear-gradient(135deg, #2b1f12 0%, #3d2a18 40%, #1a160e 100%);
+    grid-row: span 2;
+  }
+  .gt-tile--b{
+    background: linear-gradient(160deg, #18241a 0%, #1f2c1a 50%, #0d130c 100%);
+  }
+  .gt-tile--c{
+    background: linear-gradient(120deg, #2a1f1a 0%, #1c1812 60%, #0e0c08 100%);
+    grid-row: span 2;
+  }
+  .gt-tile--d{
+    background: linear-gradient(140deg, #1f1a14 0%, #2a2218 50%, #14110c 100%);
+  }
+  .gt-tile--e{
+    background: linear-gradient(110deg, #181612 0%, #25201a 60%, #0f0d0a 100%);
+  }
+  .gt-tile--f{
+    background: linear-gradient(150deg, #232018 0%, #14110c 100%);
+  }
+
+  /* Drift animation on wall — subtle */
+  .gt-wall{ animation: wallDrift 24s ease-in-out infinite alternate; }
+  @keyframes wallDrift{
+    from{ transform: scale(1.02) translateY(0); }
+    to{   transform: scale(1.06) translateY(-1.5%); }
+  }
+  @media (prefers-reduced-motion: reduce){ .gt-wall{ animation: none; } }
+
+  /* HUD frame corners */
+  .gt-corner{
+    position: absolute; pointer-events: none; z-index: 2;
+    width: 36px; height: 36px;
+    border-color: var(--bronze); border-style: solid;
+    opacity: 0.6;
+  }
+  .gt-corner--tl{ top: 14px; left: 14px;  border-width: 1px 0 0 1px; }
+  .gt-corner--tr{ top: 14px; right: 14px; border-width: 1px 1px 0 0; }
+  .gt-corner--bl{ bottom: 14px; left: 14px;  border-width: 0 0 1px 1px; }
+  .gt-corner--br{ bottom: 14px; right: 14px; border-width: 0 1px 1px 0; }
+
+  /* Veil — invitation overlay */
+  .gt-veil{
+    position: relative; z-index: 3;
+    padding: clamp(40px, 8vw, 72px) clamp(20px, 4vw, 40px);
+    text-align: center;
+    width: 100%;
+    background: radial-gradient(
+      ellipse at center,
+      rgba(10,9,8,0.92) 0%,
+      rgba(10,9,8,0.78) 45%,
+      rgba(10,9,8,0.55) 80%,
+      rgba(10,9,8,0.4) 100%
+    );
+    backdrop-filter: blur(2px);
+  }
+  .gt-veil__inner{ max-width: 540px; margin: 0 auto; }
+
+  .gt-veil__lockwrap{
+    position: relative;
+    width: 64px; height: 64px;
+    margin: 0 auto 28px;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .gt-veil__lock{
+    width: 36px; height: 36px;
+    color: var(--bronze);
+    filter: drop-shadow(0 0 14px rgba(176,141,87,.35));
+    animation: lockHover 4.5s ease-in-out infinite;
+  }
+  @keyframes lockHover{
+    0%, 100%{ transform: translateY(0); }
+    50%{ transform: translateY(-3px); }
+  }
+  .gt-veil__ring{
+    position: absolute; inset: -8px;
+    border: 1px solid rgba(176,141,87,.3);
+    border-radius: 50%;
+    animation: ringPulseGT 3s ease-in-out infinite;
+  }
+  .gt-veil__ring--2{ inset: -22px; border-color: rgba(176,141,87,.15); animation-delay: .5s; }
+  @keyframes ringPulseGT{
+    0%, 100%{ opacity: 1; transform: scale(1); }
+    50%{ opacity: .35; transform: scale(1.08); }
+  }
+
+  .gt-veil__eyebrow{
+    font-family: 'JetBrains Mono', monospace; font-size: .62rem;
+    text-transform: uppercase; letter-spacing: 3px;
+    color: var(--bronze); margin-bottom: 18px;
+  }
+  .gt-veil__title{
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.8rem, 4.5vw, 2.8rem);
+    line-height: 1.1; color: var(--cream);
+    margin-bottom: 22px;
+  }
+  .gt-veil__title em{ font-style: italic; color: var(--accent); }
+
+  .gt-veil__quote{
+    font-family: 'Instrument Serif', serif; font-style: italic;
+    font-size: clamp(1rem, 2vw, 1.18rem);
+    color: var(--cream-soft); line-height: 1.55;
+    margin: 0 auto 24px;
+    padding-left: 18px; border-left: 1px solid var(--bronze);
+    text-align: left; max-width: 460px;
+  }
+
+  .gt-veil__sub{
+    font-family: 'JetBrains Mono', monospace; font-size: .66rem;
+    text-transform: uppercase; letter-spacing: 2px;
+    color: var(--muted); margin-bottom: 32px;
+    line-height: 1.7;
+  }
+
+  .gt-veil__actions{
+    display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 28px;
+  }
+  .gt-veil__actions .btn-primary,
+  .gt-veil__actions .btn-ghost{
+    font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+    text-transform: uppercase; letter-spacing: 2px;
+    padding: 13px 28px; border-radius: 999px;
+    cursor: pointer; transition: all .4s var(--e-expo);
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .gt-veil__actions .btn-primary{
+    background: var(--accent); color: var(--bg);
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 24px -4px var(--accent-glow);
+  }
+  .gt-veil__actions .btn-primary:hover{
+    transform: translateY(-2px);
+    box-shadow: 0 10px 32px -4px var(--accent-glow);
+  }
+  .gt-veil__actions .btn-ghost{
+    background: transparent;
+    color: var(--cream-soft);
+    border: 1px solid var(--line-strong);
+  }
+  .gt-veil__actions .btn-ghost:hover{
+    border-color: var(--bronze);
+    color: var(--cream);
+  }
+
+  .gt-veil__hint{
+    font-family: 'JetBrains Mono', monospace; font-size: .58rem;
+    text-transform: uppercase; letter-spacing: 2px;
+    color: var(--muted); display: inline-flex; align-items: center; gap: 8px;
+  }
+  .gt-dot{
+    display: inline-block; width: 6px; height: 6px; border-radius: 50%;
+    background: var(--bronze);
+    box-shadow: 0 0 8px var(--bronze);
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @media (max-width: 600px){
+    .gt-veil{ padding: 48px 20px; }
+    .gt-veil__quote{ max-width: 100%; padding-left: 14px; }
+    .gt-veil__actions{ flex-direction: column; align-items: stretch; }
+    .gt-veil__actions .btn-primary,
+    .gt-veil__actions .btn-ghost{ justify-content: center; }
+  }
+
   /* FOOTER */
   footer{
     padding: 64px clamp(20px, 4vw, 32px) 48px;
@@ -2425,9 +2661,79 @@
     </form>
   </section>
 
-  <section id="contacto" class="wrap reveal">
+  <!-- ══ GALERÍA TEASER ══ -->
+  <section id="galeria-teaser" class="wrap reveal">
     <div class="section__head">
       <span class="num">05 /</span>
+      <span class="title">Galería · La sala de la comunidad</span>
+    </div>
+
+    <h2 class="kicker">Donde lo que <em>vemos</em> se vuelve obra.</h2>
+
+    <p class="gt-intro">
+      Un espacio reservado para miembros donde se exhiben las
+      <strong>composiciones, los instantes y las miradas</strong> que la comunidad
+      de Logidma quiere compartir. No es un feed. Es una galería.
+    </p>
+
+    <div class="gt-frame">
+
+      <!-- Blurred wall (decorative — no real images shown to guests) -->
+      <div class="gt-wall" aria-hidden="true">
+        <div class="gt-tile gt-tile--a"><span class="gt-tile__num">№ 001</span></div>
+        <div class="gt-tile gt-tile--b"><span class="gt-tile__num">№ 002</span></div>
+        <div class="gt-tile gt-tile--c"><span class="gt-tile__num">№ 003</span></div>
+        <div class="gt-tile gt-tile--d"><span class="gt-tile__num">№ 004</span></div>
+        <div class="gt-tile gt-tile--e"><span class="gt-tile__num">№ 005</span></div>
+        <div class="gt-tile gt-tile--f"><span class="gt-tile__num">№ 006</span></div>
+      </div>
+
+      <!-- HUD frame -->
+      <span class="gt-corner gt-corner--tl" aria-hidden="true"></span>
+      <span class="gt-corner gt-corner--tr" aria-hidden="true"></span>
+      <span class="gt-corner gt-corner--bl" aria-hidden="true"></span>
+      <span class="gt-corner gt-corner--br" aria-hidden="true"></span>
+
+      <!-- Veil with invitation -->
+      <div class="gt-veil">
+        <div class="gt-veil__inner">
+
+          <div class="gt-veil__lockwrap" aria-hidden="true">
+            <span class="gt-veil__ring"></span>
+            <span class="gt-veil__ring gt-veil__ring--2"></span>
+            <svg class="gt-veil__lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+          </div>
+
+          <p class="gt-veil__eyebrow">Detrás del velo</p>
+          <p class="gt-veil__title">¿Qué te hizo <em>detenerte</em> hoy?</p>
+          <p class="gt-veil__quote">
+            ¿Qué composición encontraste? ¿Qué instante te hizo sentir bien?
+            ¿Qué quieres compartir con quienes ven como tú?
+          </p>
+          <p class="gt-veil__sub" data-guest>La galería es para miembros. Crea tu cuenta y publica tu primera pieza.</p>
+          <p class="gt-veil__sub" data-authed style="display:none">Tu sala te espera. Sube tu primera pieza o descubre lo que la comunidad publicó.</p>
+
+          <div class="gt-veil__actions">
+            <button class="btn-primary" id="gtRegisterBtn" data-guest>Crear cuenta</button>
+            <a class="btn-primary" href="galeria.html" data-authed style="display:none">Publicar una pieza</a>
+            <a class="btn-ghost" href="galeria.html">Visitar la galería <span aria-hidden="true">→</span></a>
+          </div>
+
+          <p class="gt-veil__hint" data-guest>
+            <span class="gt-dot"></span> Vista previa restringida · Sólo miembros ven el contenido completo
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <section id="contacto" class="wrap reveal">
+    <div class="section__head">
+      <span class="num">06 /</span>
       <span class="title">Contacto · canales directos</span>
     </div>
 
@@ -3127,6 +3433,28 @@ mmenuLoginBtn && mmenuLoginBtn.addEventListener('click', () => {
 mmenuLogout && mmenuLogout.addEventListener('click', () => signOut(auth));
 
 /* ── Auth state ── */
+/* ── Galería teaser — open auth modal in register mode ── */
+const gtRegisterBtn = document.getElementById('gtRegisterBtn');
+gtRegisterBtn && gtRegisterBtn.addEventListener('click', () => {
+  setMode(true);
+  openModal();
+});
+
+/* Toggle teaser elements based on auth state */
+function syncGalleryTeaser(isAuthed) {
+  document.querySelectorAll('#galeria-teaser [data-guest]').forEach(el => {
+    el.style.display = isAuthed ? 'none' : '';
+  });
+  document.querySelectorAll('#galeria-teaser [data-authed]').forEach(el => {
+    el.style.display = isAuthed ? '' : 'none';
+  });
+  /* Reduce blur for authed users so they get a small taste */
+  const wall = document.querySelector('#galeria-teaser .gt-wall');
+  if (wall) wall.style.filter = isAuthed
+    ? 'blur(14px) saturate(0.8) brightness(0.85)'
+    : '';
+}
+
 onAuthStateChanged(auth, user => {
   if (user) {
     // Desktop nav
@@ -3147,6 +3475,8 @@ onAuthStateChanged(auth, user => {
     }
     // Hamburger indicator
     hamburgerEl && hamburgerEl.setAttribute('data-authed', 'true');
+
+    syncGalleryTeaser(true);
   } else {
     // Desktop nav
     if (navLoginBtn) navLoginBtn.style.display = '';
@@ -3156,6 +3486,8 @@ onAuthStateChanged(auth, user => {
     if (mmenuUser)     mmenuUser.style.display     = 'none';
     // Hamburger indicator
     hamburgerEl && hamburgerEl.removeAttribute('data-authed');
+
+    syncGalleryTeaser(false);
   }
 });
 </script>
