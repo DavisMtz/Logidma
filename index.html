@@ -674,6 +674,23 @@
     background: rgba(0,0,0,0.2);
     position: relative;
   }
+  .marquee::before,
+  .marquee::after{
+    content:"";
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 14%;
+    z-index: 1;
+    pointer-events: none;
+  }
+  .marquee::before{
+    left: 0;
+    background: linear-gradient(to right, var(--bg) 0%, transparent 100%);
+  }
+  .marquee::after{
+    right: 0;
+    background: linear-gradient(to left, var(--bg) 0%, transparent 100%);
+  }
   .marquee__track{
     display: flex;
     gap: 64px;
@@ -714,7 +731,7 @@
   }
 
   .section__head{
-    display:flex; gap: 16px; align-items: baseline;
+    display:flex; gap: 16px; align-items: center;
     font-family: 'JetBrains Mono', monospace;
     font-size: 0.7rem;
     text-transform: uppercase;
@@ -722,6 +739,15 @@
     color: var(--muted);
     margin-bottom: clamp(36px, 6vw, 56px);
     flex-wrap: wrap;
+  }
+  .section__head::before{
+    content:"";
+    display: inline-block;
+    width: 20px;
+    height: 1px;
+    background: var(--accent);
+    flex-shrink: 0;
+    box-shadow: 0 0 6px var(--accent-glow);
   }
   .section__head .num{ color: var(--accent); }
   .section__head .title{ color: var(--cream-soft); }
@@ -762,6 +788,18 @@
     overflow: hidden;
   }
   .etym__cell:last-child{ border-right: none; }
+  .etym__cell::after{
+    content:"";
+    position: absolute;
+    top: 0; left: 0;
+    height: 2px;
+    width: 0;
+    background: var(--accent);
+    transition: width 0.7s var(--e-expo);
+    box-shadow: 0 0 12px var(--accent-glow);
+    pointer-events: none;
+  }
+  .etym__cell:hover::after{ width: 100%; }
   .etym__cell::before{
     content:"";
     position: absolute;
@@ -1379,12 +1417,27 @@
     font-family: 'JetBrains Mono', monospace;
     font-weight: 700;
   }
+  .totop::before{
+    content:"";
+    position: absolute;
+    inset: -7px;
+    border-radius: 50%;
+    border: 1px solid var(--accent);
+    opacity: 0;
+    transform: scale(0.85);
+    transition: opacity 0.5s var(--e-expo), transform 0.5s var(--e-back);
+    pointer-events: none;
+  }
   .totop.show{
     opacity: 1;
     visibility: visible;
     transform: translateY(0) scale(1);
   }
   .totop:hover{ transform: translateY(-4px) scale(1.05); }
+  .totop:hover::before{
+    opacity: 0.6;
+    transform: scale(1.15);
+  }
 
   @keyframes fadeUp{
     from{ opacity:0; transform: translateY(24px); }
@@ -1399,21 +1452,25 @@
   .reveal{
     opacity: 0;
     transform: translateY(40px);
-    transition: opacity 1.2s var(--e-expo), transform 1.2s var(--e-expo);
+    filter: blur(6px);
+    transition: opacity 1.2s var(--e-expo), transform 1.2s var(--e-expo), filter 1s var(--e-expo);
   }
   .reveal.in{
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
 
   .reveal--stagger > *{
     opacity: 0;
     transform: translateY(28px);
-    transition: opacity 1s var(--e-expo), transform 1s var(--e-expo);
+    filter: blur(4px);
+    transition: opacity 1s var(--e-expo), transform 1s var(--e-expo), filter 0.9s var(--e-expo);
   }
   .reveal--stagger.in > *{
     opacity: 1;
     transform: translateY(0);
+    filter: blur(0);
   }
   .reveal--stagger.in > *:nth-child(1){ transition-delay: 0.05s; }
   .reveal--stagger.in > *:nth-child(2){ transition-delay: 0.18s; }
@@ -1433,6 +1490,103 @@
       transition-duration: 0.01ms !important;
     }
   }
+
+  /* ── SCROLLBAR PERSONALIZADA ── */
+  ::-webkit-scrollbar{ width: 3px; background: var(--bg); }
+  ::-webkit-scrollbar-thumb{ background: var(--muted); border-radius: 2px; }
+  ::-webkit-scrollbar-thumb:hover{ background: var(--accent); }
+
+  /* ── FOCUS RING ── */
+  :focus-visible{
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 2px;
+  }
+
+  /* ── NAV LINKS ── */
+  .nav__links{
+    display: flex;
+    gap: clamp(20px, 3vw, 36px);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.68rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+  }
+  .nav__links a{
+    color: var(--muted);
+    text-decoration: none;
+    transition: color 0.35s var(--e-expo);
+    position: relative;
+    padding-bottom: 2px;
+  }
+  .nav__links a::after{
+    content:"";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s var(--e-expo);
+    box-shadow: 0 0 6px var(--accent-glow);
+  }
+  .nav__links a:hover{ color: var(--cream); }
+  .nav__links a:hover::after{ transform: scaleX(1); }
+  @media (max-width: 680px){ .nav__links{ display: none; } }
+
+  /* ── PULLQUOTE REFINADO ── */
+  .pullquote{
+    background: linear-gradient(180deg, transparent 0%, rgba(196,255,58,0.025) 50%, transparent 100%);
+    border-left: 2px solid var(--accent);
+    border-right: 2px solid var(--accent);
+    border-top: none;
+    border-bottom: none;
+    position: relative;
+  }
+  .pullquote::before,
+  .pullquote::after{
+    content:"";
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--line-strong), transparent);
+  }
+  .pullquote::before{ top: 0; }
+  .pullquote::after{ bottom: 0; }
+
+  /* ── FORM CONTADOR ── */
+  .pform__counter{
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.63rem;
+    letter-spacing: 1px;
+    color: var(--muted);
+    text-align: right;
+    transition: color 0.3s var(--e-expo);
+    margin-top: 4px;
+  }
+  .pform__counter.ok{ color: var(--accent); text-shadow: 0 0 8px var(--accent-glow); }
+
+  /* ── PROGRESS BAR GLOW ── */
+  .progress__bar{
+    box-shadow: 0 0 12px var(--accent-glow), 0 0 4px var(--accent);
+  }
+
+  /* ── CCARD PERSPECTIVE ── */
+  .contact-grid{ perspective: 1200px; }
+  .ccard{ transform-style: preserve-3d; transition: background 0.5s var(--e-expo), transform 0.6s var(--e-expo); }
+
+  /* ── FOOTER SEPARADOR ── */
+  footer::before{
+    content:"";
+    display: block;
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--line-strong) 20%, var(--line-strong) 80%, transparent);
+    position: absolute;
+    top: 0; left: 0;
+    pointer-events: none;
+  }
+  footer{ position: relative; }
 </style>
 </head>
 <body class="is-loading">
@@ -1475,6 +1629,12 @@
     <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logo Logidma" />
     <span>Logidma</span>
   </div>
+  <nav class="nav__links" aria-label="Secciones">
+    <a href="#etimologia">Concepto</a>
+    <a href="#filosofia">Filosofía</a>
+    <a href="#proyectos">Proyectos</a>
+    <a href="#contacto">Contacto</a>
+  </nav>
   <div class="nav__meta">
     <span><span class="dot"></span>EN LÍNEA</span>
   </div>
@@ -1518,12 +1678,12 @@
       <span class="marquee__item">HTML</span>
       <span class="marquee__item">Eficiencia</span>
       <span class="marquee__item">Imagen</span>
-      <span class="marquee__item">Innovacion</span>
+      <span class="marquee__item">Innovación</span>
       <span class="marquee__item">Logidma</span>
     </div>
   </div>
 
-  <section class="wrap reveal reveal--stagger">
+  <section id="etimologia" class="wrap reveal reveal--stagger">
     <div class="section__head">
       <span class="num">01 /</span>
       <span class="title">Etimología y construcción del nombre</span>
@@ -1560,7 +1720,7 @@
     </div>
   </section>
 
-  <section class="wrap reveal">
+  <section id="filosofia" class="wrap reveal">
     <div class="section__head">
       <span class="num">02 /</span>
       <span class="title">La filosofía detrás de la marca</span>
@@ -1595,7 +1755,7 @@
     </div>
   </section>
 
-  <section class="wrap reveal">
+  <section id="arquitecto" class="wrap reveal">
     <div class="section__head">
       <span class="num">03 /</span>
       <span class="title">El arquitecto detrás del código</span>
@@ -1641,7 +1801,7 @@
     </div>
   </section>
 
-  <section class="wrap reveal">
+  <section id="proyectos" class="wrap reveal">
     <div class="section__head">
       <span class="num">04 /</span>
       <span class="title">Inicia tu proyecto · cuéntame tu idea</span>
@@ -1688,6 +1848,7 @@
         <textarea class="pform__textarea" id="pf-idea" name="idea" placeholder="Cuéntame qué proceso quieres automatizar, qué problema resuelve, o cualquier idea que tengas en mente..." required rows="5"></textarea>
         <span class="pform__line"></span>
         <span class="pform__error" data-error-for="idea"></span>
+        <span class="pform__counter" id="ideaCounter">0 chars · mínimo 10</span>
       </div>
 
       <div class="pform__status" id="pformStatus" role="status" aria-live="polite"></div>
@@ -1701,7 +1862,7 @@
     </form>
   </section>
 
-  <section class="wrap reveal">
+  <section id="contacto" class="wrap reveal">
     <div class="section__head">
       <span class="num">05 /</span>
       <span class="title">Contacto · canales directos</span>
@@ -1911,7 +2072,7 @@
     });
   });
 
-  // CONTACT — magnetic + spotlight
+  // CONTACT — magnetic + spotlight + 3D tilt
   if (fine) {
     document.querySelectorAll('[data-magnetic]').forEach(card => {
       card.addEventListener('mousemove', (e) => {
@@ -1922,12 +2083,16 @@
         card.style.setProperty('--cx', (cx * 100) + '%');
         card.style.setProperty('--cy', (cy * 100) + '%');
 
-        const tx = (cx - 0.5) * 8;
-        const ty = (cy - 0.5) * 8;
-        card.style.transform = 'translate(' + tx + 'px, ' + ty + 'px)';
+        const tx = (cx - 0.5) * 6;
+        const ty = (cy - 0.5) * 6;
+        const rx = (cy - 0.5) * -5;
+        const ry = (cx - 0.5) * 5;
+        card.style.transform = 'perspective(900px) translate(' + tx + 'px, ' + ty + 'px) rotateX(' + rx + 'deg) rotateY(' + ry + 'deg)';
+        card.style.transition = 'background 0.5s var(--e-expo)';
       });
       card.addEventListener('mouseleave', () => {
-        card.style.transform = '';
+        card.style.transform = 'perspective(900px) translate(0,0) rotateX(0deg) rotateY(0deg)';
+        card.style.transition = 'background 0.5s var(--e-expo), transform 0.7s var(--e-expo)';
       });
     });
   }
@@ -2044,6 +2209,22 @@
         if (errEl) errEl.textContent = '';
       });
     });
+
+    // Contador de caracteres en el campo idea
+    const ideaField = document.getElementById('pf-idea');
+    const ideaCounter = document.getElementById('ideaCounter');
+    if (ideaField && ideaCounter) {
+      ideaField.addEventListener('input', () => {
+        const len = ideaField.value.length;
+        if (len >= 10) {
+          ideaCounter.textContent = len + ' chars ✓';
+          ideaCounter.classList.add('ok');
+        } else {
+          ideaCounter.textContent = len + ' chars · mínimo 10';
+          ideaCounter.classList.remove('ok');
+        }
+      });
+    }
   }
 
 })();
