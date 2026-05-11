@@ -3490,6 +3490,30 @@ onAuthStateChanged(auth, user => {
     syncGalleryTeaser(false);
   }
 });
+
+/* ── GALERÍA EXIT TRANSITION ── */
+(function(){
+  document.querySelectorAll('a[href*="galeria.html"]').forEach(function(link){
+    link.addEventListener('click', function(e){
+      if (e.ctrlKey || e.metaKey || e.shiftKey || e.altKey) return;
+      e.preventDefault();
+      var href = link.href;
+      var veil = document.createElement('div');
+      veil.style.cssText = [
+        'position:fixed','inset:0','z-index:9999',
+        'background:#0a0908','opacity:0',
+        'transition:opacity .52s ease',
+        'pointer-events:all'
+      ].join(';');
+      document.body.appendChild(veil);
+      /* Double rAF ensures transition fires */
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){ veil.style.opacity = '1'; });
+      });
+      setTimeout(function(){ window.location.href = href; }, 560);
+    });
+  });
+})();
 </script>
 
 </body>
