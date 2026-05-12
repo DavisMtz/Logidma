@@ -1248,6 +1248,25 @@
   .lightbox__cmt-submit:disabled{ opacity: .4; cursor: not-allowed; }
   .lightbox__cmt-submit.loading{ opacity: .6; pointer-events: none; }
 
+  /* ══ REDES SOCIALES ══ */
+  .foot__social{ display:flex; align-items:center; gap:18px; }
+  .foot__social-link{
+    color:var(--muted); display:flex; align-items:center;
+    transition:color .3s, transform .35s var(--e-quart);
+  }
+  .foot__social-link:hover{ color:var(--accent); transform:translateY(-2px); }
+  .foot__social-link svg{ width:17px; height:17px; display:block; }
+  .mmenu__social{
+    display:flex; align-items:center; gap:22px; padding-top:20px;
+    border-top:1px solid var(--line); margin-top:4px;
+  }
+  .mmenu__social-link{
+    color:var(--muted); display:flex; align-items:center;
+    transition:color .3s, transform .35s var(--e-quart);
+  }
+  .mmenu__social-link:hover{ color:var(--accent); transform:translateY(-2px); }
+  .mmenu__social-link svg{ width:19px; height:19px; display:block; }
+
   /* ══ RETO MENSUAL ══ */
   .challenge-banner{
     margin: 0 0 32px;
@@ -1604,6 +1623,20 @@
 
 <footer>
   <a class="foot__brand" href="index.html">Logidma</a>
+  <div class="foot__social" aria-label="Redes sociales">
+    <a class="foot__social-link" href="https://www.instagram.com/logidma?igsh=MWgzcXBhMjloMm1nbA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+    </a>
+    <a class="foot__social-link" href="https://www.linkedin.com/company/logidma/" target="_blank" rel="noopener" aria-label="LinkedIn">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+    </a>
+    <a class="foot__social-link" href="https://www.tiktok.com/@logidmamx?_r=1&_t=ZS-96J2Ln5iTIq" target="_blank" rel="noopener" aria-label="TikTok">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
+    </a>
+    <a class="foot__social-link" href="https://www.facebook.com/profile.php?id=61589339563349" target="_blank" rel="noopener" aria-label="Facebook">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+    </a>
+  </div>
   <div class="foot__meta">© 2026 · DAVID MARTÍNEZ · LA LÓGICA, SISTEMATIZADA</div>
 </footer>
 
@@ -1660,6 +1693,20 @@
         <span class="mmenu__uname" id="mmenuUname"></span>
         <button type="button" class="mmenu__mlogout" id="mmenuLogout">Salir</button>
       </div>
+    </div>
+    <div class="mmenu__social" aria-label="Redes sociales">
+      <a class="mmenu__social-link" href="https://www.instagram.com/logidma?igsh=MWgzcXBhMjloMm1nbA%3D%3D&utm_source=qr" target="_blank" rel="noopener" aria-label="Instagram">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+      </a>
+      <a class="mmenu__social-link" href="https://www.linkedin.com/company/logidma/" target="_blank" rel="noopener" aria-label="LinkedIn">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+      </a>
+      <a class="mmenu__social-link" href="https://www.tiktok.com/@logidmamx?_r=1&_t=ZS-96J2Ln5iTIq" target="_blank" rel="noopener" aria-label="TikTok">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-2.88 2.5 2.89 2.89 0 0 1-2.89-2.89 2.89 2.89 0 0 1 2.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 0 0-.79-.05 6.34 6.34 0 0 0-6.34 6.34 6.34 6.34 0 0 0 6.34 6.34 6.34 6.34 0 0 0 6.33-6.34V8.69a8.18 8.18 0 0 0 4.78 1.52V6.76a4.85 4.85 0 0 1-1.01-.07z"/></svg>
+      </a>
+      <a class="mmenu__social-link" href="https://www.facebook.com/profile.php?id=61589339563349" target="_blank" rel="noopener" aria-label="Facebook">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/></svg>
+      </a>
     </div>
   </div>
 </div>
