@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0908" />
+<title>Acerca de Logidma — La lógica, sistematizada</title>
+<meta name="description" content="Conoce la historia, filosofía y el arquitecto detrás de Logidma: la firma de David Martínez Arredondo, donde la lógica se sistematiza." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+
+<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
+
+<style>
+  :root{
+    --bg: #0a0908;
+    --bg-2: #111110;
+    --surface: #16140f;
+    --line: rgba(235, 229, 214, 0.08);
+    --line-strong: rgba(235, 229, 214, 0.18);
+    --cream: #ebe5d6;
+    --cream-soft: #c9c2b0;
+    --muted: #6b6657;
+    --accent: #c4ff3a;
+    --accent-soft: rgba(196,255,58,0.12);
+    --accent-glow: rgba(196,255,58,0.4);
+    --bronze: #b08d57;
+    --maxw: 1280px;
+    --e-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --e-quart: cubic-bezier(0.22, 1, 0.36, 1);
+    --e-circ: cubic-bezier(0.85, 0, 0.15, 1);
+    --e-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; -webkit-text-size-adjust:100%; }
+  body{
+    background:var(--bg); color:var(--cream);
+    font-family:'Manrope',system-ui,sans-serif;
+    font-weight:300; line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+    overflow-x:hidden; position:relative; min-height:100vh;
+  }
+
+  /* REJILLA */
+  body::before{
+    content:""; position:fixed; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--line) 1px, transparent 1px);
+    background-size:80px 80px; pointer-events:none; z-index:0;
+    mask-image:radial-gradient(ellipse at center,rgba(0,0,0,.85) 0%,rgba(0,0,0,.25) 70%,transparent 100%);
+    -webkit-mask-image:radial-gradient(ellipse at center,rgba(0,0,0,.85) 0%,rgba(0,0,0,.25) 70%,transparent 100%);
+    animation:gridFade 2s var(--e-expo) 1.4s both;
+  }
+  @keyframes gridFade{
+    from{ opacity:0; transform:scale(1.05); }
+    to{ opacity:1; transform:scale(1); }
+  }
+
+  /* AURA */
+  .ambient{ position:fixed; inset:0; z-index:0; pointer-events:none; overflow:hidden; }
+  .ambient::before,.ambient::after{
+    content:""; position:absolute;
+    width:60vw; height:60vw; border-radius:50%;
+    filter:blur(120px); opacity:.15; will-change:transform;
+  }
+  .ambient::before{
+    top:-20%; left:-10%;
+    background:radial-gradient(circle,var(--accent) 0%,transparent 70%);
+    animation:drift1 22s ease-in-out infinite alternate;
+  }
+  .ambient::after{
+    bottom:-20%; right:-10%;
+    background:radial-gradient(circle,var(--bronze) 0%,transparent 70%);
+    animation:drift2 28s ease-in-out infinite alternate; opacity:.12;
+  }
+  @keyframes drift1{ from{ transform:translate(0,0) scale(1); } to{ transform:translate(15vw,10vh) scale(1.15); } }
+  @keyframes drift2{ from{ transform:translate(0,0) scale(1); } to{ transform:translate(-10vw,-8vh) scale(1.1); } }
+
+  /* GRANO */
+  body::after{
+    content:""; position:fixed; inset:0;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.92  0 0 0 0 0.89  0 0 0 0 0.83  0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    pointer-events:none; opacity:.5; mix-blend-mode:overlay; z-index:1;
+  }
+
+  main,header,footer{ position:relative; z-index:2; }
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 clamp(20px,4vw,32px); }
+
+  /* PROGRESS */
+  .progress{ position:fixed; top:0; left:0; width:100%; height:2px; background:transparent; z-index:100; pointer-events:none; }
+  .progress__bar{ height:100%; width:0%; background:var(--accent); box-shadow:0 0 8px var(--accent-glow); transition:width .1s linear; }
+
+  /* NAV */
+  .nav{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:clamp(18px,3vw,28px) clamp(20px,4vw,32px);
+    max-width:var(--maxw); margin:0 auto;
+    transition:backdrop-filter .4s,background .4s,border-color .4s;
+  }
+  .nav.scrolled{
+    background:rgba(10,9,8,.7); backdrop-filter:blur(20px);
+    -webkit-backdrop-filter:blur(20px); border-bottom:1px solid var(--line);
+  }
+  .nav__brand{
+    display:flex; align-items:center; gap:12px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(1.2rem,2vw,1.4rem); letter-spacing:.5px;
+    text-decoration:none; color:var(--cream);
+  }
+  .nav__brand img{
+    width:32px; height:32px; object-fit:contain;
+    filter:drop-shadow(0 0 12px var(--accent-glow));
+    transition:transform .6s var(--e-back);
+  }
+  .nav__brand:hover img{ transform:rotate(360deg) scale(1.1); }
+  .nav__links{
+    display:flex; gap:clamp(24px,4vw,48px);
+    font-family:'Manrope',sans-serif;
+    font-size:.75rem; text-transform:uppercase; letter-spacing:2px; font-weight:400;
+  }
+  .nav__links a{
+    color:var(--muted); text-decoration:none;
+    transition:color .4s var(--e-expo);
+    position:relative; padding-bottom:4px;
+  }
+  .nav__links a.active{ color:var(--accent); }
+  .nav__links a::after{
+    content:""; position:absolute; left:0; right:0; bottom:0; height:1px;
+    background:var(--accent); transform:scaleX(0); transform-origin:center;
+    transition:transform .6s var(--e-quart);
+  }
+  .nav__links a:hover{ color:var(--cream); }
+  .nav__links a:hover::after,.nav__links a.active::after{ transform:scaleX(1); }
+  @media(max-width:680px){ .nav__links{ display:none; } }
+
+  .nav__right{ display:flex; align-items:center; gap:clamp(16px,3vw,32px); }
+  .nav__meta{
+    font-family:'JetBrains Mono',monospace;
+    font-size:.7rem; text-transform:uppercase; letter-spacing:2px; color:var(--cream-soft);
+    display:flex; gap:clamp(12px,2vw,24px);
+  }
+  .nav__meta .dot{
+    display:inline-block; width:6px; height:6px; border-radius:50%;
+    background:var(--accent); margin-right:8px;
+    box-shadow:0 0 10px var(--accent); animation:pulse 2s ease-in-out infinite;
+  }
+  @keyframes pulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:.4; transform:scale(.7); } }
+  @media(max-width:520px){ .nav__meta span:nth-child(2){ display:none; } }
+
+  /* Hamburger */
+  .nav__hamburger{
+    display:none; flex-direction:column; justify-content:center; align-items:center;
+    gap:5px; cursor:pointer; background:transparent;
+    border:1px solid var(--line-strong); border-radius:6px;
+    padding:9px 11px; z-index:201; position:relative; flex-shrink:0;
+    transition:border-color .35s var(--e-quart),background .35s;
+  }
+  .nav__hamburger:hover{ border-color:var(--accent); background:var(--accent-soft); }
+  .nav__hamburger span{
+    display:block; width:20px; height:1.5px; background:var(--cream);
+    transition:transform .45s var(--e-quart),opacity .3s,width .4s var(--e-quart);
+    transform-origin:center;
+  }
+  .nav__hamburger.is-open span:nth-child(1){ transform:translateY(6.5px) rotate(45deg); }
+  .nav__hamburger.is-open span:nth-child(2){ opacity:0; width:0; }
+  .nav__hamburger.is-open span:nth-child(3){ transform:translateY(-6.5px) rotate(-45deg); }
+  @media(max-width:680px){ .nav__hamburger{ display:flex; } }
+
+  /* HERO de la página Acerca de */
+  .about-hero{
+    padding:clamp(60px,12vh,140px) 0 clamp(48px,8vh,96px);
+    max-width:var(--maxw); margin:0 auto;
+    padding-left:clamp(20px,4vw,32px); padding-right:clamp(20px,4vw,32px);
+  }
+  .about-hero__eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    text-transform:uppercase; letter-spacing:3px; color:var(--accent);
+    margin-bottom:32px; display:flex; align-items:center; gap:14px;
+    opacity:0; animation:fadeUp 1s var(--e-expo) .3s forwards;
+  }
+  .about-hero__eyebrow::before{
+    content:""; width:40px; height:1px; background:var(--accent);
+  }
+  .about-hero__title{
+    font-family:'Instrument Serif',serif; font-weight:400;
+    font-size:clamp(3rem,10vw,8rem); line-height:.95;
+    letter-spacing:-.03em; margin-bottom:32px;
+    opacity:0; animation:fadeUp 1.1s var(--e-expo) .45s forwards;
+  }
+  .about-hero__title em{ font-style:italic; color:var(--accent); }
+  .about-hero__sub{
+    font-family:'JetBrains Mono',monospace;
+    font-size:clamp(.85rem,1.3vw,1.05rem); color:var(--cream-soft);
+    max-width:580px; line-height:1.7;
+    opacity:0; animation:fadeUp 1s var(--e-expo) .6s forwards;
+  }
+  .about-hero__sub strong{ color:var(--cream); font-weight:500; }
+
+  @keyframes fadeUp{
+    from{ opacity:0; transform:translateY(24px); }
+    to{ opacity:1; transform:translateY(0); }
+  }
+  @keyframes fadeIn{
+    from{ opacity:0; } to{ opacity:1; }
+  }
+
+  /* SECTIONS */
+  section{
+    padding:clamp(64px,12vh,140px) 0; position:relative;
+  }
+  section+section{ border-top:1px solid var(--line); }
+  .section__head{
+    display:flex; gap:16px; align-items:center;
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    text-transform:uppercase; letter-spacing:3px; color:var(--muted);
+    margin-bottom:clamp(36px,6vw,56px); flex-wrap:wrap;
+  }
+  .section__head::before{
+    content:""; display:inline-block; width:20px; height:1px;
+    background:var(--accent); flex-shrink:0;
+    box-shadow:0 0 6px var(--accent-glow);
+  }
+  .section__head .num{ color:var(--accent); }
+  .section__head .title{ color:var(--cream-soft); }
+
+  h2.kicker{
+    font-family:'Instrument Serif',serif; font-weight:400;
+    font-size:clamp(2rem,5.5vw,4.4rem); line-height:1;
+    letter-spacing:-.02em; margin-bottom:48px; max-width:900px;
+  }
+  h2.kicker em{ font-style:italic; color:var(--accent); }
+
+  /* REVEAL */
+  .reveal{ opacity:0; transform:translateY(32px); transition:opacity .9s var(--e-expo),transform .9s var(--e-expo); }
+  .reveal.in{ opacity:1; transform:translateY(0); }
+
+  /* ETIMOLOGÍA */
+  .etym__intro{
+    max-width:680px; color:var(--cream-soft);
+    font-size:clamp(.95rem,1.3vw,1.05rem); line-height:1.8;
+  }
+  .etym__intro strong{ color:var(--cream); font-weight:500; }
+  .etym{
+    display:grid; grid-template-columns:1fr 1fr;
+    gap:0; border-top:1px solid var(--line-strong);
+    border-bottom:1px solid var(--line-strong); margin-top:40px;
+  }
+  .etym__cell{
+    padding:clamp(32px,5vw,56px) clamp(24px,4vw,40px);
+    border-right:1px solid var(--line-strong);
+    position:relative; transition:background .6s var(--e-expo); overflow:hidden;
+  }
+  .etym__cell:last-child{ border-right:none; }
+  .etym__cell::after{
+    content:""; position:absolute; top:0; left:0; height:2px; width:0;
+    background:var(--accent); transition:width .7s var(--e-expo);
+    box-shadow:0 0 12px var(--accent-glow); pointer-events:none;
+  }
+  .etym__cell:hover::after{ width:100%; }
+  .etym__cell::before{
+    content:""; position:absolute; top:0; left:0; width:100%; height:100%;
+    background:radial-gradient(circle at var(--mx,50%) var(--my,50%),var(--accent-soft) 0%,transparent 50%);
+    opacity:0; transition:opacity .6s; pointer-events:none;
+  }
+  .etym__cell:hover::before{ opacity:1; }
+  .etym__big{
+    font-family:'Instrument Serif',serif; font-weight:400;
+    font-size:clamp(4rem,13vw,10rem); line-height:1;
+    letter-spacing:-.04em; margin-bottom:32px;
+    background:linear-gradient(180deg,var(--cream) 0%,var(--cream) 50%,transparent 130%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .etym__big em{
+    font-style:italic;
+    background:linear-gradient(180deg,var(--accent) 0%,var(--accent) 50%,transparent 130%);
+    -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .etym__label{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    text-transform:uppercase; letter-spacing:3px; color:var(--accent); margin-bottom:24px;
+  }
+  .etym__body{
+    font-size:clamp(.95rem,1.2vw,1rem); line-height:1.75;
+    color:var(--cream-soft); max-width:460px;
+  }
+  .etym__body strong{ color:var(--cream); font-weight:500; }
+  @media(max-width:800px){
+    .etym{ grid-template-columns:1fr; }
+    .etym__cell{ border-right:none; border-bottom:1px solid var(--line-strong); }
+    .etym__cell:last-child{ border-bottom:none; }
+  }
+
+  /* FILOSOFÍA */
+  .phil{ display:grid; grid-template-columns:1fr 1.4fr; gap:clamp(40px,6vw,80px); align-items:start; }
+  .phil__lead{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(1.6rem,3.2vw,2.6rem); line-height:1.15;
+    color:var(--cream); letter-spacing:-.01em; position:sticky; top:100px;
+  }
+  .phil__lead em{ color:var(--accent); }
+  .phil__body p{ margin-bottom:24px; color:var(--cream-soft); font-size:clamp(.98rem,1.3vw,1.05rem); line-height:1.8; }
+  .phil__body strong{ color:var(--cream); font-weight:500; }
+  .pullquote{
+    margin-top:clamp(48px,8vw,80px);
+    padding:clamp(36px,6vw,56px) 0;
+    border-top:1px solid var(--line-strong); border-bottom:1px solid var(--line-strong);
+    text-align:center; font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(1.6rem,4.5vw,3.4rem); line-height:1.15; letter-spacing:-.02em;
+  }
+  .pullquote em{ color:var(--accent); position:relative; display:inline-block; }
+  .pullquote em::after{
+    content:""; position:absolute; left:0; right:0; bottom:-4px; height:2px;
+    background:var(--accent); transform:scaleX(0); transform-origin:left;
+    transition:transform 1.4s var(--e-expo);
+  }
+  .pullquote.in em::after{ transform:scaleX(1); }
+  @media(max-width:800px){
+    .phil{ grid-template-columns:1fr; gap:24px; }
+    .phil__lead{ position:static; }
+  }
+
+  /* ARQUITECTO */
+  .arch{ display:grid; grid-template-columns:.9fr 1.1fr; gap:clamp(40px,6vw,72px); align-items:center; }
+  .arch__photo{
+    position:relative; aspect-ratio:4/5; overflow:hidden;
+    border:1px solid var(--line-strong);
+    clip-path:inset(100% 0 0 0); transition:clip-path 1.4s var(--e-expo);
+    background:linear-gradient(135deg,#1f1c16 0%,#0d0c0a 100%);
+  }
+  .arch__photo-fallback{
+    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:0; overflow:hidden;
+  }
+  .arch__photo-fallback::before{
+    content:""; position:absolute; inset:0;
+    background:repeating-linear-gradient(45deg,transparent 0 14px,rgba(196,255,58,.04) 14px 15px),
+      radial-gradient(circle at 30% 30%,rgba(196,255,58,.12),transparent 60%);
+  }
+  .arch__photo-fallback span{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(5rem,14vw,9rem); letter-spacing:-.04em;
+    color:var(--cream); line-height:1; z-index:1;
+    text-shadow:0 0 40px rgba(0,0,0,.5);
+  }
+  .arch__photo-fallback span em{ font-style:italic; color:var(--accent); text-shadow:0 0 30px var(--accent-glow); }
+  .arch__photo-fallback small{
+    position:absolute; top:16px; right:16px;
+    font-family:'JetBrains Mono',monospace; font-size:.65rem;
+    letter-spacing:2px; color:var(--accent); z-index:1; opacity:.7;
+  }
+  .arch__photo.in{ clip-path:inset(0 0 0 0); }
+  .arch__photo img{
+    width:100%; height:100%; object-fit:cover;
+    filter:grayscale(.2) contrast(1.05);
+    transition:transform 1.2s var(--e-expo),filter .8s var(--e-expo),opacity .6s ease;
+    will-change:transform; position:relative; z-index:1;
+  }
+  .arch__photo img.failed{ opacity:0; }
+  .arch__photo:hover img{ transform:scale(1.06); filter:grayscale(0) contrast(1); }
+  .arch__photo::before{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(180deg,transparent 50%,rgba(10,9,8,.5) 100%);
+    z-index:2; pointer-events:none;
+  }
+  .arch__photo::after{
+    content:"DMA / 003"; position:absolute; bottom:16px; left:16px;
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    letter-spacing:2px; color:var(--accent); z-index:3;
+  }
+  .arch__name{ font-family:'Instrument Serif',serif; font-size:clamp(2rem,4.5vw,3.6rem); line-height:1; margin-bottom:16px; letter-spacing:-.02em; }
+  .arch__role{ font-family:'JetBrains Mono',monospace; font-size:.78rem; text-transform:uppercase; letter-spacing:3px; color:var(--accent); margin-bottom:32px; }
+  .arch__bio{ color:var(--cream-soft); font-size:clamp(.98rem,1.3vw,1.05rem); line-height:1.8; margin-bottom:40px; max-width:540px; }
+  .arch__badge{
+    margin-top:20px; padding:24px; border:1px solid var(--line-strong);
+    background:rgba(255,255,255,.015); display:inline-block;
+    transition:border-color .4s,background .4s;
+  }
+  .arch__badge:hover{ border-color:var(--accent); background:var(--accent-soft); }
+  .arch__badge::before{
+    content:"// LinkedIn Profile"; display:block;
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    color:var(--muted); margin-bottom:12px; letter-spacing:2px;
+  }
+  @media(max-width:900px){ .arch{ grid-template-columns:1fr; gap:32px; } .arch__photo{ max-width:320px; margin:0 auto; } }
+
+  /* CONTACTO */
+  .contact-grid{
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:0; margin-top:clamp(40px,6vw,56px); border:1px solid var(--line-strong);
+  }
+  .ccard{
+    padding:clamp(32px,4vw,48px) clamp(24px,3vw,32px);
+    border-right:1px solid var(--line-strong); text-decoration:none;
+    color:var(--cream); display:block; position:relative; overflow:hidden;
+    transition:background .5s var(--e-expo),transform .5s var(--e-expo);
+    background:transparent; will-change:transform;
+  }
+  .ccard:last-child{ border-right:none; }
+  .ccard::before{
+    content:""; position:absolute; top:0; left:0; width:100%; height:100%;
+    background:radial-gradient(circle at var(--cx,50%) var(--cy,50%),var(--accent-soft) 0%,transparent 60%);
+    opacity:0; transition:opacity .5s; pointer-events:none;
+  }
+  .ccard:hover{ background:rgba(196,255,58,.04); }
+  .ccard:hover::before{ opacity:1; }
+  .ccard__icon{
+    width:48px; height:48px; border:1px solid var(--line-strong); border-radius:50%;
+    display:flex; align-items:center; justify-content:center; margin-bottom:32px;
+    transition:border-color .5s var(--e-expo),color .5s var(--e-expo),transform .5s var(--e-back),background .5s;
+    color:var(--cream-soft); position:relative; z-index:1;
+  }
+  .ccard:hover .ccard__icon{ border-color:var(--accent); color:var(--accent); transform:scale(1.1) rotate(8deg); background:var(--accent-soft); }
+  .ccard__icon svg{ width:20px; height:20px; stroke:currentColor; fill:none; stroke-width:1.5; }
+  .ccard__label{ font-family:'JetBrains Mono',monospace; font-size:.7rem; letter-spacing:3px; text-transform:uppercase; color:var(--muted); margin-bottom:12px; position:relative; z-index:1; }
+  .ccard__value{ font-family:'Instrument Serif',serif; font-size:clamp(1.2rem,2vw,1.9rem); line-height:1.2; margin-bottom:24px; word-break:break-word; position:relative; z-index:1; }
+  .ccard__cta{ font-family:'JetBrains Mono',monospace; font-size:.78rem; text-transform:uppercase; letter-spacing:2px; color:var(--accent); display:flex; align-items:center; gap:8px; position:relative; z-index:1; }
+  .ccard__cta::after{ content:"→"; transition:transform .4s var(--e-expo); }
+  .ccard:hover .ccard__cta::after{ transform:translateX(8px); }
+  @media(max-width:800px){ .contact-grid{ grid-template-columns:1fr; } .ccard{ border-right:none; border-bottom:1px solid var(--line-strong); } .ccard:last-child{ border-bottom:none; } }
+
+  /* FOOTER */
+  footer{
+    border-top:1px solid var(--line); padding:clamp(32px,5vw,48px) clamp(20px,4vw,32px);
+    max-width:var(--maxw); margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between; gap:24px; flex-wrap:wrap;
+    position:relative; z-index:2;
+  }
+  .foot__brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:1.1rem; color:var(--cream); text-decoration:none;
+  }
+  .foot__brand img{ width:24px; height:24px; object-fit:contain; opacity:.8; }
+  .foot__meta{ font-family:'JetBrains Mono',monospace; font-size:.65rem; letter-spacing:2px; text-transform:uppercase; color:var(--muted); }
+
+  /* TOTOP */
+  .totop{
+    position:fixed; bottom:clamp(20px,3vw,32px); right:clamp(20px,3vw,32px);
+    width:44px; height:44px; border:1px solid var(--line-strong);
+    border-radius:50%; background:var(--bg-2); color:var(--muted);
+    font-family:'JetBrains Mono',monospace; font-size:.9rem;
+    cursor:pointer; z-index:40; display:flex; align-items:center; justify-content:center;
+    opacity:0; transform:translateY(16px);
+    transition:opacity .4s var(--e-expo),transform .4s var(--e-expo),border-color .3s,color .3s,background .3s;
+  }
+  .totop.show{ opacity:1; transform:translateY(0); }
+  .totop:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+
+  /* MOBILE MENU */
+  .mmenu{
+    position:fixed; inset:0; z-index:200;
+    display:flex; flex-direction:column;
+    background:var(--bg); opacity:0; visibility:hidden;
+    transition:opacity .5s var(--e-quart),visibility .5s; overflow:hidden;
+  }
+  .mmenu.is-open{ opacity:1; visibility:visible; }
+  .mmenu::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      linear-gradient(var(--line) 1px,transparent 1px),
+      linear-gradient(90deg,var(--line) 1px,transparent 1px);
+    background-size:80px 80px; pointer-events:none;
+    mask-image:radial-gradient(ellipse 90% 90% at 50% 30%,rgba(0,0,0,.55) 0%,transparent 100%);
+    -webkit-mask-image:radial-gradient(ellipse 90% 90% at 50% 30%,rgba(0,0,0,.55) 0%,transparent 100%);
+  }
+  .mmenu::after{
+    content:""; position:absolute; width:60vw; height:60vw; border-radius:50%;
+    background:radial-gradient(circle,var(--accent) 0%,transparent 70%);
+    filter:blur(100px); opacity:.05; top:-15%; right:-10%; pointer-events:none;
+  }
+  .mmenu__head{
+    display:flex; align-items:center; justify-content:space-between;
+    padding:clamp(18px,3vw,28px) clamp(20px,5vw,32px);
+    border-bottom:1px solid var(--line);
+    position:relative; z-index:1; flex-shrink:0;
+  }
+  .mmenu__brand{
+    display:flex; align-items:center; gap:10px;
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:1.2rem; color:var(--cream); text-decoration:none;
+  }
+  .mmenu__brand img{ width:28px; height:28px; object-fit:contain; filter:drop-shadow(0 0 10px var(--accent-glow)); }
+  .mmenu__close{
+    width:38px; height:38px; background:transparent; border:1px solid var(--line-strong);
+    border-radius:50%; color:var(--muted); font-size:.85rem;
+    font-family:'JetBrains Mono',monospace; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    transition:all .3s var(--e-expo);
+  }
+  .mmenu__close:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .mmenu__nav{
+    flex:1; overflow-y:auto; display:flex; flex-direction:column; justify-content:center;
+    padding:0 clamp(24px,7vw,48px); position:relative; z-index:1;
+  }
+  .mmenu__link{
+    display:flex; align-items:baseline; gap:14px; text-decoration:none;
+    padding:clamp(13px,3vw,19px) 0; border-bottom:1px solid var(--line);
+    position:relative; overflow:hidden;
+    opacity:0; transform:translateY(28px);
+    transition:opacity .55s var(--e-expo),transform .55s var(--e-expo),color .3s;
+  }
+  .mmenu.is-open .mmenu__link{ opacity:1; transform:translateY(0); }
+  .mmenu.is-open .mmenu__link:nth-child(1){ transition-delay:.06s; }
+  .mmenu.is-open .mmenu__link:nth-child(2){ transition-delay:.13s; }
+  .mmenu.is-open .mmenu__link:nth-child(3){ transition-delay:.20s; }
+  .mmenu.is-open .mmenu__link:nth-child(4){ transition-delay:.27s; }
+  .mmenu.is-open .mmenu__link:nth-child(5){ transition-delay:.34s; }
+  .mmenu.is-open .mmenu__link:nth-child(6){ transition-delay:.41s; }
+  .mmenu__link::before{
+    content:""; position:absolute; inset:0;
+    background:linear-gradient(to right,var(--accent-soft),transparent 55%);
+    transform:scaleX(0); transform-origin:left; transition:transform .5s var(--e-expo);
+  }
+  .mmenu__link:hover::before{ transform:scaleX(1); }
+  .mmenu__link.is-active::before{ transform:scaleX(.5); opacity:.7; }
+  .mmenu__num{
+    font-family:'JetBrains Mono',monospace; font-size:.58rem;
+    letter-spacing:2px; text-transform:uppercase; color:var(--muted);
+    transition:color .3s; flex-shrink:0; position:relative; z-index:1;
+  }
+  .mmenu__text{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:clamp(2rem,9vw,3.4rem); line-height:1; letter-spacing:-.02em;
+    color:var(--cream-soft); transition:color .4s var(--e-expo);
+    position:relative; z-index:1; flex:1;
+  }
+  .mmenu__arrow{
+    font-family:'JetBrains Mono',monospace; font-style:normal;
+    font-size:.85rem; color:var(--accent);
+    opacity:0; transform:translateX(-10px);
+    transition:opacity .35s var(--e-expo),transform .35s var(--e-expo);
+    position:relative; z-index:1;
+  }
+  .mmenu__link:hover .mmenu__num,.mmenu__link.is-active .mmenu__num{ color:var(--accent); }
+  .mmenu__link:hover .mmenu__text,.mmenu__link.is-active .mmenu__text{ color:var(--accent); }
+  .mmenu__link:hover .mmenu__arrow{ opacity:1; transform:translateX(0); }
+  .mmenu__link.is-active .mmenu__arrow{ opacity:.5; transform:translateX(0); }
+  .mmenu__foot{
+    border-top:1px solid var(--line);
+    padding:clamp(20px,4vw,28px) clamp(24px,7vw,48px);
+    display:flex; align-items:center; justify-content:space-between;
+    gap:16px; flex-wrap:wrap;
+    position:relative; z-index:1; flex-shrink:0;
+    opacity:0; transform:translateY(14px);
+    transition:opacity .55s var(--e-expo) .38s,transform .55s var(--e-expo) .38s;
+  }
+  .mmenu.is-open .mmenu__foot{ opacity:1; transform:translateY(0); }
+  .mmenu__status{
+    font-family:'JetBrains Mono',monospace; font-size:.66rem;
+    text-transform:uppercase; letter-spacing:2px; color:var(--cream-soft);
+    display:flex; align-items:center; gap:8px;
+  }
+  .mmenu__dot{
+    width:6px; height:6px; border-radius:50%;
+    background:var(--accent); box-shadow:0 0 8px var(--accent);
+    animation:pulse 2s ease-in-out infinite;
+  }
+
+  @media(prefers-reduced-motion:reduce){
+    *,*::before,*::after{ animation-duration:.01ms !important; transition-duration:.01ms !important; }
+  }
+</style>
+</head>
+<body>
+
+<div class="ambient" aria-hidden="true"></div>
+<div class="progress" aria-hidden="true"><div class="progress__bar" id="progressBar"></div></div>
+
+<header class="nav" id="nav">
+  <a class="nav__brand" href="index.html">
+    <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logo Logidma" />
+    <span>Logidma</span>
+  </a>
+  <nav class="nav__links" aria-label="Secciones">
+    <a href="index.html#servicios">Servicios</a>
+    <a href="index.html#como-funciona">Proceso</a>
+    <a href="proyectos.html">Proyectos</a>
+    <a href="galeria.html">Galería</a>
+    <a href="acerca-de.html" class="active">Nosotros</a>
+    <a href="index.html#contacto">Contacto</a>
+  </nav>
+  <div class="nav__right">
+    <div class="nav__meta">
+      <span><span class="dot"></span>En línea</span>
+    </div>
+    <button class="nav__hamburger" id="hamburger"
+            aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</header>
+
+<main>
+
+  <!-- HERO ACERCA DE -->
+  <div class="about-hero">
+    <div class="about-hero__eyebrow">Acerca de Logidma</div>
+    <h1 class="about-hero__title">La <em>lógica</em>,<br>sistematizada.</h1>
+    <p class="about-hero__sub">
+      Conoce la historia, la filosofía y la mente detrás de Logidma —
+      <strong>antes DavarCore</strong> — la firma donde el orden y la creatividad se fusionan.
+    </p>
+  </div>
+
+  <!-- ══ ETIMOLOGÍA ══ -->
+  <section id="etimologia" class="wrap reveal">
+    <div class="section__head">
+      <span class="num">01 /</span>
+      <span class="title">Etimología · construcción del nombre</span>
+    </div>
+
+    <h2 class="kicker">Un neologismo técnico, diseñado <em>meticulosamente</em>.</h2>
+    <p class="etym__intro">
+      <strong>Logidma</strong> fusiona la ciencia computacional con la identidad de su creador.
+      Dos pilares fundamentales sostienen la palabra:
+    </p>
+
+    <div class="etym">
+      <div class="etym__cell">
+        <div class="etym__big"><em>LOGI</em></div>
+        <div class="etym__label">// Logos · Lógica</div>
+        <p class="etym__body">
+          En la filosofía griega clásica, el <strong>Logos (λόγος)</strong> es el principio del
+          orden y del conocimiento; la razón estructural que rige el universo. En la ciencia
+          computacional, la lógica es el lenguaje absoluto de las máquinas: la capacidad analítica
+          para tomar un problema caótico, desarmarlo y traducirlo en algoritmos impecables.
+        </p>
+      </div>
+      <div class="etym__cell">
+        <div class="etym__big">DMA</div>
+        <div class="etym__label">// David Martínez Arredondo</div>
+        <p class="etym__body">
+          Las iniciales del creador actúan como el <strong>núcleo de la marca</strong>.
+          Es la firma personal integrada directamente en el código de la palabra, garantizando que
+          —aunque la solución sea tecnológica y autónoma— el diseño y la arquitectura llevan un
+          sello de autor indiscutible.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FILOSOFÍA ══ -->
+  <section id="filosofia" class="wrap reveal">
+    <div class="section__head">
+      <span class="num">02 /</span>
+      <span class="title">La filosofía detrás de la marca</span>
+    </div>
+
+    <div class="phil">
+      <div class="phil__lead">
+        Ver el <em>engranaje</em> oculto que sostiene la eficiencia.
+      </div>
+      <div class="phil__body">
+        <p>
+          Automatizar flujos de información —conectar bases de datos, estructurar interfaces en
+          HTML/CSS, diseñar secuencias de ejecución en segundo plano— requiere mirar más allá de
+          la superficie.
+        </p>
+        <p>
+          <strong>Logidma</strong> nace para encapsular ese superpoder técnico: la capacidad de
+          aplicar lógica donde hay fricción. Mientras los procesos manuales son susceptibles al
+          error, la entropía y el desgaste humano, Logidma representa la imposición de un orden
+          estructural limpio, estético y matemático.
+        </p>
+        <p>
+          No es solo código; es el diseño de la <strong>cuadrícula invisible</strong> que sostiene
+          la eficiencia corporativa y técnica.
+        </p>
+      </div>
+    </div>
+
+    <div class="pullquote" id="pullquote">
+      Logidma es <em>la lógica, sistematizada</em>.
+    </div>
+  </section>
+
+  <!-- ══ ARQUITECTO ══ -->
+  <section id="arquitecto" class="wrap reveal">
+    <div class="section__head">
+      <span class="num">03 /</span>
+      <span class="title">El arquitecto detrás del código</span>
+    </div>
+
+    <div class="arch">
+      <div class="arch__photo" id="archPhoto">
+        <div class="arch__photo-fallback" aria-hidden="true">
+          <small>// DMA</small>
+          <span>D<em>M</em>A</span>
+        </div>
+        <img src="https://firebasestorage.googleapis.com/v0/b/logidma-c1df8.firebasestorage.app/o/Untitled%20design.png?alt=media&token=785c1671-739e-4a18-aa6e-5647a32f0154"
+             alt="David Martínez Arredondo"
+             referrerpolicy="no-referrer"
+             onerror="this.classList.add('failed'); this.onerror=null;" />
+      </div>
+      <div>
+        <div class="arch__role">// Founder · Systems Architect</div>
+        <h3 class="arch__name">David Martínez Arredondo</h3>
+        <p class="arch__bio">
+          Arquitecto y desarrollador de sistemas internos. Especialista en Google Workspace,
+          Apps Script, APIs e ingeniería HTML para entornos corporativos. Diseña la cuadrícula
+          invisible: portales centralizados, CRMs automatizados y flujos donde antes había
+          fricción manual.
+        </p>
+        <div class="arch__badge">
+          <div class="badge-base LI-profile-badge"
+               data-locale="es_ES" data-size="medium" data-theme="dark"
+               data-type="VERTICAL" data-vanity="david-martinez-arredondo-86b4182bb" data-version="v1">
+            <a class="badge-base__link LI-simple-link"
+               href="https://mx.linkedin.com/in/david-martinez-arredondo-86b4182bb?trk=profile-badge"
+               target="_blank" rel="noopener">David Martinez Arredondo</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ CONTACTO ══ -->
+  <section id="contacto" class="wrap reveal">
+    <div class="section__head">
+      <span class="num">04 /</span>
+      <span class="title">Contacto · canales directos</span>
+    </div>
+
+    <h2 class="kicker">¿Quieres saber más? <em>Hablemos</em>.</h2>
+
+    <div class="contact-grid reveal">
+
+      <a class="ccard" data-magnetic href="https://wa.me/524431014385?text=Hola%20David%2C%20me%20interesa%20Logidma" target="_blank" rel="noopener">
+        <div class="ccard__icon">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+        </div>
+        <div class="ccard__label">WhatsApp · chat directo</div>
+        <div class="ccard__value">+52 443 101 4385</div>
+        <div class="ccard__cta">Iniciar conversación</div>
+      </a>
+
+      <a class="ccard" data-magnetic href="mailto:contacto@logidma.com?subject=Consulta%20Logidma">
+        <div class="ccard__icon">
+          <svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        </div>
+        <div class="ccard__label">Correo electrónico</div>
+        <div class="ccard__value">contacto@logidma.com</div>
+        <div class="ccard__cta">Redactar correo</div>
+      </a>
+
+      <a class="ccard" data-magnetic href="tel:+524431014385">
+        <div class="ccard__icon">
+          <svg viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+        </div>
+        <div class="ccard__label">Llamada de voz</div>
+        <div class="ccard__value">+52 443 101 4385</div>
+        <div class="ccard__cta">Llamar ahora</div>
+      </a>
+
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <a class="foot__brand" href="index.html">
+    <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logidma" />
+    <span>Logidma</span>
+  </a>
+  <div class="foot__meta">© 2026 · DAVID MARTÍNEZ ARREDONDO · <span>LA LÓGICA, SISTEMATIZADA</span></div>
+</footer>
+
+<!-- MOBILE MENU -->
+<div class="mmenu" id="mobileMenu" role="dialog" aria-modal="true" aria-label="Menú de navegación">
+  <div class="mmenu__head">
+    <a class="mmenu__brand" href="index.html">
+      <img src="https://github.com/DavisMtz/logidma-assets/blob/main/Logidma%20logo.png?raw=true" alt="Logidma" />
+      <span>Logidma</span>
+    </a>
+    <button class="mmenu__close" id="menuClose" aria-label="Cerrar menú">✕</button>
+  </div>
+  <nav class="mmenu__nav" aria-label="Secciones">
+    <a class="mmenu__link" href="index.html#servicios">
+      <span class="mmenu__num">01 /</span>
+      <span class="mmenu__text">Servicios</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link" href="index.html#como-funciona">
+      <span class="mmenu__num">02 /</span>
+      <span class="mmenu__text">Proceso</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link" href="proyectos.html">
+      <span class="mmenu__num">03 /</span>
+      <span class="mmenu__text">Proyectos</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link" href="galeria.html">
+      <span class="mmenu__num">04 /</span>
+      <span class="mmenu__text">Galería</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link is-active" href="acerca-de.html">
+      <span class="mmenu__num">05 /</span>
+      <span class="mmenu__text">Nosotros</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+    <a class="mmenu__link" href="index.html#contacto">
+      <span class="mmenu__num">06 /</span>
+      <span class="mmenu__text">Contacto</span>
+      <span class="mmenu__arrow" aria-hidden="true">→</span>
+    </a>
+  </nav>
+  <div class="mmenu__foot">
+    <div class="mmenu__status">
+      <span class="mmenu__dot"></span>
+      <span>En línea</span>
+    </div>
+  </div>
+</div>
+
+<button class="totop" id="totop" aria-label="Volver arriba">↑</button>
+
+<script>
+(function(){
+  'use strict';
+
+  // SCROLL PROGRESS + NAV + TOTOP
+  const progressBar = document.getElementById('progressBar');
+  const nav = document.getElementById('nav');
+  const totop = document.getElementById('totop');
+
+  function onScroll() {
+    const h = document.documentElement;
+    const scrolled = h.scrollTop;
+    const total = h.scrollHeight - h.clientHeight;
+    progressBar.style.width = (total > 0 ? (scrolled/total)*100 : 0) + '%';
+    nav.classList.toggle('scrolled', scrolled > 60);
+    totop.classList.toggle('show', scrolled > 600);
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  onScroll();
+  totop.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+
+  // MOBILE MENU
+  const hamburger  = document.getElementById('hamburger');
+  const mobileMenu = document.getElementById('mobileMenu');
+  const menuClose  = document.getElementById('menuClose');
+
+  function openMobileMenu() {
+    hamburger.classList.add('is-open'); mobileMenu.classList.add('is-open');
+    document.body.style.overflow = 'hidden';
+    hamburger.setAttribute('aria-expanded','true');
+  }
+  function closeMobileMenu() {
+    hamburger.classList.remove('is-open'); mobileMenu.classList.remove('is-open');
+    document.body.style.overflow = '';
+    hamburger.setAttribute('aria-expanded','false');
+  }
+  hamburger && hamburger.addEventListener('click', () =>
+    mobileMenu.classList.contains('is-open') ? closeMobileMenu() : openMobileMenu()
+  );
+  menuClose && menuClose.addEventListener('click', closeMobileMenu);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && mobileMenu && mobileMenu.classList.contains('is-open'))
+      closeMobileMenu();
+  });
+
+  // REVEAL
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+  // ARCH PHOTO
+  const archPhoto = document.getElementById('archPhoto');
+  if (archPhoto) {
+    const ioP = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting){ archPhoto.classList.add('in'); ioP.unobserve(archPhoto); } });
+    }, { threshold: 0.3 });
+    ioP.observe(archPhoto);
+  }
+
+  // PULLQUOTE
+  const pq = document.getElementById('pullquote');
+  if (pq) {
+    const ioQ = new IntersectionObserver((entries) => {
+      entries.forEach(e => { if(e.isIntersecting){ pq.classList.add('in'); ioQ.unobserve(pq); } });
+    }, { threshold: 0.4 });
+    ioQ.observe(pq);
+  }
+
+  // ETYM CELLS — spotlight
+  document.querySelectorAll('.etym__cell').forEach(cell => {
+    cell.addEventListener('mousemove', (e) => {
+      const r = cell.getBoundingClientRect();
+      cell.style.setProperty('--mx', ((e.clientX - r.left) / r.width * 100) + '%');
+      cell.style.setProperty('--my', ((e.clientY - r.top) / r.height * 100) + '%');
+    });
+  });
+
+  // CONTACT — spotlight
+  const fine = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+  if (fine) {
+    document.querySelectorAll('[data-magnetic]').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const r = card.getBoundingClientRect();
+        card.style.setProperty('--cx', ((e.clientX - r.left) / r.width * 100) + '%');
+        card.style.setProperty('--cy', ((e.clientY - r.top) / r.height * 100) + '%');
+      });
+    });
+  }
+})();
+</script>
+
+</body>
+</html>
