@@ -2986,14 +2986,6 @@
   const intro     = document.getElementById('intro');
   const introSkip = document.getElementById('introSkip');
 
-  // Gate de auth: resuelto por onAuthStateChanged o timeout de 3s
-  var _authGateResolve;
-  window._logidmaAuthGate = new Promise(function(res){ _authGateResolve = res; });
-  window._logidmaAuthGateResolve = function(u){
-    if (_authGateResolve){ _authGateResolve(u); _authGateResolve = null; }
-  };
-  setTimeout(function(){ window._logidmaAuthGateResolve(null); }, 3000);
-
   function endIntro(){
     if (!intro || intro.classList.contains('done')) return;
     intro.classList.add('done');
@@ -3039,9 +3031,15 @@
   try{
     if (sessionStorage.getItem('logidmaIntroSeen') === '1'){
       endIntro();
-      window._logidmaAuthGateResolve(null);
     } else {
-      window.addEventListener('load', initCinematic);
+      window.addEventListener('load', () => {
+        // Particles spawn when logo arrives (~1.4s into animation)
+        setTimeout(spawnParticles, 1350);
+        // Intro fades out at ~3.8s total
+        setTimeout(endIntro, 3800);
+        sessionStorage.setItem('logidmaIntroSeen', '1');
+      });
+      // Hard fallback
       setTimeout(() => {
         if (!sessionStorage.getItem('logidmaIntroSeen')){
           endIntro();
@@ -3545,9 +3543,6 @@ mmenuLogout && mmenuLogout.addEventListener('click', () => signOut(auth));
 
 /* ── Auth state ── */
 onAuthStateChanged(auth, user => {
-  // Resuelve el gate del intro para el saludo personalizado
-  window._logidmaAuthGateResolve && window._logidmaAuthGateResolve(user);
-
   if (user) {
     // Desktop nav
     if (navLoginBtn)   navLoginBtn.style.display   = 'none';
