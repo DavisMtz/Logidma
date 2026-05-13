@@ -62,8 +62,8 @@ body::after{
 @keyframes drift2{from{transform:translate(0,0) scale(1);}to{transform:translate(-8vw,-6vh) scale(1.08);}}
 nav,main{position:relative;z-index:2;}
 
-/* ── PROGRESS ── */
-.ob-progress{position:fixed;top:0;left:0;right:0;z-index:300;height:3px;background:var(--line-strong);}
+/* ── PROGRESS (unused — replaced by segmented track) ── */
+.ob-progress{display:none;}
 .ob-progress__fill{
   height:100%;width:0%;
   background:linear-gradient(90deg,var(--brand-2),var(--brand-1));
@@ -71,77 +71,95 @@ nav,main{position:relative;z-index:2;}
   transition:width .7s var(--e-expo);
 }
 
-/* ── STAGE DOTS ── */
-.ob-stages{
-  position:fixed;top:3px;left:0;right:0;z-index:299;
-  display:flex;justify-content:center;align-items:center;
-  padding:14px 0;gap:0;pointer-events:none;
-}
-.ob-stage-dot{
-  width:7px;height:7px;border-radius:50%;
-  background:var(--line-strong);border:1px solid var(--line-strong);
-  transition:background .4s,border-color .4s,transform .4s var(--e-back);
-}
-.ob-stage-dot.done{background:var(--brand-1);border-color:var(--brand-1);}
-.ob-stage-dot.active{
-  background:var(--brand-1);border-color:var(--brand-1);
-  transform:scale(1.6);box-shadow:0 0 8px var(--accent-glow);
-}
-.ob-stage-line{
-  width:36px;height:1px;background:var(--line-strong);margin:0 5px;
-  transition:background .5s;
-}
-.ob-stage-line.done{background:var(--brand-1);}
-
 /* ── NAV ── */
 .ob-nav{
   position:fixed;top:3px;left:0;right:0;z-index:298;height:64px;
   padding:0 clamp(20px,4vw,48px);
-  display:flex;align-items:center;justify-content:space-between;
-  background:linear-gradient(to bottom,rgba(10,9,8,.92),transparent);
-  backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);
+  display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  background:linear-gradient(to bottom,rgba(10,9,8,.95) 60%,transparent);
+  backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid rgba(235,229,214,.04);
 }
 .ob-nav__logo{
-  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
   letter-spacing:3px;text-transform:uppercase;color:var(--muted);
   text-decoration:none;display:flex;align-items:center;gap:8px;
-  transition:color .3s;
+  transition:color .35s;justify-self:start;
 }
 .ob-nav__logo:hover{color:var(--cream);}
-.ob-nav__logo svg{width:15px;height:15px;stroke:currentColor;fill:none;stroke-width:1.5;}
+.ob-nav__logo svg{width:14px;height:14px;stroke:currentColor;fill:none;stroke-width:1.5;}
 
+/* ── PERSONA CHIP (centre) ── */
 .ob-nav__persona{
-  display:flex;align-items:center;gap:12px;
-  opacity:0;transform:translateY(-8px);
-  transition:opacity .5s var(--e-expo),transform .5s var(--e-expo);
+  display:flex;align-items:center;gap:10px;
+  padding:5px 14px 5px 5px;
+  border:1px solid transparent;border-radius:999px;
+  opacity:0;transform:translateY(-10px) scale(.95);
+  transition:opacity .6s var(--e-expo),transform .6s var(--e-expo),border-color .6s;
+  background:transparent;
 }
-.ob-nav__persona.visible{opacity:1;transform:translateY(0);}
+.ob-nav__persona.visible{
+  opacity:1;transform:translateY(0) scale(1);
+  border-color:var(--line-strong);
+  background:rgba(22,20,15,.6);
+}
 .ob-nav__avatar{
-  width:34px;height:34px;border-radius:50%;
-  border:1.5px solid var(--brand-1);background:var(--accent-soft);
+  width:30px;height:30px;border-radius:50%;
+  border:1.5px solid var(--brand-1);
+  background:var(--accent-soft);
   display:flex;align-items:center;justify-content:center;
   overflow:hidden;flex-shrink:0;
-  box-shadow:0 0 12px var(--accent-glow);
-  transition:border-color .5s,box-shadow .5s;
+  box-shadow:0 0 10px var(--accent-glow);
+  transition:border-color .6s,box-shadow .6s;
+  position:relative;
 }
-.ob-nav__avatar img{width:100%;height:100%;object-fit:cover;display:none;}
+.ob-nav__avatar img{
+  position:absolute;inset:0;width:100%;height:100%;
+  object-fit:cover;border-radius:50%;
+  opacity:0;transition:opacity .4s;
+}
+.ob-nav__avatar img.loaded{opacity:1;}
 .ob-nav__initials{
-  font-family:'JetBrains Mono',monospace;font-size:.62rem;
-  letter-spacing:1px;color:var(--brand-1);font-weight:500;
-}
-.ob-nav__info{text-align:center;}
-.ob-nav__greeting{
   font-family:'JetBrains Mono',monospace;font-size:.58rem;
+  letter-spacing:.5px;color:var(--brand-1);font-weight:500;
+  transition:opacity .3s;
+  user-select:none;
+}
+.ob-nav__text{display:flex;flex-direction:column;gap:1px;}
+.ob-nav__name{
+  font-family:'JetBrains Mono',monospace;font-size:.56rem;
   letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  line-height:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:160px;
 }
 .ob-nav__project{
   font-family:'Instrument Serif',serif;font-style:italic;
-  font-size:.92rem;color:var(--cream);line-height:1.2;
+  font-size:.95rem;color:var(--cream);line-height:1.1;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:200px;
+  animation:none;
 }
-.ob-nav__step{
-  font-family:'JetBrains Mono',monospace;font-size:.66rem;
-  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+/* ── STAGE LABEL (right) ── */
+.ob-nav__stage{
+  justify-self:end;display:flex;align-items:center;gap:8px;
 }
+.ob-nav__stage-pill{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:4px 10px;border-radius:999px;
+  border:1px solid var(--line-strong);color:var(--muted);
+  transition:color .4s,border-color .4s;
+  white-space:nowrap;
+}
+.ob-nav__stage-pill.active{border-color:var(--brand-1);color:var(--brand-1);}
+
+/* ── SEGMENTED PROGRESS TRACK ── */
+.ob-seg-track{
+  position:fixed;top:0;left:0;right:0;z-index:399;
+  height:3px;background:var(--line-strong);
+  display:flex;gap:2px;
+}
+.ob-seg{flex:1;background:transparent;transition:background .5s var(--e-expo);}
+.ob-seg.done{background:var(--brand-1);}
+.ob-seg.active{background:linear-gradient(90deg,var(--brand-2),var(--brand-1));box-shadow:0 0 12px var(--accent-glow);}
 
 /* ── WRAP ── */
 .ob-wrap{
@@ -578,30 +596,41 @@ nav,main{position:relative;z-index:2;}
   .ob-actions{flex-direction:column;align-items:flex-start;}
   .summary-row{flex-direction:column;gap:4px;}
   .summary-row__key{min-width:auto;}
-  .ob-nav__persona .ob-nav__info{display:none;}
+  .ob-nav__text{display:none;}
+  .ob-nav__name,.ob-nav__project{max-width:120px;}
+}
+@media(max-width:400px){
+  .ob-nav__stage-pill{display:none;}
 }
 </style>
 </head>
 <body>
 <div class="ambient"></div>
-<div class="ob-progress"><div class="ob-progress__fill" id="progressFill"></div></div>
-<div class="ob-stages" id="stagesBar"></div>
+
+<!-- Segmented progress track (replaces plain bar + floating dots) -->
+<div class="ob-seg-track" id="segTrack"></div>
 
 <nav class="ob-nav">
   <a href="index.html" class="ob-nav__logo">
     <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>Logidma
   </a>
+
+  <!-- Persona chip — centre -->
   <div class="ob-nav__persona" id="navPersona">
     <div class="ob-nav__avatar" id="navAvatar">
       <img id="navAvatarImg" alt=""/>
       <span class="ob-nav__initials" id="navInitials"></span>
     </div>
-    <div class="ob-nav__info">
-      <div class="ob-nav__greeting" id="navGreeting"></div>
+    <div class="ob-nav__text">
+      <div class="ob-nav__name" id="navName"></div>
       <div class="ob-nav__project" id="navProject"></div>
     </div>
   </div>
-  <div class="ob-nav__step" id="stepLabel"></div>
+
+  <!-- Stage label — right -->
+  <div class="ob-nav__stage">
+    <div class="ob-nav__stage-pill" id="stagePill"></div>
+  </div>
 </nav>
 
 <main class="ob-wrap">
@@ -1081,44 +1110,53 @@ window.goStep = async function(id, back=false){
   transitioning = false;
 };
 
-/* ── PROGRESS ── */
-function buildStages(){
-  const bar = $('stagesBar'); bar.innerHTML = '';
-  STAGE_NAMES.forEach((_, i) => {
-    const d = document.createElement('div');
-    d.className='ob-stage-dot'; d.id='sd'+i; bar.appendChild(d);
-    if(i < STAGE_NAMES.length-1){
-      const l = document.createElement('div');
-      l.className='ob-stage-line'; l.id='sl'+i; bar.appendChild(l);
-    }
+/* ── SEGMENTED PROGRESS ── */
+function buildSegments(){
+  const track=$('segTrack'); track.innerHTML='';
+  STAGE_NAMES.forEach((_,i)=>{
+    const seg=document.createElement('div');
+    seg.className='ob-seg'; seg.id='seg'+i; track.appendChild(seg);
   });
 }
 function updateProgress(){
-  const ord = s.ruta==='auto' ? ORD_AUTO : ORD_WEB;
+  const ord  = s.ruta==='auto' ? ORD_AUTO : ORD_WEB;
   const sidx = s.ruta==='auto' ? SIDX_AUTO : SIDX_WEB;
-  const idx = ord.indexOf(cur);
-  const pct = idx<0 ? 3 : Math.round(((idx+1)/ord.length)*100);
-  $('progressFill').style.width = pct+'%';
-  const si = idx<0 ? 0 : sidx[idx];
+  const idx  = ord.indexOf(cur);
+  const si   = idx<0 ? 0 : sidx[idx];
   STAGE_NAMES.forEach((_,i)=>{
-    const d=$('sd'+i);
-    if(d) d.className='ob-stage-dot'+(i<si?' done':i===si?' active':'');
-    const l=$('sl'+i);
-    if(l) l.className='ob-stage-line'+(i<si?' done':'');
+    const seg=$('seg'+i); if(!seg) return;
+    seg.className='ob-seg'+(i<si?' done':i===si?' active':'');
   });
-  $('stepLabel').textContent = idx>=0 ? STAGE_NAMES[si] : '';
+  const pill=$('stagePill');
+  if(pill){
+    const name=STAGE_NAMES[si]||'';
+    const num=String(si+1).padStart(2,'0');
+    pill.textContent=idx>=0?`${num} / ${name}`:'';
+    pill.className='ob-nav__stage-pill'+(idx>=0?' active':'');
+  }
 }
 
 /* ── NAV PERSONALIZATION ── */
 function updateNav(){
-  const p = $('navPersona');
+  const p=$('navPersona');
   if(!s.nombre){ p.classList.remove('visible'); return; }
-  p.classList.add('visible');
-  const img = $('navAvatarImg'), ini = $('navInitials');
-  if(s.logoLocal){ img.src=s.logoLocal; img.style.display='block'; ini.style.display='none'; }
-  else{ img.style.display='none'; ini.style.display='block'; ini.textContent=s.nombre[0].toUpperCase()+(s.proyecto?s.proyecto[0].toUpperCase():''); }
-  $('navGreeting').textContent = `Hola, ${s.nombre}`;
-  $('navProject').textContent  = s.proyecto||'';
+
+  // Avatar: show logo image, fade-in over initials
+  const img=$('navAvatarImg'), ini=$('navInitials');
+  if(s.logoLocal && img.src !== s.logoLocal){
+    img.src = s.logoLocal;
+    img.onload = ()=>{ img.classList.add('loaded'); ini.style.opacity='0'; };
+  } else if(!s.logoLocal){
+    img.classList.remove('loaded'); ini.style.opacity='1';
+    ini.textContent = (s.nombre[0]||'').toUpperCase()+(s.proyecto?s.proyecto[0].toUpperCase():'');
+  }
+
+  // Text
+  $('navName').textContent    = s.nombre;
+  $('navProject').textContent = s.proyecto||'';
+
+  // Reveal with spring — only add class, CSS handles the animation
+  if(!p.classList.contains('visible')) p.classList.add('visible');
 }
 
 /* ── STEP 1 ── */
@@ -1357,14 +1395,15 @@ window.signInGoogle=async()=>{
 };
 window.finish=()=>{
   $(cur).classList.remove('active'); cur='success';
-  $('progressFill').style.width='100%';
-  $('stepLabel').textContent='Completado';
+  // Fill all segments
+  STAGE_NAMES.forEach((_,i)=>{ const seg=$('seg'+i); if(seg) seg.className='ob-seg done'; });
+  const pill=$('stagePill'); if(pill){ pill.textContent='Completado'; pill.className='ob-nav__stage-pill active'; }
   $('successScreen').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
 };
 
 /* ── INIT ── */
-buildStages();
+buildSegments();
 updateProgress();
 </script>
 </body>
