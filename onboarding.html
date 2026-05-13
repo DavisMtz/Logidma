@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0908"/>
+<title>Construye tu sistema — Logidma</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+
+<style>
+/* ── ROOT VARIABLES (overridable by color picker) ── */
+:root{
+  --bg:#0a0908; --bg-2:#111110; --surface:#16140f;
+  --line:rgba(235,229,214,0.08); --line-strong:rgba(235,229,214,0.18);
+  --cream:#ebe5d6; --cream-soft:#c9c2b0; --muted:#6b6657;
+  --accent:#c4ff3a; --accent-soft:rgba(196,255,58,0.12); --accent-glow:rgba(196,255,58,0.4);
+  --brand-1:#c4ff3a; --brand-2:#b08d57; --brand-3:transparent;
+  --bronze:#b08d57; --maxw:860px;
+  --e-expo:cubic-bezier(0.16,1,0.3,1); --e-quart:cubic-bezier(0.22,1,0.36,1);
+  --e-back:cubic-bezier(0.34,1.56,0.64,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  background:var(--bg); color:var(--cream);
+  font-family:'Manrope',system-ui,sans-serif; font-weight:300;
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+  overflow-x:hidden; min-height:100vh;
+}
+/* grid background */
+body::before{
+  content:""; position:fixed; inset:0;
+  background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);
+  background-size:80px 80px; pointer-events:none; z-index:0;
+  mask-image:radial-gradient(ellipse at center,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.25) 70%,transparent 100%);
+  -webkit-mask-image:radial-gradient(ellipse at center,rgba(0,0,0,0.85) 0%,rgba(0,0,0,0.25) 70%,transparent 100%);
+}
+body::after{
+  content:""; position:fixed; inset:0;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/><feColorMatrix values='0 0 0 0 0.92 0 0 0 0 0.89 0 0 0 0 0.83 0 0 0 0.04 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+  pointer-events:none; opacity:0.5; mix-blend-mode:overlay; z-index:1;
+}
+/* ambient glow reacts to brand colors */
+.ambient{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.ambient::before{
+  content:""; position:absolute; width:60vw; height:60vw; border-radius:50%;
+  filter:blur(120px); opacity:0.12; top:-20%; left:-10%;
+  background:radial-gradient(circle,var(--brand-1) 0%,transparent 70%);
+  animation:drift1 22s ease-in-out infinite alternate;
+}
+.ambient::after{
+  content:""; position:absolute; width:60vw; height:60vw; border-radius:50%;
+  filter:blur(120px); opacity:0.1; bottom:-20%; right:-10%;
+  background:radial-gradient(circle,var(--brand-2) 0%,transparent 70%);
+  animation:drift2 28s ease-in-out infinite alternate;
+}
+@keyframes drift1{from{transform:translate(0,0) scale(1);}to{transform:translate(15vw,10vh) scale(1.15);}}
+@keyframes drift2{from{transform:translate(0,0) scale(1);}to{transform:translate(-10vw,-8vh) scale(1.1);}}
+
+/* ── LAYOUT ── */
+.ob-wrap{position:relative;z-index:2;max-width:var(--maxw);margin:0 auto;padding:clamp(40px,6vw,80px) clamp(20px,4vw,32px);}
+
+/* ── PROGRESS BAR ── */
+.ob-progress{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  height:3px; background:var(--line-strong);
+}
+.ob-progress__bar{
+  height:100%; background:var(--brand-1);
+  box-shadow:0 0 12px var(--accent-glow);
+  transition:width .6s var(--e-expo);
+  width:0%;
+}
+
+/* ── TOP NAV ── */
+.ob-nav{
+  position:fixed;top:0;left:0;right:0;z-index:99;
+  padding:20px clamp(20px,4vw,40px);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.ob-nav__logo{
+  font-family:'JetBrains Mono',monospace; font-size:.75rem;
+  letter-spacing:3px; text-transform:uppercase; color:var(--muted);
+  text-decoration:none; transition:color .3s;
+}
+.ob-nav__logo:hover{color:var(--cream);}
+.ob-nav__step{
+  font-family:'JetBrains Mono',monospace; font-size:.7rem;
+  letter-spacing:2px; text-transform:uppercase; color:var(--muted);
+}
+
+/* ── STEP PANELS ── */
+.ob-step{
+  display:none; opacity:0;
+  animation:stepIn .6s var(--e-expo) forwards;
+  padding-top:clamp(80px,10vw,120px);
+  min-height:100vh;
+}
+.ob-step.active{display:block;}
+@keyframes stepIn{from{opacity:0;transform:translateY(24px);}to{opacity:1;transform:translateY(0);}}
+
+/* step label */
+.ob-step__label{
+  font-family:'JetBrains Mono',monospace; font-size:.68rem;
+  letter-spacing:3px; text-transform:uppercase; color:var(--muted);
+  margin-bottom:20px; display:flex; align-items:center; gap:10px;
+}
+.ob-step__label::before{
+  content:""; display:block; width:28px; height:1px; background:var(--muted);
+}
+.ob-step__title{
+  font-family:'Instrument Serif',serif; font-style:italic;
+  font-size:clamp(2rem,5vw,3.4rem); line-height:1.05;
+  letter-spacing:-.02em; margin-bottom:16px; color:var(--cream);
+}
+.ob-step__title em{color:var(--brand-1); font-style:italic;}
+.ob-step__sub{
+  font-size:clamp(.95rem,1.5vw,1.05rem); color:var(--cream-soft);
+  margin-bottom:48px; max-width:560px;
+}
+
+/* ── INPUT FIELDS ── */
+.ob-field{margin-bottom:36px; position:relative;}
+.ob-label{
+  font-family:'JetBrains Mono',monospace; font-size:.7rem;
+  letter-spacing:2px; text-transform:uppercase; color:var(--muted);
+  display:block; margin-bottom:12px;
+}
+.ob-input,.ob-textarea{
+  width:100%; background:transparent; border:none;
+  border-bottom:1px solid var(--line-strong);
+  padding:14px 0; font-family:'Manrope',sans-serif;
+  font-size:clamp(1rem,2vw,1.15rem); color:var(--cream);
+  outline:none; transition:border-color .3s;
+}
+.ob-input::placeholder,.ob-textarea::placeholder{color:var(--muted);}
+.ob-input:focus,.ob-textarea:focus{border-bottom-color:var(--brand-1);}
+.ob-textarea{resize:vertical;min-height:120px;padding-top:14px;line-height:1.6;}
+.ob-field__line{
+  position:absolute; bottom:0; left:0; right:0; height:2px;
+  background:var(--brand-1); box-shadow:0 0 8px var(--accent-glow);
+  transform:scaleX(0); transform-origin:left; transition:transform .4s var(--e-expo);
+}
+.ob-input:focus~.ob-field__line,.ob-textarea:focus~.ob-field__line{transform:scaleX(1);}
+.ob-error{
+  font-family:'JetBrains Mono',monospace; font-size:.68rem;
+  color:#ff6b6b; letter-spacing:1px; margin-top:8px; display:none;
+}
+.ob-error.show{display:block;}
+
+/* ── BUTTONS ── */
+.ob-btn{
+  font-family:'JetBrains Mono',monospace; font-size:.78rem;
+  text-transform:uppercase; letter-spacing:3px;
+  padding:16px 36px; border:1px solid var(--brand-1);
+  border-radius:999px; color:var(--bg); background:var(--brand-1);
+  cursor:pointer; display:inline-flex; align-items:center; gap:10px;
+  transition:all .4s var(--e-expo); box-shadow:0 0 24px -4px var(--accent-glow);
+  margin-top:8px;
+}
+.ob-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px -2px var(--accent-glow);}
+.ob-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+.ob-btn--ghost{
+  background:transparent; color:var(--cream-soft);
+  border-color:var(--line-strong); box-shadow:none;
+}
+.ob-btn--ghost:hover{border-color:var(--cream);color:var(--cream);box-shadow:none;}
+
+/* ── PATH CARDS ── */
+.path-cards{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:8px;}
+@media(max-width:560px){.path-cards{grid-template-columns:1fr;}}
+.path-card{
+  border:1px solid var(--line-strong); border-radius:16px;
+  padding:32px 28px; cursor:pointer; position:relative; overflow:hidden;
+  transition:border-color .4s var(--e-expo), background .4s;
+  background:var(--surface);
+}
+.path-card::before{
+  content:""; position:absolute; top:0;left:0;right:0; height:2px;
+  background:var(--brand-1); transform:scaleX(0); transform-origin:left;
+  transition:transform .5s var(--e-expo);
+}
+.path-card:hover::before,.path-card.selected::before{transform:scaleX(1);}
+.path-card:hover,.path-card.selected{border-color:var(--brand-1);}
+.path-card.selected{background:var(--accent-soft);}
+.path-card__icon{
+  width:44px;height:44px; border:1px solid var(--line-strong); border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--brand-1); margin-bottom:20px;
+  transition:background .3s,border-color .3s;
+}
+.path-card:hover .path-card__icon,.path-card.selected .path-card__icon{
+  background:var(--accent-soft); border-color:var(--brand-1);
+}
+.path-card__icon svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.5;}
+.path-card__title{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:1.35rem;margin-bottom:10px;color:var(--cream);
+}
+.path-card__desc{font-size:.9rem;color:var(--cream-soft);line-height:1.6;}
+.path-card__check{
+  position:absolute;top:16px;right:16px;
+  width:20px;height:20px;border-radius:50%;
+  border:1px solid var(--line-strong); display:flex;align-items:center;justify-content:center;
+  transition:background .3s,border-color .3s;
+}
+.path-card.selected .path-card__check{background:var(--brand-1);border-color:var(--brand-1);}
+.path-card__check svg{width:10px;height:10px;stroke:var(--bg);fill:none;stroke-width:3;opacity:0;transition:opacity .2s;}
+.path-card.selected .path-card__check svg{opacity:1;}
+
+/* ── GREETING BANNER ── */
+.ob-greeting{
+  background:var(--surface); border:1px solid var(--line-strong);
+  border-radius:16px; padding:28px 32px; margin-bottom:48px;
+  border-left:3px solid var(--brand-1);
+}
+.ob-greeting p{font-size:1.05rem;color:var(--cream-soft);line-height:1.7;}
+.ob-greeting strong{color:var(--cream);}
+
+/* ── DOMAIN INPUT + BADGES ── */
+.domain-suggestions{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;}
+.domain-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.72rem;
+  padding:6px 14px; border:1px solid var(--line-strong); border-radius:999px;
+  color:var(--cream-soft); cursor:pointer; transition:all .3s;
+}
+.domain-badge:hover,.domain-badge.active{border-color:var(--brand-1);color:var(--brand-1);}
+
+/* ── LOGO DROPZONE ── */
+.logo-dropzone{
+  border:2px dashed var(--line-strong); border-radius:16px;
+  padding:48px 32px; text-align:center; cursor:pointer;
+  transition:border-color .4s,background .4s; position:relative;
+}
+.logo-dropzone.dragover{border-color:var(--brand-1);background:var(--accent-soft);}
+.logo-dropzone input[type=file]{
+  position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;
+}
+.logo-dropzone__icon{color:var(--muted);margin-bottom:16px;}
+.logo-dropzone__icon svg{width:40px;height:40px;stroke:currentColor;fill:none;stroke-width:1;}
+.logo-dropzone__text{color:var(--muted);font-size:.9rem;}
+.logo-dropzone__text strong{color:var(--cream-soft);}
+.logo-preview{
+  display:none; margin-top:24px; align-items:center; gap:20px;
+  background:var(--surface); border:1px solid var(--line-strong);
+  border-radius:12px; padding:16px 20px;
+}
+.logo-preview.visible{display:flex;}
+.logo-preview img{
+  width:56px;height:56px;object-fit:contain;
+  border-radius:8px;background:rgba(255,255,255,0.04);padding:4px;
+}
+.logo-preview__name{font-size:.85rem;color:var(--cream-soft);}
+.logo-preview__remove{
+  margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:.65rem;
+  letter-spacing:2px; color:var(--muted); cursor:pointer;
+  text-transform:uppercase; transition:color .3s;
+}
+.logo-preview__remove:hover{color:#ff6b6b;}
+.logo-upload-status{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  letter-spacing:2px;margin-top:12px;color:var(--muted);
+}
+
+/* ── BRAND HEADER (shown after logo) ── */
+.brand-header{
+  display:flex;align-items:center;gap:20px;
+  background:var(--surface);border:1px solid var(--line-strong);
+  border-radius:16px;padding:20px 24px;margin-bottom:40px;
+  opacity:0;transition:opacity .6s var(--e-expo);
+}
+.brand-header.visible{opacity:1;}
+.brand-header img{width:48px;height:48px;object-fit:contain;border-radius:8px;}
+.brand-header__name{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.4rem;}
+.brand-header__tagline{font-size:.8rem;color:var(--muted);}
+
+/* ── COLOR PICKER ── */
+.color-pickers{display:flex;gap:24px;flex-wrap:wrap;margin-top:16px;}
+.color-slot{display:flex;flex-direction:column;gap:10px;align-items:center;}
+.color-slot__label{font-family:'JetBrains Mono',monospace;font-size:.65rem;letter-spacing:2px;text-transform:uppercase;color:var(--muted);}
+.color-slot input[type=color]{
+  width:56px;height:56px;border:2px solid var(--line-strong);
+  border-radius:50%;cursor:pointer;padding:4px;background:none;
+  transition:border-color .3s;
+}
+.color-slot input[type=color]:hover{border-color:var(--cream-soft);}
+
+/* ── TECH STACK CHIPS ── */
+.stack-chips{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px;}
+.stack-chip{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  letter-spacing:1px;padding:8px 16px;
+  border:1px solid var(--line-strong);border-radius:999px;
+  color:var(--cream-soft);cursor:pointer;transition:all .3s;
+}
+.stack-chip:hover,.stack-chip.active{border-color:var(--brand-1);color:var(--brand-1);}
+
+/* ── SUMMARY CARD ── */
+.summary-card{
+  background:var(--surface);border:1px solid var(--line-strong);
+  border-radius:20px;overflow:hidden;margin-bottom:32px;
+}
+.summary-card__header{
+  padding:24px 28px;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:16px;
+}
+.summary-card__header img{width:40px;height:40px;object-fit:contain;border-radius:6px;}
+.summary-card__biz{font-family:'Instrument Serif',serif;font-style:italic;font-size:1.2rem;}
+.summary-card__body{padding:24px 28px;}
+.summary-row{
+  display:flex;gap:12px;padding:12px 0;
+  border-bottom:1px solid var(--line);
+  font-size:.9rem;
+}
+.summary-row:last-child{border-bottom:none;}
+.summary-row__key{
+  font-family:'JetBrains Mono',monospace;font-size:.68rem;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  min-width:120px;padding-top:2px;
+}
+.summary-row__val{color:var(--cream-soft);line-height:1.5;}
+
+/* ── PREVIEW WIREFRAME ── */
+.preview-wrap{
+  border:1px solid var(--line-strong);border-radius:16px;overflow:hidden;
+  margin-bottom:12px; background:var(--surface);
+}
+.preview-bar{
+  background:var(--bg-2);padding:10px 16px;
+  display:flex;align-items:center;gap:8px;
+  border-bottom:1px solid var(--line);
+}
+.preview-dot{width:10px;height:10px;border-radius:50%;}
+.preview-frame{padding:28px;min-height:320px;}
+.preview-navbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 0 20px;border-bottom:1px solid var(--line);margin-bottom:24px;
+}
+.preview-logo-area{display:flex;align-items:center;gap:10px;}
+.preview-logo-img{
+  width:32px;height:32px;object-fit:contain;border-radius:4px;
+  border:1px solid var(--line-strong);
+}
+.preview-biz-name{font-family:'Instrument Serif',serif;font-size:1rem;font-style:italic;}
+.preview-nav-links{display:flex;gap:14px;}
+.preview-nav-link{
+  font-family:'JetBrains Mono',monospace;font-size:.55rem;
+  letter-spacing:2px;text-transform:uppercase;
+  background:var(--line);border-radius:4px;padding:4px 10px;
+}
+.preview-hero-area{text-align:center;padding:24px 0;}
+.preview-hero-title{
+  font-family:'Instrument Serif',serif;font-size:1.8rem;font-style:italic;
+  margin-bottom:12px;
+}
+.preview-hero-sub{font-size:.75rem;color:var(--cream-soft);margin-bottom:20px;}
+.preview-cta{
+  display:inline-block;padding:10px 24px;border-radius:999px;
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  letter-spacing:2px;text-transform:uppercase;
+  background:var(--brand-1);color:#0a0908;
+}
+.preview-disclaimer{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  letter-spacing:1px;color:var(--muted);text-align:center;margin-bottom:40px;
+  padding:12px;border:1px solid var(--line);border-radius:8px;
+}
+
+/* ── GOOGLE AUTH BUTTON ── */
+.btn-google{
+  display:inline-flex;align-items:center;gap:12px;
+  padding:16px 28px;border:1px solid var(--line-strong);
+  border-radius:999px;background:transparent;
+  color:var(--cream);cursor:pointer;font-family:'Manrope',sans-serif;
+  font-size:.95rem;font-weight:400;transition:all .4s var(--e-expo);
+  margin-top:8px;
+}
+.btn-google:hover{border-color:var(--cream);background:rgba(255,255,255,0.04);}
+.btn-google svg{width:20px;height:20px;flex-shrink:0;}
+
+/* ── FINAL SUCCESS ── */
+.ob-success{
+  text-align:center;padding:clamp(60px,10vw,100px) 0;display:none;
+}
+.ob-success__icon{
+  width:64px;height:64px;border-radius:50%;
+  background:var(--accent-soft);border:1px solid var(--brand-1);
+  display:inline-flex;align-items:center;justify-content:center;
+  margin-bottom:28px;color:var(--brand-1);
+}
+.ob-success__icon svg{width:28px;height:28px;stroke:currentColor;fill:none;stroke-width:1.5;}
+.ob-success h2{
+  font-family:'Instrument Serif',serif;font-style:italic;
+  font-size:clamp(1.8rem,4vw,2.8rem);margin-bottom:16px;
+}
+.ob-success p{color:var(--cream-soft);max-width:500px;margin:0 auto 32px;}
+
+/* ── BACK LINK ── */
+.ob-back{
+  font-family:'JetBrains Mono',monospace;font-size:.7rem;
+  letter-spacing:2px;text-transform:uppercase;color:var(--muted);
+  cursor:pointer;background:none;border:none;
+  display:inline-flex;align-items:center;gap:8px;
+  transition:color .3s;margin-bottom:40px;
+}
+.ob-back:hover{color:var(--cream);}
+
+/* ── ACTIONS ROW ── */
+.ob-actions{display:flex;align-items:center;gap:16px;flex-wrap:wrap;margin-top:48px;}
+
+/* ── ROUTE BADGE ── */
+.route-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:6px 14px;border-radius:999px;
+  border:1px solid var(--brand-1);color:var(--brand-1);
+  margin-bottom:24px;
+}
+
+/* ── LOADING SPINNER ── */
+.ob-spinner{
+  display:inline-block;width:16px;height:16px;
+  border:2px solid rgba(10,9,8,0.3);border-top-color:var(--bg);
+  border-radius:50%;animation:spin .8s linear infinite;
+}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ── RESPONSIVE ── */
+@media(max-width:600px){
+  .path-cards{grid-template-columns:1fr;}
+  .ob-actions{flex-direction:column;align-items:flex-start;}
+}
+</style>
+</head>
+<body>
+
+<div class="ambient"></div>
+
+<!-- Progress bar -->
+<div class="ob-progress"><div class="ob-progress__bar" id="progressBar"></div></div>
+
+<!-- Top nav -->
+<nav class="ob-nav">
+  <a href="index.html" class="ob-nav__logo">← Logidma</a>
+  <span class="ob-nav__step" id="stepIndicator">Paso 1 / 8</span>
+</nav>
+
+<main class="ob-wrap">
+
+<!-- ══════════════════════════════════════
+     STEP 1 — Identidad básica
+══════════════════════════════════════ -->
+<section class="ob-step active" id="step1">
+  <div class="ob-step__label">Inicio del proceso</div>
+  <h1 class="ob-step__title">Cuéntanos sobre <em>ti</em>.</h1>
+  <p class="ob-step__sub">Comenzamos con lo básico. Estos datos personalizarán toda tu experiencia.</p>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputNombre">Tu nombre</label>
+    <input class="ob-input" id="inputNombre" type="text" placeholder="¿Cómo te llaman?" autocomplete="given-name"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errNombre">Por favor, ingresa tu nombre.</div>
+  </div>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputProyecto">Nombre de tu proyecto, negocio o idea</label>
+    <input class="ob-input" id="inputProyecto" type="text" placeholder="Ej. Taquería El Padrino, Bienes Raíces Torres…"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errProyecto">Por favor, ingresa el nombre de tu proyecto.</div>
+  </div>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputGiro">Giro del negocio</label>
+    <input class="ob-input" id="inputGiro" type="text" placeholder="Ej. Restaurante, Bienes Raíces, E-commerce, Salud…"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errGiro">Por favor, describe el giro de tu negocio.</div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStep1">Continuar →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     STEP 2 — Saludo dinámico + bifurcación
+══════════════════════════════════════ -->
+<section class="ob-step" id="step2">
+  <div class="ob-greeting" id="greetingBanner">
+    <p id="greetingText"></p>
+  </div>
+
+  <div class="ob-step__label">Elige tu camino</div>
+  <h2 class="ob-step__title">¿Qué buscas <em>construir</em> hoy?</h2>
+  <p class="ob-step__sub">Podemos ayudarte de dos maneras. Selecciona la que mejor describe tu necesidad.</p>
+
+  <div class="path-cards">
+    <div class="path-card" id="pathWeb" onclick="selectPath('web')">
+      <div class="path-card__check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+      <div class="path-card__icon">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/></svg>
+      </div>
+      <div class="path-card__title">Portal web propio</div>
+      <div class="path-card__desc">Quiero un sitio web profesional que refleje mi marca y atraiga clientes.</div>
+    </div>
+    <div class="path-card" id="pathAuto" onclick="selectPath('auto')">
+      <div class="path-card__check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>
+      <div class="path-card__icon">
+        <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </div>
+      <div class="path-card__title">Automatizar procesos</div>
+      <div class="path-card__desc">Tengo tareas repetitivas o flujos de trabajo que quiero optimizar con tecnología.</div>
+    </div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStep2" disabled>Continuar →</button>
+    <button class="ob-back" onclick="goStep(1)">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RUTA A — STEP 3 — Estilo y audiencia
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepA3">
+  <div class="route-badge">
+    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+    Portal web
+  </div>
+  <div class="ob-step__label">Paso 3 · Enfoque y audiencia</div>
+  <h2 class="ob-step__title">Hablemos del <em>estilo</em>.</h2>
+  <p class="ob-step__sub">Esto nos ayuda a orientar el diseño hacia tu marca y público objetivo.</p>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputEstilo">¿Cuál es el estilo de tu negocio?</label>
+    <input class="ob-input" id="inputEstilo" type="text" placeholder="Ej. Moderno y minimalista, cálido y familiar, lujo, fresco y juvenil…"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errEstilo">Describe el estilo de tu negocio.</div>
+  </div>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputPublico">¿A quién quieres dirigirte?</label>
+    <input class="ob-input" id="inputPublico" type="text" placeholder="Ej. Familias locales, empresas medianas, jóvenes 18-30…"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errPublico">Describe tu público objetivo.</div>
+  </div>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputProposito">¿Para qué quieres usar tu web?</label>
+    <input class="ob-input" id="inputProposito" type="text" placeholder="Ej. Mostrar mi menú, vender en línea, captar clientes, dar a conocer mis servicios…"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errProposito">Cuéntanos el propósito de tu web.</div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStepA3">Continuar →</button>
+    <button class="ob-back" onclick="goStep(2)">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RUTA A — STEP 4 — Dominio
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepA4">
+  <div class="route-badge">
+    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+    Portal web
+  </div>
+  <div class="ob-step__label">Paso 4 · Presencia digital</div>
+  <h2 class="ob-step__title">Tu dirección en <em>internet</em>.</h2>
+  <p class="ob-step__sub">¿Qué dominio quieres conseguir para tu negocio?</p>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputDominio">Nombre del dominio</label>
+    <input class="ob-input" id="inputDominio" type="text" placeholder="Ej. mirestaurante" oninput="updateDomainSuggestions()"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errDominio">Ingresa el nombre de dominio que deseas.</div>
+  </div>
+
+  <div class="domain-suggestions" id="domainSuggestions"></div>
+
+  <div style="margin-top:20px;font-size:.82rem;color:var(--muted);display:flex;align-items:center;gap:8px;">
+    <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" fill="none" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    Validaremos la disponibilidad de este dominio por ti.
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStepA4">Continuar →</button>
+    <button class="ob-back" onclick="goStep('A3')">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RUTA A — STEP 5 — Logo upload
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepA5">
+  <div class="route-badge">
+    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+    Portal web
+  </div>
+  <div class="ob-step__label">Paso 5 · Identidad gráfica</div>
+  <h2 class="ob-step__title">El rostro de tu <em>marca</em>.</h2>
+  <p class="ob-step__sub">Sube el logo de tu negocio. Lo guardaremos de forma segura en la nube.</p>
+
+  <div class="logo-dropzone" id="logoDropzone">
+    <input type="file" id="logoInput" accept="image/png,image/jpeg,image/webp,image/svg+xml" onchange="handleLogoFile(this.files[0])"/>
+    <div class="logo-dropzone__icon">
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+    </div>
+    <div class="logo-dropzone__text">
+      <strong>Arrastra tu logo aquí</strong> o haz clic para seleccionar<br>
+      <span style="font-size:.78rem;margin-top:8px;display:block;">PNG, JPG, SVG · Máx. 5MB</span>
+    </div>
+  </div>
+
+  <div class="logo-preview" id="logoPreviewRow">
+    <img id="logoThumb" src="" alt="Logo preview"/>
+    <div>
+      <div id="logoFileName" class="logo-preview__name"></div>
+      <div class="logo-upload-status" id="logoUploadStatus">Pendiente de subida…</div>
+    </div>
+    <div class="logo-preview__remove" onclick="removeLogo()">✕ Quitar</div>
+  </div>
+
+  <div class="ob-error" id="errLogo" style="margin-top:16px;">Por favor sube el logo de tu negocio.</div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStepA5" disabled>Continuar →</button>
+    <button class="ob-back" onclick="goStep('A4')">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RUTA A — STEP 6 — Colorimetría
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepA6">
+  <div class="route-badge">
+    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+    Portal web
+  </div>
+  <div class="ob-step__label">Paso 6 · Colorimetría</div>
+
+  <!-- Brand header: logo + nombre -->
+  <div class="brand-header" id="brandHeader">
+    <img id="brandHeaderLogo" src="" alt="logo"/>
+    <div>
+      <div class="brand-header__name" id="brandHeaderName"></div>
+      <div class="brand-header__tagline">Tu identidad visual</div>
+    </div>
+  </div>
+
+  <h2 class="ob-step__title">Los colores de tu <em>marca</em>.</h2>
+  <p class="ob-step__sub">Selecciona los colores que representan tu negocio. Verás cómo transforman esta página en tiempo real.</p>
+
+  <div class="color-pickers">
+    <div class="color-slot">
+      <input type="color" id="color1" value="#c4ff3a" oninput="applyBrandColors()"/>
+      <div class="color-slot__label">Color principal</div>
+    </div>
+    <div class="color-slot">
+      <input type="color" id="color2" value="#b08d57" oninput="applyBrandColors()"/>
+      <div class="color-slot__label">Color secundario</div>
+    </div>
+    <div class="color-slot">
+      <input type="color" id="color3" value="#ffffff" oninput="applyBrandColors()"/>
+      <div class="color-slot__label">Acento (opcional)</div>
+    </div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStepA6">Continuar →</button>
+    <button class="ob-back" onclick="goStep('A5')">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RUTA A — STEP 7 — Contexto web
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepA7">
+  <div class="route-badge">
+    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>
+    Portal web
+  </div>
+  <div class="ob-step__label">Paso 7 · Tu visión</div>
+  <h2 class="ob-step__title">¿Qué quieres <em>lograr</em>?</h2>
+  <p class="ob-step__sub">Cuéntanos con tus palabras qué esperas de tu portal propio. Mientras más detalle, mejor podremos ayudarte.</p>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputContextoWeb">Tu visión para el portal</label>
+    <textarea class="ob-textarea" id="inputContextoWeb" placeholder="Ej. Quiero que mis clientes puedan ver mi catálogo, contactarme fácilmente y que cuando alguien busque en Google me encuentren antes que a mi competencia…"></textarea>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errContextoWeb">Cuéntanos un poco sobre tus objetivos.</div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStepA7">Ver resumen →</button>
+    <button class="ob-back" onclick="goStep('A6')">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RUTA B — STEP 3 — Procesos
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepB3">
+  <div class="route-badge">
+    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Automatización
+  </div>
+  <div class="ob-step__label">Paso 3 · Tu situación actual</div>
+  <h2 class="ob-step__title">¿Qué es lo que <em>frena</em> a tu negocio?</h2>
+  <p class="ob-step__sub">¿Manejas información dispersa, procesos repetitivos o tareas que consumen demasiado tiempo? Cuéntanos todo.</p>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputProcesosMejorar">Tu situación y lo que quieres mejorar</label>
+    <textarea class="ob-textarea" id="inputProcesosMejorar" placeholder="Ej. Actualmente registro mis ventas a mano en Excel, después las paso a otro sistema, me toma horas y cometo errores. Necesito que esto sea automático…"></textarea>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errProcesos">Cuéntanos tu situación actual.</div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStepB3">Continuar →</button>
+    <button class="ob-back" onclick="goStep(2)">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RUTA B — STEP 4 — Stack tecnológico
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepB4">
+  <div class="route-badge">
+    <svg viewBox="0 0 24 24" width="12" height="12" stroke="currentColor" fill="none" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Automatización
+  </div>
+  <div class="ob-step__label">Paso 4 · Tus herramientas</div>
+  <h2 class="ob-step__title">¿Con qué <em>trabajas</em> hoy?</h2>
+  <p class="ob-step__sub">Selecciona los programas que usas y agrega los que no estén en la lista.</p>
+
+  <div class="ob-field">
+    <label class="ob-label">Herramientas y aplicaciones (selecciona las que apliquen)</label>
+    <div class="stack-chips" id="stackChips">
+      <div class="stack-chip" onclick="toggleChip(this)">Google Sheets</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Google Drive</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Google Forms</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Gmail</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Microsoft Excel</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Microsoft Teams</div>
+      <div class="stack-chip" onclick="toggleChip(this)">WhatsApp Business</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Contpaq</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Aspel</div>
+      <div class="stack-chip" onclick="toggleChip(this)">SAP</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Notion</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Trello</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Slack</div>
+      <div class="stack-chip" onclick="toggleChip(this)">Zoom</div>
+    </div>
+  </div>
+
+  <div class="ob-field" style="margin-top:8px;">
+    <label class="ob-label" for="inputStackOtro">Otros que uses</label>
+    <input class="ob-input" id="inputStackOtro" type="text" placeholder="Escribe otros programas separados por coma…"/>
+    <div class="ob-field__line"></div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnStepB4">Ver resumen →</button>
+    <button class="ob-back" onclick="goStep('B3')">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     RESUMEN — compartido por ambas rutas
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepResumen">
+  <div class="ob-step__label">Resumen de tu proyecto</div>
+  <h2 class="ob-step__title">Todo listo para <em>cotizar</em>.</h2>
+  <p class="ob-step__sub">Revisaremos tu información a detalle para estructurar una propuesta a la medida de tu negocio.</p>
+
+  <!-- Summary card -->
+  <div class="summary-card">
+    <div class="summary-card__header" id="summaryHeader">
+      <img id="summaryLogo" src="" alt="logo" style="display:none;"/>
+      <div>
+        <div class="summary-card__biz" id="summaryBizName"></div>
+        <div style="font-size:.78rem;color:var(--muted);" id="summaryGiro"></div>
+      </div>
+    </div>
+    <div class="summary-card__body" id="summaryBody"></div>
+  </div>
+
+  <!-- Preview (Ruta A only) -->
+  <div id="previewSection" style="display:none;">
+    <div class="preview-wrap">
+      <div class="preview-bar">
+        <div class="preview-dot" style="background:#ff5f57;"></div>
+        <div class="preview-dot" style="background:#ffbd2e;"></div>
+        <div class="preview-dot" style="background:#28ca41;"></div>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:.6rem;color:var(--muted);margin-left:8px;" id="previewDomain"></span>
+      </div>
+      <div class="preview-frame">
+        <div class="preview-navbar">
+          <div class="preview-logo-area">
+            <img class="preview-logo-img" id="previewLogoImg" src="" alt="" style="display:none;"/>
+            <div class="preview-biz-name" id="previewBizName"></div>
+          </div>
+          <div class="preview-nav-links">
+            <div class="preview-nav-link">Inicio</div>
+            <div class="preview-nav-link">Servicios</div>
+            <div class="preview-nav-link">Contacto</div>
+          </div>
+        </div>
+        <div class="preview-hero-area">
+          <div class="preview-hero-title" id="previewTitle"></div>
+          <div class="preview-hero-sub" id="previewSub"></div>
+          <div class="preview-cta" id="previewCta" style="background:var(--brand-1);">Contáctanos →</div>
+        </div>
+      </div>
+    </div>
+    <div class="preview-disclaimer">
+      ⓘ Esta vista previa es solo una representación visual de tus respuestas y no representa el formato final de diseño.
+    </div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnResumen">Confirmar y dejar mis datos →</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CONTACTO — datos finales
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepContacto">
+  <div class="ob-step__label">Casi terminamos</div>
+  <h2 class="ob-step__title">¿Dónde te <em>encontramos</em>?</h2>
+  <p class="ob-step__sub">Necesitamos estos datos para enviarte tu cotización y dar seguimiento a tu proyecto.</p>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputCorreo">Correo electrónico</label>
+    <input class="ob-input" id="inputCorreo" type="email" placeholder="tu@correo.com" autocomplete="email"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errCorreo">Ingresa un correo electrónico válido.</div>
+  </div>
+
+  <div class="ob-field">
+    <label class="ob-label" for="inputTelefono">Número de teléfono / WhatsApp</label>
+    <input class="ob-input" id="inputTelefono" type="tel" placeholder="+52 555 000 0000" autocomplete="tel"/>
+    <div class="ob-field__line"></div>
+    <div class="ob-error" id="errTelefono">Ingresa un número de teléfono.</div>
+  </div>
+
+  <div class="ob-actions">
+    <button class="ob-btn" id="btnContacto">Enviar información →</button>
+    <button class="ob-back" onclick="goStep('resumen')">← Regresar</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     PORTAL DE CLIENTE — Google Auth
+══════════════════════════════════════ -->
+<section class="ob-step" id="stepPortal">
+  <div class="ob-step__label">Portal de cliente</div>
+  <h2 class="ob-step__title">Tu proyecto está <em>en marcha</em>.</h2>
+  <p class="ob-step__sub">Registra tu cuenta para acceder al portal de cliente, conocer el estatus de tu proceso y recibir actualizaciones.</p>
+
+  <div class="ob-greeting" style="margin-bottom:40px;">
+    <p>📬 Te notificaremos los siguientes pasos mediante correo electrónico. También podrás consultar el estatus de tu proyecto directamente en el <strong>portal de cliente</strong>.</p>
+  </div>
+
+  <div style="display:flex;flex-direction:column;align-items:flex-start;gap:16px;">
+    <button class="btn-google" id="btnGoogle" onclick="signInWithGoogle()">
+      <svg viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Registrarme con Google
+    </button>
+    <span style="font-size:.82rem;color:var(--muted);">o continúa sin registrarte — te contactaremos por los datos proporcionados.</span>
+    <button class="ob-btn ob-btn--ghost" onclick="finishWithoutAuth()">Continuar sin cuenta</button>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     ÉXITO FINAL
+══════════════════════════════════════ -->
+<div class="ob-success" id="successScreen">
+  <div class="ob-success__icon">
+    <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+  </div>
+  <h2>¡Tu información está <em>registrada</em>!</h2>
+  <p>Nuestro equipo revisará tu proyecto y se pondrá en contacto contigo a la brevedad. Sigue el estatus de tu proceso en el portal de cliente.</p>
+  <a href="index.html" class="ob-btn" style="text-decoration:none;">← Volver al inicio</a>
+</div>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════
+     JAVASCRIPT — Lógica del flujo completo
+══════════════════════════════════════════════════ -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
+const firebaseConfig = {
+  apiKey:"AIzaSyCiDKiKDvPkPIonnFrsWU-IJkpNIpfQt9g",
+  authDomain:"logidma-c1df8.firebaseapp.com",
+  projectId:"logidma-c1df8",
+  storageBucket:"logidma-c1df8.firebasestorage.app",
+  messagingSenderId:"1089066225627",
+  appId:"1:1089066225627:web:29add3b175fb959fe221fe"
+};
+
+const app  = initializeApp(firebaseConfig);
+const stor = getStorage(app);
+const auth = getAuth(app);
+const googleProvider = new GoogleAuthProvider();
+
+/* ─────────────────────────────────
+   STATE
+───────────────────────────────── */
+const state = {
+  nombre:'', proyecto:'', giro:'',
+  ruta: null, // 'web' | 'auto'
+  // Ruta A
+  estilo:'', publico:'', proposito:'',
+  dominio:'', dominioExtension:'.com',
+  logoFile:null, logoUrl:'', logoLocalUrl:'',
+  colores:'', color1:'#c4ff3a', color2:'#b08d57', color3:'',
+  contextoWeb:'',
+  // Ruta B
+  procesosMejorar:'', stack:'',
+  // Contacto
+  correo:'', telefono:'',
+  // Meta
+  rutaElegida:'',
+};
+
+/* ─────────────────────────────────
+   STEP NAVIGATION
+───────────────────────────────── */
+// Step order for progress calculation
+const STEP_ORDER_WEB  = ['step1','step2','stepA3','stepA4','stepA5','stepA6','stepA7','stepResumen','stepContacto','stepPortal'];
+const STEP_ORDER_AUTO = ['step1','step2','stepB3','stepB4','stepResumen','stepContacto','stepPortal'];
+
+let currentStep = 'step1';
+
+window.goStep = function(id) {
+  const key = typeof id === 'string' && !id.startsWith('step') ? 'step'+id : id;
+  // Construct full id if shorthand used
+  let fullId;
+  if (typeof id === 'number') fullId = 'step'+id;
+  else if (id === 'resumen') fullId = 'stepResumen';
+  else if (id === 'contacto') fullId = 'stepContacto';
+  else if (id === 'portal') fullId = 'stepPortal';
+  else if (typeof id === 'string' && /^[AB]\d/.test(id)) fullId = 'step' + id;
+  else fullId = 'step' + id;
+
+  document.getElementById(currentStep)?.classList.remove('active');
+  currentStep = fullId;
+  const el = document.getElementById(fullId);
+  if (el) {
+    el.classList.add('active');
+    el.style.animation = 'none';
+    el.offsetHeight; // reflow
+    el.style.animation = '';
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  updateProgress();
+  updateStepLabel();
+};
+
+function updateProgress() {
+  const order = state.ruta === 'auto' ? STEP_ORDER_AUTO : STEP_ORDER_WEB;
+  const idx = order.indexOf(currentStep);
+  const pct = idx < 0 ? 5 : Math.round(((idx+1)/order.length)*100);
+  document.getElementById('progressBar').style.width = pct + '%';
+}
+
+function updateStepLabel() {
+  const order = state.ruta === 'auto' ? STEP_ORDER_AUTO : STEP_ORDER_WEB;
+  const idx = order.indexOf(currentStep);
+  const total = order.length;
+  const lbl = idx >= 0 ? `Paso ${idx+1} / ${total}` : '';
+  document.getElementById('stepIndicator').textContent = lbl;
+}
+
+/* ─────────────────────────────────
+   STEP 1 — Identidad básica
+───────────────────────────────── */
+document.getElementById('btnStep1').addEventListener('click', () => {
+  const nombre   = document.getElementById('inputNombre').value.trim();
+  const proyecto = document.getElementById('inputProyecto').value.trim();
+  const giro     = document.getElementById('inputGiro').value.trim();
+  let valid = true;
+
+  const showErr = (id, show) => {
+    document.getElementById(id).classList.toggle('show', show);
+  };
+  showErr('errNombre',   nombre.length < 2);
+  showErr('errProyecto', proyecto.length < 2);
+  showErr('errGiro',     giro.length < 2);
+  valid = nombre.length >= 2 && proyecto.length >= 2 && giro.length >= 2;
+  if (!valid) return;
+
+  state.nombre   = nombre;
+  state.proyecto = proyecto;
+  state.giro     = giro;
+  goStep(2);
+  populateGreeting();
+});
+
+['inputNombre','inputProyecto','inputGiro'].forEach(id => {
+  document.getElementById(id).addEventListener('input', () => {
+    const errMap = {inputNombre:'errNombre',inputProyecto:'errProyecto',inputGiro:'errGiro'};
+    document.getElementById(errMap[id]).classList.remove('show');
+  });
+});
+
+/* ─────────────────────────────────
+   STEP 2 — Greeting + Path
+───────────────────────────────── */
+function populateGreeting() {
+  document.getElementById('greetingText').innerHTML =
+    `Es un placer colaborar contigo, estimado <strong>${state.nombre}</strong>. Vamos a impulsar tu idea para <strong>${state.proyecto}</strong>.`;
+  document.getElementById('greetingBanner').style.display = 'block';
+}
+
+window.selectPath = function(path) {
+  state.ruta = path;
+  document.getElementById('pathWeb').classList.toggle('selected', path === 'web');
+  document.getElementById('pathAuto').classList.toggle('selected', path === 'auto');
+  document.getElementById('btnStep2').disabled = false;
+};
+
+document.getElementById('btnStep2').addEventListener('click', () => {
+  if (!state.ruta) return;
+  state.rutaElegida = state.ruta === 'web' ? 'Portal Web' : 'Automatización de Procesos';
+  if (state.ruta === 'web') goStep('A3');
+  else goStep('B3');
+  updateProgress();
+});
+
+/* ─────────────────────────────────
+   RUTA A — STEP 3
+───────────────────────────────── */
+document.getElementById('btnStepA3').addEventListener('click', () => {
+  const estilo   = document.getElementById('inputEstilo').value.trim();
+  const publico  = document.getElementById('inputPublico').value.trim();
+  const proposito= document.getElementById('inputProposito').value.trim();
+  const showErr  = (id, show) => document.getElementById(id).classList.toggle('show', show);
+  showErr('errEstilo',   estilo.length < 2);
+  showErr('errPublico',  publico.length < 2);
+  showErr('errProposito',proposito.length < 2);
+  if (estilo.length < 2 || publico.length < 2 || proposito.length < 2) return;
+  state.estilo = estilo; state.publico = publico; state.proposito = proposito;
+  goStep('A4');
+});
+
+/* ─────────────────────────────────
+   RUTA A — STEP 4 — Dominio
+───────────────────────────────── */
+window.updateDomainSuggestions = function() {
+  const base = document.getElementById('inputDominio').value.trim().toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,'');
+  const container = document.getElementById('domainSuggestions');
+  if (!base) { container.innerHTML=''; return; }
+  const exts = ['.com','.net','.mx'];
+  container.innerHTML = exts.map(ext =>
+    `<div class="domain-badge" onclick="pickDomain('${base}','${ext}')">${base}${ext}</div>`
+  ).join('');
+};
+
+window.pickDomain = function(base, ext) {
+  document.getElementById('inputDominio').value = base;
+  state.dominioExtension = ext;
+  document.querySelectorAll('.domain-badge').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+};
+
+document.getElementById('btnStepA4').addEventListener('click', () => {
+  const dom = document.getElementById('inputDominio').value.trim();
+  if (dom.length < 2) { document.getElementById('errDominio').classList.add('show'); return; }
+  document.getElementById('errDominio').classList.remove('show');
+  state.dominio = dom + state.dominioExtension;
+  goStep('A5');
+});
+
+/* ─────────────────────────────────
+   RUTA A — STEP 5 — Logo upload
+───────────────────────────────── */
+// Drag and drop
+const dropzone = document.getElementById('logoDropzone');
+dropzone.addEventListener('dragover', e => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', e => {
+  e.preventDefault(); dropzone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) handleLogoFile(file);
+});
+
+window.handleLogoFile = function(file) {
+  if (!file) return;
+  if (file.size > 5 * 1024 * 1024) {
+    alert('El archivo es muy grande. Máximo 5MB.'); return;
+  }
+  state.logoFile = file;
+  const reader = new FileReader();
+  reader.onload = e => {
+    state.logoLocalUrl = e.target.result;
+    document.getElementById('logoThumb').src = e.target.result;
+    document.getElementById('logoFileName').textContent = file.name;
+    document.getElementById('logoPreviewRow').classList.add('visible');
+    document.getElementById('logoUploadStatus').textContent = 'Subiendo a la nube…';
+    document.getElementById('btnStepA5').disabled = true;
+    uploadLogoToFirebase(file);
+  };
+  reader.readAsDataURL(file);
+  document.getElementById('errLogo').classList.remove('show');
+};
+
+async function uploadLogoToFirebase(file) {
+  try {
+    const ext = file.name.split('.').pop();
+    const path = `logos/${Date.now()}_${state.proyecto.replace(/\s+/g,'_')}.${ext}`;
+    const logoRef = storageRef(stor, path);
+    await uploadBytes(logoRef, file);
+    const url = await getDownloadURL(logoRef);
+    state.logoUrl = url;
+    document.getElementById('logoUploadStatus').textContent = '✓ Logo subido correctamente';
+    document.getElementById('btnStepA5').disabled = false;
+  } catch (err) {
+    document.getElementById('logoUploadStatus').textContent = '✕ Error al subir. Intenta de nuevo.';
+    console.error(err);
+    document.getElementById('btnStepA5').disabled = false; // allow retry continue
+  }
+}
+
+window.removeLogo = function() {
+  state.logoFile = null; state.logoUrl = ''; state.logoLocalUrl = '';
+  document.getElementById('logoPreviewRow').classList.remove('visible');
+  document.getElementById('logoInput').value = '';
+  document.getElementById('btnStepA5').disabled = true;
+};
+
+document.getElementById('btnStepA5').addEventListener('click', () => {
+  if (!state.logoFile && !state.logoUrl) {
+    document.getElementById('errLogo').classList.add('show'); return;
+  }
+  // Populate brand header
+  document.getElementById('brandHeaderLogo').src = state.logoLocalUrl;
+  document.getElementById('brandHeaderName').textContent = state.proyecto;
+  document.getElementById('brandHeader').classList.add('visible');
+  goStep('A6');
+});
+
+/* ─────────────────────────────────
+   RUTA A — STEP 6 — Colors
+───────────────────────────────── */
+window.applyBrandColors = function() {
+  const c1 = document.getElementById('color1').value;
+  const c2 = document.getElementById('color2').value;
+  const c3 = document.getElementById('color3').value;
+  document.documentElement.style.setProperty('--brand-1', c1);
+  document.documentElement.style.setProperty('--brand-2', c2);
+  document.documentElement.style.setProperty('--brand-3', c3);
+  // Update accent-glow dynamically
+  document.documentElement.style.setProperty('--accent-glow', hexToRgba(c1, 0.4));
+  document.documentElement.style.setProperty('--accent-soft', hexToRgba(c1, 0.12));
+  state.color1 = c1; state.color2 = c2; state.color3 = c3;
+  state.colores = `Principal: ${c1} / Secundario: ${c2}` + (c3 !== '#ffffff' ? ` / Acento: ${c3}` : '');
+};
+
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+document.getElementById('btnStepA6').addEventListener('click', () => {
+  if (!state.colores) {
+    // Use defaults
+    state.colores = `Principal: ${state.color1} / Secundario: ${state.color2}`;
+  }
+  goStep('A7');
+});
+
+/* ─────────────────────────────────
+   RUTA A — STEP 7 — Contexto
+───────────────────────────────── */
+document.getElementById('btnStepA7').addEventListener('click', () => {
+  const ctx = document.getElementById('inputContextoWeb').value.trim();
+  if (ctx.length < 10) { document.getElementById('errContextoWeb').classList.add('show'); return; }
+  document.getElementById('errContextoWeb').classList.remove('show');
+  state.contextoWeb = ctx;
+  buildSummary();
+  goStep('resumen');
+});
+
+/* ─────────────────────────────────
+   RUTA B — STEP 3
+───────────────────────────────── */
+document.getElementById('btnStepB3').addEventListener('click', () => {
+  const proc = document.getElementById('inputProcesosMejorar').value.trim();
+  if (proc.length < 10) { document.getElementById('errProcesos').classList.add('show'); return; }
+  document.getElementById('errProcesos').classList.remove('show');
+  state.procesosMejorar = proc;
+  goStep('B4');
+});
+
+/* ─────────────────────────────────
+   RUTA B — STEP 4 — Stack
+───────────────────────────────── */
+window.toggleChip = function(el) {
+  el.classList.toggle('active');
+};
+
+document.getElementById('btnStepB4').addEventListener('click', () => {
+  const selected = [...document.querySelectorAll('.stack-chip.active')].map(c => c.textContent.trim());
+  const other = document.getElementById('inputStackOtro').value.trim();
+  if (other) selected.push(...other.split(',').map(s=>s.trim()).filter(Boolean));
+  state.stack = selected.join(', ') || 'No especificado';
+  buildSummary();
+  goStep('resumen');
+});
+
+/* ─────────────────────────────────
+   SUMMARY builder
+───────────────────────────────── */
+function buildSummary() {
+  // Header
+  const logoEl = document.getElementById('summaryLogo');
+  if (state.logoLocalUrl) {
+    logoEl.src = state.logoLocalUrl;
+    logoEl.style.display = 'block';
+  }
+  document.getElementById('summaryBizName').textContent = state.proyecto;
+  document.getElementById('summaryGiro').textContent = state.giro;
+
+  // Body rows
+  const rows = [];
+  rows.push({k:'Cliente', v: state.nombre});
+  rows.push({k:'Ruta', v: state.rutaElegida});
+  if (state.ruta === 'web') {
+    rows.push({k:'Estilo', v: state.estilo});
+    rows.push({k:'Público', v: state.publico});
+    rows.push({k:'Propósito', v: state.proposito});
+    rows.push({k:'Dominio', v: state.dominio});
+    rows.push({k:'Colores', v: state.colores});
+    rows.push({k:'Visión', v: state.contextoWeb});
+  } else {
+    rows.push({k:'Procesos', v: state.procesosMejorar});
+    rows.push({k:'Stack', v: state.stack});
+  }
+
+  document.getElementById('summaryBody').innerHTML = rows.map(r =>
+    `<div class="summary-row"><div class="summary-row__key">${r.k}</div><div class="summary-row__val">${escHtml(r.v)}</div></div>`
+  ).join('');
+
+  // Preview (web only)
+  const prevSection = document.getElementById('previewSection');
+  if (state.ruta === 'web') {
+    prevSection.style.display = 'block';
+    document.getElementById('previewDomain').textContent = state.dominio;
+    document.getElementById('previewBizName').textContent = state.proyecto;
+    const previewLogoImg = document.getElementById('previewLogoImg');
+    if (state.logoLocalUrl) { previewLogoImg.src = state.logoLocalUrl; previewLogoImg.style.display = 'block'; }
+    document.getElementById('previewTitle').textContent = `${state.proyecto} — Tu solución en línea`;
+    document.getElementById('previewSub').textContent = `${state.giro} · ${state.publico}`;
+    document.getElementById('previewCta').style.background = state.color1;
+    document.getElementById('previewCta').style.color = '#0a0908';
+  } else {
+    prevSection.style.display = 'none';
+  }
+}
+
+document.getElementById('btnResumen').addEventListener('click', () => {
+  goStep('contacto');
+});
+
+/* ─────────────────────────────────
+   CONTACTO
+───────────────────────────────── */
+document.getElementById('btnContacto').addEventListener('click', async () => {
+  const correo   = document.getElementById('inputCorreo').value.trim();
+  const telefono = document.getElementById('inputTelefono').value.trim();
+  const emailRe  = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const showErr  = (id, show) => document.getElementById(id).classList.toggle('show', show);
+  showErr('errCorreo',   !emailRe.test(correo));
+  showErr('errTelefono', telefono.length < 7);
+  if (!emailRe.test(correo) || telefono.length < 7) return;
+  state.correo   = correo;
+  state.telefono = telefono;
+  await submitToSheets();
+  goStep('portal');
+});
+
+/* ─────────────────────────────────
+   GOOGLE SHEETS SUBMISSION
+───────────────────────────────── */
+const SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyeHTmABdGjckQ04nPUbMh0KblMNbXXVa3lq_-UzJhEsiHx4oPvFdRgM6gvLtpZuCGV/exec';
+
+async function submitToSheets() {
+  const btn = document.getElementById('btnContacto');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="ob-spinner"></span> Enviando…';
+  try {
+    const payload = {
+      nombre:          state.nombre,
+      proyecto:        state.proyecto,
+      giro:            state.giro,
+      rutaElegida:     state.rutaElegida,
+      estilo:          state.estilo,
+      publico:         state.publico,
+      proposito:       state.proposito,
+      dominio:         state.dominio,
+      colores:         state.colores,
+      contextoWeb:     state.contextoWeb,
+      logoUrl:         state.logoUrl,
+      procesosMejorar: state.procesosMejorar,
+      stack:           state.stack,
+      correo:          state.correo,
+      telefono:        state.telefono,
+    };
+    await fetch(SHEETS_URL, {
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify(payload),
+    });
+  } catch(e) {
+    console.error('Sheets error:', e);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Enviar información →';
+  }
+}
+
+/* ─────────────────────────────────
+   GOOGLE AUTH
+───────────────────────────────── */
+window.signInWithGoogle = async function() {
+  const btn = document.getElementById('btnGoogle');
+  btn.disabled = true;
+  try {
+    await signInWithPopup(auth, googleProvider);
+    showSuccess();
+  } catch(err) {
+    console.error(err);
+    btn.disabled = false;
+    alert('No se pudo iniciar sesión. Intenta de nuevo.');
+  }
+};
+
+window.finishWithoutAuth = function() {
+  showSuccess();
+};
+
+function showSuccess() {
+  document.getElementById('stepPortal').classList.remove('active');
+  currentStep = 'success';
+  document.getElementById('successScreen').style.display = 'block';
+  document.getElementById('progressBar').style.width = '100%';
+  document.getElementById('stepIndicator').textContent = '¡Listo!';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+/* ─────────────────────────────────
+   UTILS
+───────────────────────────────── */
+function escHtml(str) {
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// Init progress
+updateProgress();
+updateStepLabel();
+</script>
+</body>
+</html>
