@@ -18,6 +18,7 @@
   --accent-soft:rgba(196,255,58,.1); --accent-glow:rgba(196,255,58,.32);
   --danger:#ff6b6b;
   --nav-h:64px;
+  --nav-bg:rgba(10,9,8,.96);
   --e-expo:cubic-bezier(.16,1,.3,1);
   --e-back:cubic-bezier(.34,1.56,.64,1);
   --e-soft:cubic-bezier(.22,.61,.36,1);
@@ -98,7 +99,7 @@ nav,main{position:relative;z-index:2;}
   position:fixed;top:3px;left:0;right:0;z-index:298;
   height:var(--nav-h);padding:0 clamp(16px,4vw,48px);
   display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
-  background:linear-gradient(180deg,rgba(10,9,8,.96) 55%,transparent 100%);
+  background:linear-gradient(180deg,var(--nav-bg) 55%,transparent 100%);
   backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);
   border-bottom:1px solid rgba(235,229,214,.04);
 }
@@ -302,6 +303,71 @@ nav,main{position:relative;z-index:2;}
   margin-top:8px;display:none;text-transform:uppercase;
 }
 .ob-error.show{display:block;animation:softUp .3s var(--e-expo) both;}
+
+/* ── SUGGESTION CHIPS ── */
+.ob-sugg-wrap{margin-top:12px;margin-bottom:4px;}
+.ob-sugg-label{
+  font-family:'JetBrains Mono',monospace;font-size:.54rem;
+  letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:7px;margin-bottom:9px;
+}
+.ob-sugg-label::before{content:"✦";opacity:.5;font-size:.48rem;}
+.ob-suggestions{display:flex;flex-wrap:wrap;gap:6px;}
+.ob-suggestion{
+  font-family:'JetBrains Mono',monospace;font-size:.63rem;
+  letter-spacing:.5px;padding:6px 14px;border-radius:999px;
+  border:1px solid var(--line-strong);color:var(--cream-soft);
+  background:transparent;cursor:pointer;
+  transition:border-color .22s,color .22s,background .22s,transform .22s var(--e-back);
+  -webkit-tap-highlight-color:transparent;
+  min-height:34px;display:inline-flex;align-items:center;
+}
+.ob-suggestion:hover{
+  border-color:var(--brand-2);color:var(--cream);
+  background:rgba(176,141,87,.08);transform:translateY(-2px);
+}
+.ob-suggestion.picked{border-color:var(--brand-1);color:var(--brand-1);background:var(--accent-soft);}
+
+/* ── TEXTAREA STARTERS ── */
+.ob-starters{margin-top:18px;}
+.ob-starters-label{
+  font-family:'JetBrains Mono',monospace;font-size:.54rem;
+  letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:7px;margin-bottom:10px;
+}
+.ob-starters-label::before{content:"✦";opacity:.5;font-size:.48rem;}
+.ob-starter{
+  display:flex;align-items:flex-start;gap:10px;width:100%;text-align:left;
+  padding:11px 15px;border-radius:10px;border:1px solid var(--line);
+  color:var(--cream-soft);background:var(--surface);
+  font-family:'Manrope',sans-serif;font-size:.85rem;line-height:1.55;
+  cursor:pointer;transition:border-color .25s,color .25s,background .25s,transform .25s var(--e-soft);
+  margin-bottom:7px;-webkit-tap-highlight-color:transparent;
+}
+.ob-starter::before{content:"→";color:var(--brand-2);font-weight:700;flex-shrink:0;line-height:1.55;}
+.ob-starter:hover{border-color:var(--brand-2);color:var(--cream);background:var(--surface-2);transform:translateX(4px);}
+
+/* Animate suggestions/starters on step entrance */
+.ob-step.active .ob-sugg-wrap{animation:softUp .5s var(--e-expo) .3s both;}
+.ob-step.active .ob-starters  {animation:softUp .5s var(--e-expo) .32s both;}
+
+/* ── BG TOGGLE ── */
+.bg-toggle{display:flex;gap:8px;margin:10px 0 8px;}
+.bg-opt{
+  flex:1;padding:9px 8px;border-radius:11px;
+  border:1px solid var(--line-strong);
+  font-family:'JetBrains Mono',monospace;font-size:.57rem;
+  letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;transition:all .3s var(--e-expo);
+  color:var(--cream-soft);background:transparent;
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  -webkit-tap-highlight-color:transparent;min-height:58px;justify-content:center;
+}
+.bg-opt.active{border-color:var(--brand-1);color:var(--brand-1);background:var(--accent-soft);}
+.bg-opt__preview{
+  width:22px;height:22px;border-radius:5px;
+  border:1.5px solid rgba(255,255,255,.14);flex-shrink:0;
+}
 
 /* ── BUTTONS ── */
 .ob-btn{
@@ -512,7 +578,7 @@ nav,main{position:relative;z-index:2;}
 .brand-swatch:hover{transform:scale(1.4);}
 
 /* ── COLOR PICKER ── */
-.color-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;}
+.color-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-top:16px;}
 .color-slot{
   background:var(--surface);border:1px solid var(--line-strong);
   border-radius:14px;padding:clamp(14px,3vw,20px);text-align:center;
@@ -733,7 +799,6 @@ nav,main{position:relative;z-index:2;}
   .ob-btn--ghost{width:100%;}
   .ob-back{justify-content:center;padding:10px 0;}
   .btn-google{width:100%;justify-content:center;}
-  .color-grid{grid-template-columns:1fr 1fr;}
   .brand-header{flex-wrap:wrap;gap:12px;}
 }
 
@@ -817,6 +882,19 @@ nav,main{position:relative;z-index:2;}
     <div class="ob-field__line"></div>
     <div class="ob-error" id="errGiro">Describe el giro de tu negocio.</div>
   </div>
+  <div class="ob-sugg-wrap">
+    <div class="ob-sugg-label">Sugerencias comunes</div>
+    <div class="ob-suggestions">
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Restaurante / Cafetería</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Consultoría de negocios</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Tienda en línea</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Servicios médicos</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Despacho contable</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Agencia de marketing</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Estudio jurídico</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputGiro',this)">Constructora</span>
+    </div>
+  </div>
 
   <div class="ob-actions">
     <button class="ob-btn ob-btn--primary" id="btnStep1">Continuar →</button>
@@ -868,17 +946,51 @@ nav,main{position:relative;z-index:2;}
     <div class="ob-field__line"></div>
     <div class="ob-error" id="errEstilo">Describe el estilo de tu negocio.</div>
   </div>
-  <div class="ob-field">
+  <div class="ob-sugg-wrap">
+    <div class="ob-sugg-label">Sugerencias</div>
+    <div class="ob-suggestions">
+      <span class="ob-suggestion" onclick="fillSugg('inputEstilo',this)">Profesional y moderno</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputEstilo',this)">Minimalista y elegante</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputEstilo',this)">Jovial y creativo</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputEstilo',this)">Corporativo y serio</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputEstilo',this)">Artesanal y auténtico</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputEstilo',this)">Tecnológico y vanguardista</span>
+    </div>
+  </div>
+
+  <div class="ob-field" style="margin-top:clamp(28px,5vw,40px);">
     <input class="ob-input" id="inputPublico" type="text" placeholder=" "/>
     <label class="ob-label" for="inputPublico">¿A quién quieres dirigirte?</label>
     <div class="ob-field__line"></div>
     <div class="ob-error" id="errPublico">Describe tu público objetivo.</div>
   </div>
-  <div class="ob-field">
+  <div class="ob-sugg-wrap">
+    <div class="ob-sugg-label">Sugerencias</div>
+    <div class="ob-suggestions">
+      <span class="ob-suggestion" onclick="fillSugg('inputPublico',this)">Empresas (B2B)</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputPublico',this)">Consumidores finales (B2C)</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputPublico',this)">Emprendedores</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputPublico',this)">Profesionistas</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputPublico',this)">Jóvenes 18–35 años</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputPublico',this)">Familias</span>
+    </div>
+  </div>
+
+  <div class="ob-field" style="margin-top:clamp(28px,5vw,40px);">
     <input class="ob-input" id="inputProposito" type="text" placeholder=" "/>
     <label class="ob-label" for="inputProposito">¿Para qué quieres usar tu web?</label>
     <div class="ob-field__line"></div>
     <div class="ob-error" id="errProposito">Cuéntanos el propósito de tu web.</div>
+  </div>
+  <div class="ob-sugg-wrap">
+    <div class="ob-sugg-label">Sugerencias</div>
+    <div class="ob-suggestions">
+      <span class="ob-suggestion" onclick="fillSugg('inputProposito',this)">Vender en línea</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputProposito',this)">Atraer clientes potenciales</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputProposito',this)">Mostrar portafolio</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputProposito',this)">Información institucional</span>
+      <span class="ob-suggestion" onclick="fillSugg('inputProposito',this)">Agendar citas</span>
+    </div>
   </div>
 
   <div class="ob-actions">
@@ -987,6 +1099,20 @@ nav,main{position:relative;z-index:2;}
         <div><div class="color-slot__name">Acento</div><div class="color-slot__hex" id="hex3">#ffffff</div></div>
       </label>
     </div>
+    <div class="color-slot">
+      <div class="color-slot__name" style="margin-bottom:10px;">Fondo del sitio</div>
+      <div class="bg-toggle">
+        <button class="bg-opt active" id="bgDark" onclick="setBg('dark')">
+          <span class="bg-opt__preview" style="background:#0a0908;"></span>
+          Oscuro
+        </button>
+        <button class="bg-opt" id="bgLight" onclick="setBg('light')">
+          <span class="bg-opt__preview" style="background:#f5f3ee;border-color:rgba(0,0,0,.18);"></span>
+          Claro
+        </button>
+      </div>
+      <div class="color-slot__hex" id="hexBg">#0a0908</div>
+    </div>
   </div>
 
   <div class="ob-actions">
@@ -1009,6 +1135,12 @@ nav,main{position:relative;z-index:2;}
     <div class="ob-field__line"></div>
     <div class="ob-error" id="errContexto">Cuéntanos tus objetivos (mín. 10 caracteres).</div>
   </div>
+  <div class="ob-starters">
+    <div class="ob-starters-label">Puntos de partida — elige uno y edítalo</div>
+    <button class="ob-starter" onclick="fillStarter('inputContexto',this)">Quiero un sitio que transmita profesionalismo, sea fácil de navegar y convierta visitas en clientes.</button>
+    <button class="ob-starter" onclick="fillStarter('inputContexto',this)">Busco modernizar mi presencia digital y empezar a vender en línea sin complicaciones.</button>
+    <button class="ob-starter" onclick="fillStarter('inputContexto',this)">Necesito mostrar mi portafolio de trabajo de forma atractiva y que los clientes puedan contactarme rápido.</button>
+  </div>
 
   <div class="ob-actions">
     <button class="ob-btn ob-btn--primary" id="btnA7">Ver resumen →</button>
@@ -1029,6 +1161,12 @@ nav,main{position:relative;z-index:2;}
     <label class="ob-label" for="inputProcesos">Tu situación actual y lo que quieres mejorar</label>
     <div class="ob-field__line"></div>
     <div class="ob-error" id="errProcesos">Cuéntanos tu situación (mín. 10 caracteres).</div>
+  </div>
+  <div class="ob-starters">
+    <div class="ob-starters-label">Puntos de partida — elige uno y edítalo</div>
+    <button class="ob-starter" onclick="fillStarter('inputProcesos',this)">Registro datos de clientes manualmente en Excel y tardo mucho tiempo en organizar y buscar información.</button>
+    <button class="ob-starter" onclick="fillStarter('inputProcesos',this)">Coordino pedidos y citas por WhatsApp, pero los datos se pierden y hay muchos errores en la comunicación.</button>
+    <button class="ob-starter" onclick="fillStarter('inputProcesos',this)">Genero reportes de ventas e inventario de forma manual cada semana y me consume horas que podría ahorrar.</button>
   </div>
 
   <div class="ob-actions">
@@ -1212,7 +1350,7 @@ const s={
   estilo:'',publico:'',proposito:'',
   dominio:'',dominioExt:'.com',
   logoFile:null,logoUrl:'',logoLocal:'',
-  colores:'',c1:'#c4ff3a',c2:'#b08d57',c3:'#ffffff',
+  colores:'',c1:'#c4ff3a',c2:'#b08d57',c3:'#ffffff',bgMode:'dark',
   contexto:'',procesos:'',stack:'',
   correo:'',telefono:'',
 };
@@ -1233,6 +1371,51 @@ function h2r(hex,a){
   const r=parseInt(hex.slice(1,3),16),g=parseInt(hex.slice(3,5),16),b=parseInt(hex.slice(5,7),16);
   return `rgba(${r},${g},${b},${a})`;
 }
+
+/* ── SUGGESTION CHIPS ── */
+window.fillSugg=(inputId,el)=>{
+  const inp=$(inputId);
+  inp.value=el.textContent;
+  inp.dispatchEvent(new Event('input'));
+  inp.focus();
+  el.closest('.ob-suggestions').querySelectorAll('.ob-suggestion').forEach(c=>c.classList.remove('picked'));
+  el.classList.add('picked');
+};
+window.fillStarter=(textareaId,el)=>{
+  const ta=$(textareaId);
+  const text=el.textContent.trim();
+  ta.value=text;
+  ta.dispatchEvent(new Event('input'));
+  ta.focus();
+  ta.setSelectionRange(text.length,text.length);
+  el.closest('.ob-starters').querySelectorAll('.ob-starter').forEach(b=>b.style.borderColor='');
+  el.style.borderColor='var(--brand-2)';
+};
+
+/* ── BACKGROUND TOGGLE ── */
+const BG={
+  dark:{
+    '--bg':'#0a0908','--bg-2':'#111110','--surface':'#16140f','--surface-2':'#1b1915',
+    '--cream':'#ebe5d6','--cream-soft':'#c9c2b0','--muted':'#6b6657',
+    '--line':'rgba(235,229,214,.07)','--line-strong':'rgba(235,229,214,.15)',
+    '--nav-bg':'rgba(10,9,8,.96)',hex:'#0a0908',
+  },
+  light:{
+    '--bg':'#f5f3ee','--bg-2':'#edeae3','--surface':'#e8e4dc','--surface-2':'#e2ddd5',
+    '--cream':'#1c1a16','--cream-soft':'#44413a','--muted':'#7a7368',
+    '--line':'rgba(28,26,22,.07)','--line-strong':'rgba(28,26,22,.18)',
+    '--nav-bg':'rgba(245,243,238,.97)',hex:'#f5f3ee',
+  },
+};
+window.setBg=mode=>{
+  s.bgMode=mode;
+  const r=document.documentElement;
+  const p=BG[mode];
+  Object.entries(p).forEach(([k,v])=>{if(k!=='hex')r.style.setProperty(k,v);});
+  $('hexBg').textContent=p.hex;
+  $('bgDark').classList.toggle('active',mode==='dark');
+  $('bgLight').classList.toggle('active',mode==='light');
+};
 function rid(id){
   if(typeof id==='number') return 'step'+id;
   if(id==='resumen') return 'stepResumen';
@@ -1440,7 +1623,7 @@ $('btnA5').addEventListener('click',()=>{
 window.applyColors=()=>{
   const c1=$('color1').value,c2=$('color2').value,c3=$('color3').value;
   s.c1=c1;s.c2=c2;s.c3=c3;
-  s.colores=`Principal: ${c1} / Secundario: ${c2}`+(c3!=='#ffffff'?` / Acento: ${c3}`:'');
+  s.colores=`Principal: ${c1} / Secundario: ${c2}`+(c3!=='#ffffff'?` / Acento: ${c3}`:'')+` / Fondo: ${s.bgMode==='dark'?'Oscuro':'Claro'}`;
   const r=document.documentElement;
   r.style.setProperty('--brand-1',c1);r.style.setProperty('--brand-2',c2);r.style.setProperty('--brand-3',c3);
   r.style.setProperty('--accent-soft',h2r(c1,.1));r.style.setProperty('--accent-glow',h2r(c1,.32));
@@ -1454,7 +1637,7 @@ function refreshBrandSwatches(){
     .map(c=>`<div class="brand-swatch" style="background:${c};" title="${c}"></div>`).join('');
 }
 $('btnA6').addEventListener('click',()=>{
-  if(!s.colores)s.colores=`Principal: ${s.c1} / Secundario: ${s.c2}`;
+  if(!s.colores)s.colores=`Principal: ${s.c1} / Secundario: ${s.c2} / Fondo: ${s.bgMode==='dark'?'Oscuro':'Claro'}`;
   goStep('A7');
 });
 
