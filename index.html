@@ -4,8 +4,8 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="theme-color" content="#0a0908" />
-<title>Logidma — Páginas web, automatizaciones y consultoría para tu negocio</title>
-<meta name="description" content="Diseñamos tu sitio web, automatizamos tus procesos y te asesoramos para que tu negocio pequeño destaque en digital. Logidma — la lógica, sistematizada." />
+<title>Logidma — Infraestructura Digital, Automatización y Blindaje Legal TI para empresas</title>
+<meta name="description" content="Implementamos Google Workspace, automatizamos procesos con Python y Apps Script, y blindamos tu empresa con contratos y NDAs corporativos. Logidma — la lógica, sistematizada." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -2352,6 +2352,7 @@
   #narrativa-cinematica{
     background:var(--bg);
     overflow:hidden;
+    border-top:1px solid var(--line-strong);
   }
   .nc-bloque{
     min-height:80vh;
@@ -2363,26 +2364,67 @@
     margin:0 auto;
     border-bottom:1px solid var(--line);
     opacity:0;
-    transform:translateY(40px);
+    transform:translateY(40px) scale(.97);
     transition:opacity .9s var(--e-expo),transform .9s var(--e-expo);
   }
+  .nc-bloque:last-child{ border-bottom:none; }
   .nc-bloque.is-active{
     opacity:1;
-    transform:translateY(0);
+    transform:translateY(0) scale(1);
+  }
+  .nc-bloque__counter{
+    display:block;
+    font-family:'JetBrains Mono',monospace;
+    font-size:.7rem;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 1.5rem;
+    opacity:0;
+    transform:translateX(-12px);
+    transition:opacity .45s var(--e-expo),transform .45s var(--e-expo);
+  }
+  .nc-bloque.is-active .nc-bloque__counter{
+    opacity:1;
+    transform:translateX(0);
+  }
+  .nc-bloque__line{
+    width:100%;
+    height:1px;
+    background:var(--line-strong);
+    transform:scaleX(0);
+    transform-origin:left;
+    margin-bottom:2.5rem;
+    transition:transform .7s var(--e-expo) .1s;
+  }
+  .nc-bloque.is-active .nc-bloque__line{
+    transform:scaleX(1);
   }
   .nc-gancho{
     font-family:'Instrument Serif',serif;
     font-style:italic;
     font-size:clamp(2.2rem,5.5vw,6rem);
     color:var(--cream);
-    line-height:1.1;
+    line-height:1.15;
     margin:0 0 2rem;
-    filter:blur(12px);
-    transform:translateY(20px);
-    transition:filter .9s var(--e-expo),transform .9s var(--e-expo);
+    filter:blur(10px);
+    transition:filter .9s var(--e-expo);
   }
   .nc-bloque.is-active .nc-gancho{
     filter:blur(0);
+  }
+  .nc-word{
+    display:inline-block;
+    overflow:hidden;
+    vertical-align:bottom;
+    line-height:1.2;
+  }
+  .nc-word .nc-inner{
+    display:inline-block;
+    transform:translateY(110%);
+    transition:transform .75s var(--e-expo) calc(var(--wi,0) * .07s);
+  }
+  .nc-bloque.is-active .nc-word .nc-inner{
     transform:translateY(0);
   }
   .nc-cuerpo{
@@ -2394,7 +2436,7 @@
     margin:0 0 2rem;
     opacity:0;
     transform:translateY(16px);
-    transition:opacity .7s var(--e-expo) .25s,transform .7s var(--e-expo) .25s;
+    transition:opacity .8s var(--e-expo) .3s,transform .8s var(--e-expo) .3s;
   }
   .nc-bloque.is-active .nc-cuerpo{
     opacity:1;
@@ -2408,16 +2450,23 @@
     letter-spacing:.04em;
     text-transform:uppercase;
     margin:0;
+    padding:.75rem 1rem;
+    border-left:2px solid var(--accent);
+    background:var(--accent-soft);
+    max-width:680px;
     opacity:0;
     transform:translateY(12px);
-    transition:opacity .6s var(--e-expo) .45s,transform .6s var(--e-expo) .45s;
+    transition:opacity .65s var(--e-expo) .5s,transform .65s var(--e-expo) .5s;
   }
   .nc-bloque.is-active .nc-metrica{
     opacity:1;
     transform:translateY(0);
   }
-  @media(max-width:600px){
-    .nc-bloque{ min-height:70vh; }
+  @media(max-width:768px){
+    .nc-bloque{ min-height:60vh; }
+  }
+  @media(max-width:480px){
+    .nc-bloque{ min-height:auto; padding:4rem clamp(1.25rem,6vw,2rem); }
   }
 </style>
 </head>
@@ -2511,24 +2560,32 @@
   <section id="narrativa-cinematica" aria-label="Por qué elegir Logidma">
 
     <div class="nc-bloque">
+      <span class="nc-bloque__counter">01 / 04</span>
+      <div class="nc-bloque__line"></div>
       <p class="nc-gancho">En el mercado de Morelia, la confianza no se pide. Se proyecta.</p>
       <p class="nc-cuerpo">Muchos negocios locales con gran potencial siguen cerrando tratos usando correos gratuitos (@gmail.com). En el entorno digital, esto frena el crecimiento. Cambiar a un dominio corporativo propio (@tuempresa.com) no es un lujo técnico; es la primera línea de validación ante clientes y proveedores de alta gama. Una identidad digital sólida incrementa la percepción de valor de tus servicios desde el primer clic.</p>
       <p class="nc-metrica">+80% de preferencia comercial. Dejas de ser un negocio informal; te conviertes en una corporación.</p>
     </div>
 
     <div class="nc-bloque">
+      <span class="nc-bloque__counter">02 / 04</span>
+      <div class="nc-bloque__line"></div>
       <p class="nc-gancho">Tus datos son el motor de tu negocio. Asegúrate de que las llaves estén solo en tus manos.</p>
       <p class="nc-cuerpo">Cuando tu equipo utiliza cuentas personales para almacenar cotizaciones o carteras de clientes, la información de tu empresa está en riesgo. Con la implementación de Google Workspace, tú mantienes el control absoluto. Si un colaborador se va, los archivos, accesos e históricos se quedan en tu empresa. La información no se va con las personas; se institucionaliza de forma segura y permanente.</p>
       <p class="nc-metrica">Propiedad intelectual blindada desde el día uno. Cero fugas de información.</p>
     </div>
 
     <div class="nc-bloque">
+      <span class="nc-bloque__counter">03 / 04</span>
+      <div class="nc-bloque__line"></div>
       <p class="nc-gancho">La mejor tecnología es la que tu equipo ya sabe usar.</p>
       <p class="nc-cuerpo">La transformación digital suele fallar debido a la resistencia al cambio y a las largas curvas de capacitación. Nosotros eliminamos ese obstáculo. Al estructurar tus sistemas sobre el ecosistema empresarial de Google, tu equipo trabaja sobre interfaces que ya domina en su día a día (Gmail, Drive, Hojas de cálculo). Cambiamos el motor interno y blindamos el entorno, pero la experiencia sigue siendo simple, intuitiva y directa.</p>
       <p class="nc-metrica">0 horas perdidas en capacitaciones complejas. Productividad inmediata.</p>
     </div>
 
     <div class="nc-bloque">
+      <span class="nc-bloque__counter">04 / 04</span>
+      <div class="nc-bloque__line"></div>
       <p class="nc-gancho">Deja que las máquinas ejecuten la rutina. Dedica tu mente a la estrategia.</p>
       <p class="nc-cuerpo">El crecimiento de una PyME se estanca cuando los directivos pasan el día llenando datos manualmente o persiguiendo aprobaciones por mensajería. Conectamos tus herramientas mediante desarrollos a la medida en Python y Apps Script. Automatizamos reportes, alertas de ventas y seguimientos para que tus procesos ocurran de fondo, sin errores humanos y de forma totalmente sistemática.</p>
       <p class="nc-metrica">-40% de tiempo operativo en tareas repetitivas. Tu negocio escala en piloto automático.</p>
@@ -2538,15 +2595,15 @@
 
   <div class="marquee" aria-hidden="true">
     <div class="marquee__track">
-      <span class="marquee__item">Páginas web</span>
+      <span class="marquee__item">Workspace Empresarial</span>
       <span class="marquee__item">Automatización</span>
-      <span class="marquee__item">Consultoría</span>
+      <span class="marquee__item">NDAs Corporativos</span>
       <span class="marquee__item">Logidma</span>
-      <span class="marquee__item">Diseño moderno</span>
+      <span class="marquee__item">Blindaje Legal</span>
       <span class="marquee__item">Google Workspace</span>
       <span class="marquee__item">Apps Script</span>
       <span class="marquee__item">Negocios locales</span>
-      <span class="marquee__item">Posicionamiento</span>
+      <span class="marquee__item">Contratos TI</span>
       <span class="marquee__item">Innovación</span>
       <span class="marquee__item">Logidma</span>
       <span class="marquee__item">Soporte continuo</span>
@@ -2634,31 +2691,34 @@
 
       <div class="step">
         <div class="step__num">01</div>
-        <div class="step__label">// Platicamos</div>
-        <div class="step__title">Cuéntame tu negocio</div>
+        <div class="step__label">// Diagnóstico</div>
+        <div class="step__title">Analizamos tu operación</div>
         <p class="step__desc">
-          Una llamada de 15 minutos, sin costo, para entender qué necesitas y
-          qué podemos construir juntos. Sin presiones, sin compromisos.
+          Una sesión estratégica de 30 minutos para mapear tus procesos, detectar
+          cuellos de botella y definir qué se puede automatizar, institucionalizar
+          y proteger. Sin costo, sin compromiso.
         </p>
       </div>
 
       <div class="step">
         <div class="step__num">02</div>
-        <div class="step__label">// Diseñamos</div>
-        <div class="step__title">Te presento la propuesta</div>
+        <div class="step__label">// Implementamos</div>
+        <div class="step__title">Construimos tu infraestructura</div>
         <p class="step__desc">
-          Armo una propuesta personalizada: tiempos, precios y el plan de trabajo.
-          Tú decides si avanzamos. Sin letras pequeñas.
+          Desplegamos Google Workspace, desarrollamos los flujos automatizados en
+          Python o Apps Script y redactamos los contratos TI a medida. Todo en
+          paralelo, con tiempos claros.
         </p>
       </div>
 
       <div class="step">
         <div class="step__num">03</div>
-        <div class="step__label">// Lanzamos</div>
-        <div class="step__title">Publicamos y te acompañamos</div>
+        <div class="step__label">// Blindamos</div>
+        <div class="step__title">Tu empresa opera protegida</div>
         <p class="step__desc">
-          Lanzamos tu solución y nos quedamos contigo para soporte, ajustes y
-          mejoras. Tu éxito es el mío.
+          Tu equipo trabaja sobre la nueva infraestructura, los procesos corren en
+          piloto automático y tus acuerdos legales respaldan cada operación. Nos
+          quedamos contigo para soporte y escala.
         </p>
       </div>
 
@@ -2687,10 +2747,11 @@
 
       <div class="pillar">
         <div class="pillar__accent">100%</div>
-        <div class="pillar__title">Diseño a medida, sin plantillas</div>
+        <div class="pillar__title">Implementación 100% a medida</div>
         <p class="pillar__desc">
-          Cada proyecto se construye desde cero pensando en tu negocio, tu cliente y
-          tu identidad. No recibirás algo genérico.
+          Cada infraestructura, cada automatización y cada contrato se construye
+          específicamente para tu empresa y sector. Sin plantillas, sin soluciones
+          genéricas.
         </p>
       </div>
 
@@ -2698,8 +2759,8 @@
         <div class="pillar__accent">∞</div>
         <div class="pillar__title">Soporte y actualizaciones continuas</div>
         <p class="pillar__desc">
-          Tu sitio evoluciona contigo. Ajustes, actualizaciones de contenido y mejoras
-          de rendimiento están incluidas en el servicio.
+          Tu infraestructura evoluciona con tu empresa. Ajustes de Workspace, nuevas
+          automatizaciones y actualizaciones legales están incluidas en el servicio.
         </p>
       </div>
 
@@ -2724,8 +2785,8 @@
 
     <h2 class="kicker">¿Listo para crecer en <em>digital</em>?</h2>
     <p class="form-intro">
-      Cuéntame qué necesitas — <strong>una página web, automatizar un proceso</strong> o
-      simplemente explorar opciones. Llena los campos y la información llega directo a mí.
+      Cuéntame qué necesitas — <strong>implementar Workspace, automatizar un proceso o blindar tu empresa legalmente</strong>.
+      Llena los campos y la información llega directo a mí.
       Te respondo en menos de 72 horas.
     </p>
 
@@ -3651,6 +3712,14 @@ onAuthStateChanged(auth, user => {
 
 /* ── NARRATIVA CINEMÁTICA ── */
 (function(){
+  // Split nc-gancho text into per-word animated spans
+  document.querySelectorAll('.nc-gancho').forEach(function(gancho){
+    var words = gancho.textContent.trim().split(/\s+/);
+    gancho.innerHTML = words.map(function(w, i){
+      return '<span class="nc-word" style="--wi:' + i + '"><span class="nc-inner">' + w + '</span></span>';
+    }).join(' ');
+  });
+
   var ncObserver = new IntersectionObserver(function(entries){
     entries.forEach(function(e){
       if(e.isIntersecting){
