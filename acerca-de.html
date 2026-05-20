@@ -11,8 +11,6 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@200;300;400;500;700&display=swap" rel="stylesheet">
 
-<script src="https://platform.linkedin.com/badges/js/profile.js" async defer type="text/javascript"></script>
-
 <style>
   :root{
     --bg: #0a0908;
@@ -325,68 +323,66 @@
     .phil__lead{ position:static; }
   }
 
-  /* ARQUITECTO */
-  .arch{ display:grid; grid-template-columns:.9fr 1.1fr; gap:clamp(40px,6vw,72px); align-items:center; }
-  .arch__photo{
-    position:relative; aspect-ratio:4/5; overflow:hidden;
-    border:1px solid var(--line-strong);
-    clip-path:inset(100% 0 0 0); transition:clip-path 1.4s var(--e-expo);
+  /* EQUIPO — grid de tarjetas */
+  .team-grid{
+    display:grid; grid-template-columns:repeat(3,1fr);
+    gap:0; border:1px solid var(--line-strong); margin-top:clamp(40px,6vw,56px);
+  }
+  .team-card{
+    padding:clamp(32px,4vw,48px) clamp(24px,3vw,36px);
+    border-right:1px solid var(--line-strong); position:relative;
+    display:flex; flex-direction:column; gap:0;
+    transition:background .5s var(--e-expo);
+  }
+  .team-card:last-child{ border-right:none; }
+  .team-card:hover{ background:rgba(196,255,58,.03); }
+  .team-card__avatar{
+    width:72px; height:72px; border-radius:50%;
+    border:1px solid var(--line-strong); overflow:hidden;
+    margin-bottom:28px; position:relative; flex-shrink:0;
     background:linear-gradient(135deg,#1f1c16 0%,#0d0c0a 100%);
+    display:flex; align-items:center; justify-content:center;
+    transition:border-color .4s var(--e-expo);
   }
-  .arch__photo-fallback{
-    position:absolute; inset:0; display:flex; align-items:center; justify-content:center; z-index:0; overflow:hidden;
-  }
-  .arch__photo-fallback::before{
-    content:""; position:absolute; inset:0;
-    background:repeating-linear-gradient(45deg,transparent 0 14px,rgba(196,255,58,.04) 14px 15px),
-      radial-gradient(circle at 30% 30%,rgba(196,255,58,.12),transparent 60%);
-  }
-  .arch__photo-fallback span{
-    font-family:'Instrument Serif',serif; font-style:italic;
-    font-size:clamp(5rem,14vw,9rem); letter-spacing:-.04em;
-    color:var(--cream); line-height:1; z-index:1;
-    text-shadow:0 0 40px rgba(0,0,0,.5);
-  }
-  .arch__photo-fallback span em{ font-style:italic; color:var(--accent); text-shadow:0 0 30px var(--accent-glow); }
-  .arch__photo-fallback small{
-    position:absolute; top:16px; right:16px;
-    font-family:'JetBrains Mono',monospace; font-size:.72rem;
-    letter-spacing:2px; color:var(--accent); z-index:1; opacity:.7;
-  }
-  .arch__photo.in{ clip-path:inset(0 0 0 0); }
-  .arch__photo img{
+  .team-card:hover .team-card__avatar{ border-color:var(--accent); }
+  .team-card__avatar img{
     width:100%; height:100%; object-fit:cover;
-    filter:grayscale(.2) contrast(1.05);
-    transition:transform 1.2s var(--e-expo),filter .8s var(--e-expo),opacity .6s ease;
-    will-change:transform; position:relative; z-index:1;
+    filter:grayscale(.15); transition:filter .6s;
   }
-  .arch__photo img.failed{ opacity:0; }
-  .arch__photo:hover img{ transform:scale(1.06); filter:grayscale(0) contrast(1); }
-  .arch__photo::before{
-    content:""; position:absolute; inset:0;
-    background:linear-gradient(180deg,transparent 50%,rgba(10,9,8,.5) 100%);
-    z-index:2; pointer-events:none;
+  .team-card:hover .team-card__avatar img{ filter:grayscale(0); }
+  .team-card__initials{
+    font-family:'Instrument Serif',serif; font-style:italic;
+    font-size:1.6rem; color:var(--cream); letter-spacing:-.03em; line-height:1;
   }
-  .arch__photo::after{
-    content:"DMA / 003"; position:absolute; bottom:16px; left:16px;
-    font-family:'JetBrains Mono',monospace; font-size:.72rem;
-    letter-spacing:2px; color:var(--accent); z-index:3;
+  .team-card__initials em{ color:var(--accent); }
+  .team-card__role{
+    font-family:'JetBrains Mono',monospace; font-size:.7rem;
+    text-transform:uppercase; letter-spacing:3px; color:var(--accent);
+    margin-bottom:12px;
   }
-  .arch__name{ font-family:'Instrument Serif',serif; font-size:clamp(2rem,4.5vw,3.6rem); line-height:1; margin-bottom:16px; letter-spacing:-.02em; }
-  .arch__role{ font-family:'JetBrains Mono',monospace; font-size:.78rem; text-transform:uppercase; letter-spacing:3px; color:var(--accent); margin-bottom:32px; }
-  .arch__bio{ color:var(--cream-soft); font-size:clamp(.98rem,1.3vw,1.05rem); line-height:1.8; margin-bottom:40px; max-width:540px; }
-  .arch__badge{
-    margin-top:20px; padding:24px; border:1px solid var(--line-strong);
-    background:rgba(255,255,255,.015); display:inline-block;
-    transition:border-color .4s,background .4s;
+  .team-card__name{
+    font-family:'Instrument Serif',serif; font-size:clamp(1.3rem,2.4vw,1.9rem);
+    line-height:1.1; letter-spacing:-.02em; margin-bottom:16px;
   }
-  .arch__badge:hover{ border-color:var(--accent); background:var(--accent-soft); }
-  .arch__badge::before{
-    content:"// LinkedIn Profile"; display:block;
-    font-family:'JetBrains Mono',monospace; font-size:.72rem;
-    color:var(--muted); margin-bottom:12px; letter-spacing:2px;
+  .team-card__bio{
+    font-size:clamp(.9rem,1.2vw,.98rem); line-height:1.75;
+    color:var(--cream-soft); margin-bottom:28px; flex:1;
   }
-  @media(max-width:900px){ .arch{ grid-template-columns:1fr; gap:32px; } .arch__photo{ max-width:320px; margin:0 auto; } }
+  .team-card__linkedin{
+    display:inline-flex; align-items:center; gap:10px;
+    padding:12px 18px; border:1px solid var(--line-strong);
+    background:rgba(255,255,255,.015); text-decoration:none;
+    color:var(--cream-soft); font-family:'JetBrains Mono',monospace;
+    font-size:.7rem; text-transform:uppercase; letter-spacing:2px;
+    transition:border-color .4s,color .4s,background .4s; margin-top:auto;
+  }
+  .team-card__linkedin:hover{ border-color:var(--accent); color:var(--accent); background:var(--accent-soft); }
+  .team-card__linkedin svg{ width:14px; height:14px; fill:currentColor; flex-shrink:0; }
+  @media(max-width:900px){
+    .team-grid{ grid-template-columns:1fr; }
+    .team-card{ border-right:none; border-bottom:1px solid var(--line-strong); }
+    .team-card:last-child{ border-bottom:none; }
+  }
 
   /* CONTACTO */
   .contact-grid{
@@ -640,8 +636,8 @@
 
     <h2 class="kicker">Un neologismo técnico, diseñado <em>meticulosamente</em>.</h2>
     <p class="etym__intro">
-      <strong>Logidma</strong> fusiona la ciencia computacional con la identidad de su creador.
-      Dos pilares fundamentales sostienen la palabra:
+      <strong>Logidma</strong> fusiona la ciencia computacional con tres principios de trabajo que definen cada entrega.
+      Dos elementos sostienen la palabra:
     </p>
 
     <div class="etym">
@@ -657,12 +653,12 @@
       </div>
       <div class="etym__cell">
         <div class="etym__big">DMA</div>
-        <div class="etym__label">// David Martínez Arredondo</div>
+        <div class="etym__label">// Diseño · Métodos · Agilidad</div>
         <p class="etym__body">
-          Las iniciales del creador actúan como el <strong>núcleo de la marca</strong>.
-          Es la firma personal integrada directamente en el código de la palabra, garantizando que
-          —aunque la solución sea tecnológica y autónoma— el diseño y la arquitectura llevan un
-          sello de autor indiscutible.
+          <strong>Diseño</strong> por la arquitectura visual y funcional de cada solución;
+          <strong>Métodos</strong> por los procesos sistemáticos que eliminan la fricción operativa;
+          <strong>Agilidad</strong> por la capacidad de adaptarse y evolucionar ante cada desafío.
+          Tres principios que definen cómo Logidma construye y entrega.
         </p>
       </div>
     </div>
@@ -703,43 +699,71 @@
     </div>
   </section>
 
-  <!-- ══ ARQUITECTO ══ -->
+  <!-- ══ EQUIPO ══ -->
   <section id="arquitecto" class="wrap reveal">
     <div class="section__head">
       <span class="num">03 /</span>
-      <span class="title">El arquitecto detrás del código</span>
+      <span class="title">El equipo detrás del código</span>
     </div>
 
-    <div class="arch">
-      <div class="arch__photo" id="archPhoto">
-        <div class="arch__photo-fallback" aria-hidden="true">
-          <small>// DMA</small>
-          <span>D<em>M</em>A</span>
+    <h2 class="kicker">Las personas que hacen <em>posible</em> Logidma.</h2>
+
+    <div class="team-grid">
+
+      <!-- David Martínez Arredondo — Fundador y CEO -->
+      <div class="team-card">
+        <div class="team-card__avatar">
+          <img src="https://firebasestorage.googleapis.com/v0/b/logidma-c1df8.firebasestorage.app/o/Untitled%20design.png?alt=media&token=785c1671-739e-4a18-aa6e-5647a32f0154"
+               alt="David Martínez Arredondo"
+               referrerpolicy="no-referrer"
+               onerror="this.style.display='none'" />
         </div>
-        <img src="https://firebasestorage.googleapis.com/v0/b/logidma-c1df8.firebasestorage.app/o/Untitled%20design.png?alt=media&token=785c1671-739e-4a18-aa6e-5647a32f0154"
-             alt="David Martínez Arredondo"
-             referrerpolicy="no-referrer"
-             onerror="this.classList.add('failed'); this.onerror=null;" />
-      </div>
-      <div>
-        <div class="arch__role">// Founder · Systems Architect</div>
-        <h3 class="arch__name">David Martínez Arredondo</h3>
-        <p class="arch__bio">
-          Arquitecto y desarrollador de sistemas internos. Especialista en Google Workspace,
-          Apps Script, APIs e ingeniería HTML para entornos corporativos. Diseña la cuadrícula
-          invisible: portales centralizados, CRMs automatizados y flujos donde antes había
-          fricción manual.
+        <div class="team-card__role">// Fundador · CEO</div>
+        <h3 class="team-card__name">David Martínez Arredondo</h3>
+        <p class="team-card__bio">
+          Arquitecto de sistemas internos. Especialista en Google Workspace,
+          Apps Script, APIs e ingeniería HTML para entornos corporativos. Diseña
+          la cuadrícula invisible: portales centralizados, CRMs automatizados y
+          flujos donde antes había fricción manual.
         </p>
-        <div class="arch__badge">
-          <div class="badge-base LI-profile-badge"
-               data-locale="es_ES" data-size="medium" data-theme="dark"
-               data-type="VERTICAL" data-vanity="david-martinez-arredondo-86b4182bb" data-version="v1">
-            <a class="badge-base__link LI-simple-link"
-               href="https://mx.linkedin.com/in/david-martinez-arredondo-86b4182bb?trk=profile-badge"
-               target="_blank" rel="noopener">David Martinez Arredondo</a>
-          </div>
-        </div>
+        <a class="team-card__linkedin"
+           href="https://mx.linkedin.com/in/david-martinez-arredondo-86b4182bb"
+           target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          Ver perfil LinkedIn
+        </a>
       </div>
+
+      <!-- Nisay Yaneli Gómez Valencia — CLO -->
+      <div class="team-card">
+        <div class="team-card__avatar">
+          <span class="team-card__initials">N<em>Y</em></span>
+        </div>
+        <div class="team-card__role">// Chief Legal Officer · CLO</div>
+        <h3 class="team-card__name">Nisay Yaneli Gómez Valencia</h3>
+        <a class="team-card__linkedin"
+           href="https://www.linkedin.com/in/nisay-gomez-16aab2292/"
+           target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          Ver perfil LinkedIn
+        </a>
+      </div>
+
+      <!-- Octavio Antonio Juárez Romero — CTO -->
+      <div class="team-card">
+        <div class="team-card__avatar">
+          <span class="team-card__initials">O<em>A</em></span>
+        </div>
+        <div class="team-card__role">// Chief Technology · CTO</div>
+        <h3 class="team-card__name">Octavio Antonio Juárez Romero</h3>
+        <a class="team-card__linkedin"
+           href="https://www.linkedin.com/in/octavio-antonio-ju%C3%A1rez-romero-a91282321/"
+           target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect x="2" y="9" width="4" height="12"/><circle cx="4" cy="4" r="2"/></svg>
+          Ver perfil LinkedIn
+        </a>
+      </div>
+
     </div>
   </section>
 
@@ -925,15 +949,6 @@
     });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => io.observe(el));
-
-  // ARCH PHOTO
-  const archPhoto = document.getElementById('archPhoto');
-  if (archPhoto) {
-    const ioP = new IntersectionObserver((entries) => {
-      entries.forEach(e => { if(e.isIntersecting){ archPhoto.classList.add('in'); ioP.unobserve(archPhoto); } });
-    }, { threshold: 0.3 });
-    ioP.observe(archPhoto);
-  }
 
   // PULLQUOTE
   const pq = document.getElementById('pullquote');
