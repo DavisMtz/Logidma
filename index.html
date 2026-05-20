@@ -2330,6 +2330,95 @@
   @media(max-width:400px){
     .wrap{ padding:0 clamp(16px,4vw,20px); }
   }
+
+  /* ═══ HERO — CTA SECUNDARIO ═══ */
+  .hero__also{
+    font-family:'Manrope',sans-serif;
+    font-size:clamp(.8rem,1vw,.9rem);
+    color:var(--muted);
+    margin-top:1rem;
+    letter-spacing:.01em;
+    line-height:1.6;
+  }
+  .hero__also-link{
+    color:var(--cream-soft);
+    text-decoration:underline;
+    text-underline-offset:3px;
+    transition:color .2s;
+  }
+  .hero__also-link:hover{ color:var(--accent); }
+
+  /* ═══ NARRATIVA CINEMÁTICA ═══ */
+  #narrativa-cinematica{
+    background:var(--bg);
+    overflow:hidden;
+  }
+  .nc-bloque{
+    min-height:80vh;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    padding:clamp(3rem,8vw,8rem) clamp(1.25rem,6vw,4rem);
+    max-width:var(--maxw);
+    margin:0 auto;
+    border-bottom:1px solid var(--line);
+    opacity:0;
+    transform:translateY(40px);
+    transition:opacity .9s var(--e-expo),transform .9s var(--e-expo);
+  }
+  .nc-bloque.is-active{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .nc-gancho{
+    font-family:'Instrument Serif',serif;
+    font-style:italic;
+    font-size:clamp(2.2rem,5.5vw,6rem);
+    color:var(--cream);
+    line-height:1.1;
+    margin:0 0 2rem;
+    filter:blur(12px);
+    transform:translateY(20px);
+    transition:filter .9s var(--e-expo),transform .9s var(--e-expo);
+  }
+  .nc-bloque.is-active .nc-gancho{
+    filter:blur(0);
+    transform:translateY(0);
+  }
+  .nc-cuerpo{
+    font-family:'Manrope',sans-serif;
+    font-size:clamp(.95rem,1.3vw,1.15rem);
+    color:var(--cream-soft);
+    max-width:680px;
+    line-height:1.75;
+    margin:0 0 2rem;
+    opacity:0;
+    transform:translateY(16px);
+    transition:opacity .7s var(--e-expo) .25s,transform .7s var(--e-expo) .25s;
+  }
+  .nc-bloque.is-active .nc-cuerpo{
+    opacity:1;
+    transform:translateY(0);
+  }
+  .nc-metrica{
+    font-family:'Manrope',sans-serif;
+    font-weight:700;
+    font-size:clamp(.85rem,1.1vw,1rem);
+    color:var(--accent);
+    letter-spacing:.04em;
+    text-transform:uppercase;
+    margin:0;
+    opacity:0;
+    transform:translateY(12px);
+    transition:opacity .6s var(--e-expo) .45s,transform .6s var(--e-expo) .45s;
+  }
+  .nc-bloque.is-active .nc-metrica{
+    opacity:1;
+    transform:translateY(0);
+  }
+  @media(max-width:600px){
+    .nc-bloque{ min-height:70vh; }
+  }
 </style>
 </head>
 <body class="is-loading">
@@ -2391,16 +2480,23 @@
 <main>
 
   <section class="hero">
-    <div class="hero__label"><span>Para negocios pequeños que quieren destacar</span></div>
-    <h1 class="hero__title" id="heroTitle">Tu negocio, con la presencia digital que <em>merece</em>.</h1>
+    <div class="hero__label"><span>Infraestructura Digital · Automatización · Blindaje Legal TI</span></div>
+    <h1 class="hero__title" id="heroTitle">Tu empresa, con la infraestructura digital que <em>merece</em>.</h1>
     <p class="hero__sub">
-      Diseñamos tu sitio web, automatizamos tus procesos y te asesoramos para que
-      tu negocio dé el salto digital. <strong>Sin tecnicismos, sin complicaciones.</strong>
+      Implementamos Google Workspace, automatizamos tus procesos con Python y Apps Script,
+      y blindamos tu operación con contratos legales TI. <strong>Tecnología y ley, trabajando juntas.</strong>
     </p>
     <div class="hero__ctas">
-      <a href="onboarding.html" class="btn-cta">Comenzar a construir sistema →</a>
+      <a href="onboarding.html" class="btn-cta">Activar mi infraestructura →</a>
       <a href="#servicios" class="btn-outline">Ver servicios</a>
     </div>
+    <p class="hero__also">
+      ¿También necesitas un
+      <a href="onboarding.html" class="hero__also-link">sitio web corporativo</a>
+      o una
+      <a href="onboarding.html" class="hero__also-link">automatización a la medida</a>?
+      Cuéntanos tu proyecto.
+    </p>
 
     <div class="hero__logo" id="heroLogo">
       <div class="hero__logo-inner">
@@ -2409,6 +2505,35 @@
     </div>
 
     <div class="hero__scroll">EXPLORAR</div>
+  </section>
+
+  <!-- ══ NARRATIVA CINEMÁTICA ══ -->
+  <section id="narrativa-cinematica" aria-label="Por qué elegir Logidma">
+
+    <div class="nc-bloque">
+      <p class="nc-gancho">En el mercado de Morelia, la confianza no se pide. Se proyecta.</p>
+      <p class="nc-cuerpo">Muchos negocios locales con gran potencial siguen cerrando tratos usando correos gratuitos (@gmail.com). En el entorno digital, esto frena el crecimiento. Cambiar a un dominio corporativo propio (@tuempresa.com) no es un lujo técnico; es la primera línea de validación ante clientes y proveedores de alta gama. Una identidad digital sólida incrementa la percepción de valor de tus servicios desde el primer clic.</p>
+      <p class="nc-metrica">+80% de preferencia comercial. Dejas de ser un negocio informal; te conviertes en una corporación.</p>
+    </div>
+
+    <div class="nc-bloque">
+      <p class="nc-gancho">Tus datos son el motor de tu negocio. Asegúrate de que las llaves estén solo en tus manos.</p>
+      <p class="nc-cuerpo">Cuando tu equipo utiliza cuentas personales para almacenar cotizaciones o carteras de clientes, la información de tu empresa está en riesgo. Con la implementación de Google Workspace, tú mantienes el control absoluto. Si un colaborador se va, los archivos, accesos e históricos se quedan en tu empresa. La información no se va con las personas; se institucionaliza de forma segura y permanente.</p>
+      <p class="nc-metrica">Propiedad intelectual blindada desde el día uno. Cero fugas de información.</p>
+    </div>
+
+    <div class="nc-bloque">
+      <p class="nc-gancho">La mejor tecnología es la que tu equipo ya sabe usar.</p>
+      <p class="nc-cuerpo">La transformación digital suele fallar debido a la resistencia al cambio y a las largas curvas de capacitación. Nosotros eliminamos ese obstáculo. Al estructurar tus sistemas sobre el ecosistema empresarial de Google, tu equipo trabaja sobre interfaces que ya domina en su día a día (Gmail, Drive, Hojas de cálculo). Cambiamos el motor interno y blindamos el entorno, pero la experiencia sigue siendo simple, intuitiva y directa.</p>
+      <p class="nc-metrica">0 horas perdidas en capacitaciones complejas. Productividad inmediata.</p>
+    </div>
+
+    <div class="nc-bloque">
+      <p class="nc-gancho">Deja que las máquinas ejecuten la rutina. Dedica tu mente a la estrategia.</p>
+      <p class="nc-cuerpo">El crecimiento de una PyME se estanca cuando los directivos pasan el día llenando datos manualmente o persiguiendo aprobaciones por mensajería. Conectamos tus herramientas mediante desarrollos a la medida en Python y Apps Script. Automatizamos reportes, alertas de ventas y seguimientos para que tus procesos ocurran de fondo, sin errores humanos y de forma totalmente sistemática.</p>
+      <p class="nc-metrica">-40% de tiempo operativo en tareas repetitivas. Tu negocio escala en piloto automático.</p>
+    </div>
+
   </section>
 
   <div class="marquee" aria-hidden="true">
@@ -2441,18 +2566,19 @@
 
       <div class="svc-card">
         <div class="svc-card__icon">
-          <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><polyline points="8 21 12 17 16 21"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
         </div>
-        <div class="svc-card__num">01 / Diseño web</div>
-        <div class="svc-card__title">Tu página web, hecha a medida</div>
+        <div class="svc-card__num">01 / Workspace &amp; Identidad</div>
+        <div class="svc-card__title">Infraestructura Corporativa y Control</div>
         <p class="svc-card__desc">
-          Diseñamos y desarrollamos tu sitio web desde cero: moderno, rápido y pensado
-          para que tus clientes te encuentren fácil. Con mantenimiento y actualizaciones incluidas.
+          Implementamos Google Workspace para tu empresa: correo corporativo @tuempresa.com,
+          administración centralizada de cuentas, Google Drive compartido y control total sobre
+          tu información. Tú decides quién accede a qué y cuándo.
         </p>
         <div class="svc-card__tags">
-          <span class="svc-tag">Responsive</span>
-          <span class="svc-tag">SEO básico</span>
-          <span class="svc-tag">Soporte</span>
+          <span class="svc-tag">Google Workspace</span>
+          <span class="svc-tag">Correo Corporativo</span>
+          <span class="svc-tag">Control de Accesos</span>
         </div>
       </div>
 
@@ -2460,33 +2586,35 @@
         <div class="svc-card__icon">
           <svg viewBox="0 0 24 24"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
         </div>
-        <div class="svc-card__num">02 / Automatizaciones</div>
-        <div class="svc-card__title">Deja que la tecnología trabaje por ti</div>
+        <div class="svc-card__num">02 / Python &amp; Apps Script</div>
+        <div class="svc-card__title">Automatizaciones a la Medida</div>
         <p class="svc-card__desc">
-          Conectamos tus herramientas, automatizamos tareas repetitivas y creamos flujos
-          inteligentes con Google Workspace y Apps Script. Más tiempo para lo que importa.
+          Conectamos tus herramientas y eliminamos tareas manuales mediante desarrollos en
+          Python y Apps Script. Reportes automáticos, alertas de ventas, seguimientos e
+          integraciones que hacen que tu operación corra sola.
         </p>
         <div class="svc-card__tags">
+          <span class="svc-tag">Python</span>
           <span class="svc-tag">Apps Script</span>
-          <span class="svc-tag">Google Sheets</span>
-          <span class="svc-tag">Reportes</span>
+          <span class="svc-tag">Flujos Automáticos</span>
         </div>
       </div>
 
       <div class="svc-card">
         <div class="svc-card__icon">
-          <svg viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <svg viewBox="0 0 24 24"><path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7L12 2z"/></svg>
         </div>
-        <div class="svc-card__num">03 / Consultoría</div>
-        <div class="svc-card__title">Estrategia digital, sin rodeos</div>
+        <div class="svc-card__num">03 / Contratos &amp; Protección TI</div>
+        <div class="svc-card__title">Blindaje Legal Corporativo</div>
         <p class="svc-card__desc">
-          Te orientamos en cada decisión digital: qué herramientas usar, cómo posicionarte
-          y qué pasos dar para innovar. Una sesión puede cambiarlo todo.
+          Redactamos y estructuramos contratos de servicios TI, NDAs corporativos y acuerdos
+          de propiedad intelectual para tu empresa. Tu negocio opera con respaldo jurídico
+          real, no solo con buena fe.
         </p>
         <div class="svc-card__tags">
-          <span class="svc-tag">Estrategia</span>
-          <span class="svc-tag">Diagnóstico</span>
-          <span class="svc-tag">Hoja de ruta</span>
+          <span class="svc-tag">NDA</span>
+          <span class="svc-tag">Contratos TI</span>
+          <span class="svc-tag">Propiedad Intelectual</span>
         </div>
       </div>
 
@@ -2576,11 +2704,12 @@
       </div>
 
       <div class="pillar">
-        <div class="pillar__accent">PyME</div>
-        <div class="pillar__title">Precios justos para negocios reales</div>
+        <div class="pillar__accent">Técnico + Legal</div>
+        <div class="pillar__title">Ecosistema integral único</div>
         <p class="pillar__desc">
-          Ofrecemos calidad de agencia sin el costo de agencia. Planes accesibles
-          y adaptados al presupuesto de negocios pequeños en crecimiento.
+          Fusionamos el desarrollo de software con el blindaje jurídico corporativo.
+          No solo construimos tu infraestructura digital; también la protegemos
+          legalmente desde el primer día.
         </p>
       </div>
 
@@ -3517,6 +3646,21 @@ onAuthStateChanged(auth, user => {
       });
       setTimeout(function(){ window.location.href = href; }, 560);
     });
+  });
+})();
+
+/* ── NARRATIVA CINEMÁTICA ── */
+(function(){
+  var ncObserver = new IntersectionObserver(function(entries){
+    entries.forEach(function(e){
+      if(e.isIntersecting){
+        e.target.classList.add('is-active');
+        ncObserver.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.4 });
+  document.querySelectorAll('.nc-bloque').forEach(function(el){
+    ncObserver.observe(el);
   });
 })();
 </script>
