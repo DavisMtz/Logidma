@@ -11,7 +11,14 @@
  */
 
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getAuth, GoogleAuthProvider } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {
+  initializeAuth,
+  GoogleAuthProvider,
+  indexedDBLocalPersistence,
+  browserLocalPersistence,
+  browserSessionPersistence,
+  browserPopupRedirectResolver,
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getStorage } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 
@@ -26,7 +33,11 @@ export const firebaseConfig = {
 };
 
 export const app   = initializeApp(firebaseConfig);
-export const auth  = getAuth(app);
+// Persistencia en capas: IndexedDB (mejor soporte iOS Safari) → localStorage → sessionStorage
+export const auth  = initializeAuth(app, {
+  persistence: [indexedDBLocalPersistence, browserLocalPersistence, browserSessionPersistence],
+  popupRedirectResolver: browserPopupRedirectResolver,
+});
 export const db    = getFirestore(app);
 export const stor  = getStorage(app);
 export const gProv = new GoogleAuthProvider();

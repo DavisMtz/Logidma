@@ -1787,9 +1787,11 @@ window.signInGoogle=async()=>{
     await signInWithPopup(auth,gProv);
     finish();
   }catch(e){
-    if(e.code==='auth/popup-blocked'||e.code==='auth/popup-cancelled'){
+    if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'){
       try{ await signInWithRedirect(auth,gProv); }
       catch(re){ console.error(re); btn.disabled=false; alert('No se pudo iniciar sesión. Intenta de nuevo.'); }
+    }else if(e.code==='auth/popup-closed-by-user'){
+      btn.disabled=false; // El usuario cerró el popup; reactivar botón sin mostrar error
     }else{
       console.error(e); btn.disabled=false; alert('No se pudo iniciar sesión. Intenta de nuevo.');
     }
@@ -1797,7 +1799,12 @@ window.signInGoogle=async()=>{
 };
 
 /* ── Capture redirect result (mobile fallback) ── */
-getRedirectResult(auth).then(r=>{ if(r&&r.user) finish(); }).catch(e=>console.error(e));
+getRedirectResult(auth).then(r=>{ if(r&&r.user) finish(); }).catch(e=>{
+  console.error(e);
+  const btn=$('btnGoogle');
+  if(btn) btn.disabled=false;
+  if(e&&e.code&&e.code!=='auth/no-auth-event') alert('No se pudo iniciar sesión. Intenta de nuevo.');
+});
 window.finish=()=>{
   $(cur).classList.remove('active');cur='success';
   STAGES.forEach((_,i)=>{const seg=$('seg'+i);if(seg)seg.className='ob-seg done';});

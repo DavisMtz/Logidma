@@ -1115,20 +1115,34 @@ function toast(msg, type='info') {
 }
 
 /* ── AUTH ───────────────────────────────────────── */
+function errMsgAdmin(code) {
+  return ({
+    'auth/popup-blocked':           'El navegador bloqueó la ventana emergente. Activa las ventanas emergentes e intenta de nuevo.',
+    'auth/popup-closed-by-user':    null,
+    'auth/cancelled-popup-request': null,
+    'auth/network-request-failed':  'Sin conexión. Verifica tu red.',
+    'auth/unauthorized-domain':     'Dominio no autorizado en Firebase. Contacta al administrador.',
+    'auth/operation-not-allowed':   'Inicio de sesión con Google no está habilitado.',
+    'auth/internal-error':          'Error interno. Inténtalo de nuevo.',
+    'auth/user-disabled':           'Esta cuenta ha sido deshabilitada.',
+  })[code] || 'Error al iniciar sesión. Inténtalo de nuevo.';
+}
+
 document.getElementById('btnSignIn').addEventListener('click', async ()=>{
   try {
     await signInWithPopup(auth, gProv);
   } catch(e) {
-    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-cancelled') {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
       try { await signInWithRedirect(auth, gProv); }
-      catch(re){ toast('Error al iniciar sesión: '+re.message,'error'); }
+      catch(re){ const m = errMsgAdmin(re.code); if(m) toast(m,'error'); }
     } else {
-      toast('Error al iniciar sesión: '+e.message,'error');
+      const m = errMsgAdmin(e.code);
+      if(m) toast(m,'error');
     }
   }
 });
 
-getRedirectResult(auth).catch(e=>{ if(e&&e.message) toast('Error al iniciar sesión: '+e.message,'error'); });
+getRedirectResult(auth).catch(e=>{ const m = errMsgAdmin(e?.code); if(m) toast(m,'error'); });
 ['btnSideLogout','btnTopLogout','btnDeniedLogout'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=>signOut(auth));
