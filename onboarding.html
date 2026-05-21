@@ -1803,7 +1803,8 @@ getRedirectResult(auth).then(r=>{ if(r&&r.user) finish(); }).catch(e=>{
   console.error(e);
   const btn=$('btnGoogle');
   if(btn) btn.disabled=false;
-  if(e&&e.code&&e.code!=='auth/no-auth-event') alert('No se pudo iniciar sesión. Intenta de nuevo.');
+  const suppress=['auth/no-auth-event','auth/popup-closed-by-user','auth/cancelled-popup-request'];
+  if(e&&e.code&&!suppress.includes(e.code)) alert('No se pudo iniciar sesión. Intenta de nuevo.');
 });
 window.finish=()=>{
   $(cur).classList.remove('active');cur='success';

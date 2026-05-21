@@ -1142,7 +1142,13 @@ document.getElementById('btnSignIn').addEventListener('click', async ()=>{
   }
 });
 
-getRedirectResult(auth).catch(e=>{ const m = errMsgAdmin(e?.code); if(m) toast(m,'error'); });
+getRedirectResult(auth).catch(e=>{
+  if(!e||!e.code||e.code==='auth/no-auth-event') return;
+  const m = e.code==='auth/internal-error'||e.code==='auth/unauthorized-domain'
+    ? 'No se pudo completar el inicio de sesión con Google. Asegúrate de que el dominio esté autorizado en Firebase.'
+    : errMsgAdmin(e.code);
+  if(m) toast(m,'error');
+});
 ['btnSideLogout','btnTopLogout','btnDeniedLogout'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=>signOut(auth));

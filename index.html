@@ -3815,9 +3815,13 @@ googleSignIn && googleSignIn.addEventListener('click', async () => {
 getRedirectResult(auth).then(result => {
   if (result && result.user) closeModal();
 }).catch(err => {
-  const msg = errMsg(err.code);
+  // auth/no-auth-event ocurre cuando no había redirect en curso — ignorar
+  if (!err || !err.code || err.code === 'auth/no-auth-event') return;
+  // auth/internal-error del redirect casi siempre = dominio no autorizado en Firebase
+  const msg = err.code === 'auth/internal-error' || err.code === 'auth/unauthorized-domain'
+    ? 'No se pudo completar el inicio de sesión con Google. Intenta con correo y contraseña o espera un momento.'
+    : errMsg(err.code);
   if (msg) {
-    // Abrir el modal para que el error sea visible al regresar del redirect
     openModal();
     showErr(msg);
   }
