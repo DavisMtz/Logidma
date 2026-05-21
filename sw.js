@@ -7,7 +7,7 @@
  * Cambia VERSION para invalidar todo el cache cuando hagas un release grande.
  */
 
-const VERSION = 'logidma-v2-2026-05';
+const VERSION = 'logidma-v3-2026-05';
 const STATIC_CACHE = `static-${VERSION}`;
 const HTML_CACHE = `html-${VERSION}`;
 const RUNTIME_CACHE = `runtime-${VERSION}`;
@@ -24,10 +24,16 @@ const PRECACHE_URLS = [
   '/gracias.html',
   '/404.html',
   '/manifest.json',
+  '/assets/css/site-chrome.css',
   '/assets/js/firebase-init.js',
   '/assets/js/sanitize.js',
   '/assets/js/forms.js',
-  '/assets/js/analytics.js'
+  '/assets/js/analytics.js',
+  '/assets/js/site-nav.js',
+  '/assets/js/site-footer.js',
+  '/assets/js/page-transition.js',
+  '/assets/js/reveal.js',
+  '/assets/js/sw-register.js'
 ];
 
 const CACHEABLE_HOSTS = [

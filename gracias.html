@@ -426,13 +426,7 @@
 
 <div class="ambient" aria-hidden="true"></div>
 
-<nav class="nav">
-  <a href="/" class="nav__brand">
-    <span class="nav__brand-dot" aria-hidden="true"></span>
-    <span>Logidma</span>
-  </a>
-  <a href="/" class="nav__back">← Volver al inicio</a>
-</nav>
+<div id="siteNav"></div>
 
 <main>
   <div class="status">
@@ -495,11 +489,9 @@
     </a>
   </div>
 
-  <footer class="foot">
-    <span class="foot__txt">© Logidma · La lógica, sistematizada</span>
-    <a class="foot__link" href="mailto:contacto@logidma.com">contacto@logidma.com</a>
-  </footer>
 </main>
+
+<div id="siteFooter"></div>
 
 <script>
   // ── ESCAPE HTML ──
@@ -571,6 +563,10 @@
   wa.href = `https://wa.me/524431014385?text=${waMsg}`;
 </script>
 
+<script type="module" src="/assets/js/site-nav.js"></script>
+<script type="module" src="/assets/js/site-footer.js"></script>
+<script type="module" src="/assets/js/reveal.js"></script>
+<script type="module" src="/assets/js/page-transition.js"></script>
 <script type="module" src="/assets/js/sw-register.js"></script>
 
 </body>

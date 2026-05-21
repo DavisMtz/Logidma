@@ -89,62 +89,68 @@
     opacity:.35; mix-blend-mode:overlay;
   }
 
-  /* NAV */
-  .nav{
-    position: sticky; top:0; z-index: 50;
-    padding: 16px 32px;
-    display: flex; justify-content: space-between; align-items: center;
-    background: rgba(10,9,8,.78);
-    backdrop-filter: blur(14px);
-    -webkit-backdrop-filter: blur(14px);
+  /* USER STRIP — tira con info de sesión debajo del nav */
+  .user-strip{
+    position: fixed; top: 64px; left: 0; right: 0;
+    z-index: 49;
+    background: rgba(17,17,16,.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--line);
-    opacity:0; transform: translateY(-8px);
-    animation: navIn .8s var(--e-expo) .2s forwards;
+    opacity: 0;
+    transform: translateY(-8px);
+    animation: stripIn .6s var(--e-expo) .5s forwards;
   }
-  @keyframes navIn{ to{opacity:1;transform:translateY(0);} }
-
-  .nav__brand{
-    display:flex; align-items:center; gap:12px;
-    text-decoration:none; color: var(--cream);
-    font-family:'Instrument Serif',serif; font-size:22px; letter-spacing:.02em;
+  @keyframes stripIn{ to{ opacity: 1; transform: translateY(0); } }
+  .user-strip__inner{
+    max-width: var(--maxw); margin: 0 auto;
+    padding: 10px 32px;
+    display: flex; justify-content: space-between; align-items: center; gap: 12px;
   }
-  .nav__brand-dot{
-    width:8px; height:8px; border-radius:50%;
-    background: var(--accent);
-    box-shadow: 0 0 12px var(--accent-glow);
-    animation: dotPulse 2.4s ease-in-out infinite;
-  }
-  @keyframes dotPulse{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.55;transform:scale(.85);} }
-
-  .nav__right{ display:flex; align-items:center; gap:12px; }
-  .nav__user{
-    display:none; align-items:center; gap:10px;
-    padding: 6px 12px 6px 6px;
+  .user-strip__user{
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 5px 12px 5px 5px;
     border: 1px solid var(--line-strong);
     border-radius: 999px;
-    font-family:'JetBrains Mono',monospace; font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
   }
-  .nav__user.is-visible{ display:inline-flex; }
-  .nav__user img{
-    width: 26px; height: 26px; border-radius:50%; object-fit:cover;
+  .user-strip__user img{
+    width: 24px; height: 24px; border-radius: 50%; object-fit: cover;
     border: 1px solid var(--line-strong);
   }
-  .nav__user span{ color: var(--cream-soft); letter-spacing:.04em; }
-  .nav__btn{
-    background: transparent; border: 1px solid var(--line-strong);
-    color: var(--cream-soft); cursor: pointer;
-    padding: 8px 14px; border-radius: 999px;
-    font-family:'JetBrains Mono',monospace;
-    font-size: 11px; letter-spacing:.16em; text-transform: uppercase;
+  .user-strip__user span{ color: var(--cream-soft); letter-spacing: .04em; }
+  .user-strip__user:not(:has(img[src])){ /* sin avatar */ }
+  .user-strip__logout{
+    background: transparent;
+    border: 1px solid var(--line-strong);
+    color: var(--cream-soft);
+    cursor: pointer;
+    padding: 7px 14px;
+    border-radius: 999px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px; letter-spacing: .18em; text-transform: uppercase;
     transition: all .3s var(--e-expo);
   }
-  .nav__btn:hover{ border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+  .user-strip__logout:hover{
+    border-color: var(--accent); color: var(--accent); background: var(--accent-soft);
+  }
+  @media (max-width: 640px){
+    .user-strip{ top: 58px; }
+    .user-strip__inner{ padding: 8px 18px; }
+    .user-strip__user span{ display: none; }
+  }
+  @keyframes dotPulse{ 0%,100%{opacity:1;transform:scale(1);} 50%{opacity:.55;transform:scale(.85);} }
 
   /* MAIN */
   main{
     position: relative; z-index: 2;
     max-width: var(--maxw); margin: 0 auto;
-    padding: 56px 32px 96px;
+    padding: 130px 32px 96px;
+  }
+  /* Si la tira de usuario está visible, empuja el contenido */
+  body:has(.user-strip:not([hidden])) main{
+    padding-top: 170px;
   }
 
   /* LOADING */
@@ -400,19 +406,18 @@
 </head>
 <body>
 
-<nav class="nav">
-  <a href="/" class="nav__brand">
-    <span class="nav__brand-dot" aria-hidden="true"></span>
-    <span>Logidma</span>
-  </a>
-  <div class="nav__right">
-    <div class="nav__user" id="navUser">
+<div id="siteNav"></div>
+
+<!-- Tira de usuario (visible solo cuando hay sesión activa) -->
+<div class="user-strip" id="userStrip" hidden>
+  <div class="user-strip__inner">
+    <div class="user-strip__user">
       <img id="navAvatar" src="" alt="" />
       <span id="navName">—</span>
     </div>
-    <button class="nav__btn" id="btnLogout" type="button">Cerrar sesión</button>
+    <button class="user-strip__logout" id="btnLogout" type="button">Cerrar sesión</button>
   </div>
-</nav>
+</div>
 
 <main>
   <!-- LOADING -->
@@ -505,7 +510,7 @@
   const stLoading = $('stLoading');
   const stGuest   = $('stGuest');
   const stAuthed  = $('stAuthed');
-  const navUser   = $('navUser');
+  const navUser   = $('userStrip');
   const btnLogout = $('btnLogout');
 
   function showState(which){
@@ -519,7 +524,7 @@
   onAuthStateChanged(auth, async user => {
     if (!user){
       showState('guest');
-      navUser.classList.remove('is-visible');
+      navUser.hidden = true;
       track('cliente_panel_guest');
       return;
     }
@@ -535,7 +540,7 @@
     } else {
       $('navAvatar').removeAttribute('src');
     }
-    navUser.classList.add('is-visible');
+    navUser.hidden = false;
 
     // Personalizar WhatsApp con el nombre
     const wa = $('suppWa');
@@ -621,6 +626,12 @@
   }, 4000);
 </script>
 
+<div id="siteFooter"></div>
+
+<script type="module" src="/assets/js/site-nav.js"></script>
+<script type="module" src="/assets/js/site-footer.js"></script>
+<script type="module" src="/assets/js/reveal.js"></script>
+<script type="module" src="/assets/js/page-transition.js"></script>
 <script type="module" src="/assets/js/sw-register.js"></script>
 
 </body>
