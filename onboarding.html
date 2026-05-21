@@ -1369,11 +1369,10 @@ nav,main{position:relative;z-index:2;}
 </main>
 
 <script type="module">
-import { app, auth, stor, gProv } from './assets/js/firebase-init.js';
+import { app, auth, stor } from './assets/js/firebase-init.js';
+import { googleSignIn, checkRedirectResult } from './assets/js/auth.js';
 import { ref as sRef, uploadBytes, getDownloadURL }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
-import { signInWithPopup, signInWithRedirect, getRedirectResult }
-  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 /* ── STATE ── */
 const s={
@@ -1781,30 +1780,20 @@ async function sendSheets(){
 }
 
 /* ── GOOGLE AUTH ── */
-window.signInGoogle=async()=>{
-  const btn=$('btnGoogle');btn.disabled=true;
-  try{
-    await signInWithPopup(auth,gProv);
-    finish();
-  }catch(e){
-    if(e.code==='auth/popup-blocked'||e.code==='auth/cancelled-popup-request'){
-      try{ await signInWithRedirect(auth,gProv); }
-      catch(re){ console.error(re); btn.disabled=false; alert('No se pudo iniciar sesión. Intenta de nuevo.'); }
-    }else if(e.code==='auth/popup-closed-by-user'){
-      btn.disabled=false; // El usuario cerró el popup; reactivar botón sin mostrar error
-    }else{
-      console.error(e); btn.disabled=false; alert('No se pudo iniciar sesión. Intenta de nuevo.');
-    }
-  }
+window.signInGoogle = async () => {
+  const btn = $('btnGoogle');
+  btn.disabled = true;
+  const { error, redirecting, cancelled } = await googleSignIn();
+  if (redirecting) return; // La página se redirigirá automáticamente
+  if (cancelled || !error) { btn.disabled = false; return; }
+  btn.disabled = false;
+  alert(error);
 };
 
-/* ── Capture redirect result (mobile fallback) ── */
-getRedirectResult(auth).then(r=>{ if(r&&r.user) finish(); }).catch(e=>{
-  console.error(e);
-  const btn=$('btnGoogle');
-  if(btn) btn.disabled=false;
-  const suppress=['auth/no-auth-event','auth/popup-closed-by-user','auth/cancelled-popup-request'];
-  if(e&&e.code&&!suppress.includes(e.code)) alert('No se pudo iniciar sesión. Intenta de nuevo.');
+/* ── Resultado del redirect de Google al volver a la página ── */
+checkRedirectResult().then(({ user, error }) => {
+  if (user) finish();
+  else if (error) { const btn = $('btnGoogle'); if (btn) btn.disabled = false; alert(error); }
 });
 window.finish=()=>{
   $(cur).classList.remove('active');cur='success';
