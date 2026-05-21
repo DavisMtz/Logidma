@@ -1,0 +1,24 @@
+{
+  "name": "logidma",
+  "version": "2.0.0",
+  "description": "Logidma — Infraestructura Digital, Automatización y Blindaje Legal TI.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "serve": "npx http-server -p 8000 -c-1 .",
+    "lint:html": "npx htmlhint '*.html'",
+    "validate:html": "npx html-validate '*.html'",
+    "format:check": "npx prettier --check '*.html' 'assets/**/*.{js,css}'",
+    "format:write": "npx prettier --write '*.html' 'assets/**/*.{js,css}'"
+  },
+  "devDependencies": {
+    "htmlhint": "^1.1.4"
+  },
+  "homepage": "https://logidma.com",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DavisMtz/Logidma.git"
+  },
+  "author": "David Martínez Arredondo (DMA)",
+  "license": "UNLICENSED"
+}
