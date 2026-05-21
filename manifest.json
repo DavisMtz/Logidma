@@ -1,0 +1,26 @@
+{
+  "name": "Logidma",
+  "short_name": "Logidma",
+  "description": "Infraestructura Digital, Automatización y Blindaje Legal TI para empresas.",
+  "start_url": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0a0908",
+  "theme_color": "#0a0908",
+  "lang": "es-MX",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "https://github.com/DavisMtz/logidma-assets/blob/main/icon-192.png?raw=true",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "https://github.com/DavisMtz/logidma-assets/blob/main/icon-512.png?raw=true",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
