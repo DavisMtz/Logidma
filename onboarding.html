@@ -1372,7 +1372,7 @@ nav,main{position:relative;z-index:2;}
 import { app, auth, stor, gProv } from './assets/js/firebase-init.js';
 import { ref as sRef, uploadBytes, getDownloadURL }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
-import { signInWithPopup }
+import { signInWithPopup, signInWithRedirect, getRedirectResult }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 /* ── STATE ── */
@@ -1783,9 +1783,21 @@ async function sendSheets(){
 /* ── GOOGLE AUTH ── */
 window.signInGoogle=async()=>{
   const btn=$('btnGoogle');btn.disabled=true;
-  try{await signInWithPopup(auth,gProv);finish();}
-  catch(e){console.error(e);btn.disabled=false;alert('No se pudo iniciar sesión. Intenta de nuevo.');}
+  try{
+    await signInWithPopup(auth,gProv);
+    finish();
+  }catch(e){
+    if(e.code==='auth/popup-blocked'||e.code==='auth/popup-cancelled'){
+      try{ await signInWithRedirect(auth,gProv); }
+      catch(re){ console.error(re); btn.disabled=false; alert('No se pudo iniciar sesión. Intenta de nuevo.'); }
+    }else{
+      console.error(e); btn.disabled=false; alert('No se pudo iniciar sesión. Intenta de nuevo.');
+    }
+  }
 };
+
+/* ── Capture redirect result (mobile fallback) ── */
+getRedirectResult(auth).then(r=>{ if(r&&r.user) finish(); }).catch(e=>console.error(e));
 window.finish=()=>{
   $(cur).classList.remove('active');cur='success';
   STAGES.forEach((_,i)=>{const seg=$('seg'+i);if(seg)seg.className='ob-seg done';});
