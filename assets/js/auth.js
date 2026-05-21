@@ -1,9 +1,12 @@
 /**
  * auth.js — Módulo central de autenticación Firebase.
  *
- * Exporta helpers usados por index.html, admin.html y onboarding.html.
- * Las páginas que solo escuchan el estado (galeria, proyectos, cliente)
- * pueden importar { auth } de firebase-init.js directamente.
+ * Estrategia cross-device:
+ *  - iOS / Android → signInWithRedirect directo (popup no confiable en Safari)
+ *  - Desktop       → signInWithPopup, con fallback a redirect para CUALQUIER error
+ *
+ * Se pasa browserPopupRedirectResolver explícitamente en todas las llamadas
+ * para evitar comportamientos indefinidos con initializeAuth en iOS Safari.
  */
 
 import { auth, gProv } from './firebase-init.js';
@@ -15,9 +18,13 @@ import {
   signInWithPopup,
   signInWithRedirect,
   getRedirectResult,
+  browserPopupRedirectResolver,
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
-/* ── Mensajes de error en español ──────────────────── */
+// iOS Safari y Android no soportan popup de forma confiable
+const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+/* ── Mensajes de error en español ──────────────────────── */
 const ERR_MSGS = {
   'auth/invalid-email':           'Correo inválido.',
   'auth/user-not-found':          'No existe cuenta con ese correo.',
@@ -31,7 +38,7 @@ const ERR_MSGS = {
   'auth/operation-not-allowed':   'Este método de inicio de sesión no está habilitado.',
   'auth/internal-error':          'Error interno. Inténtalo de nuevo.',
   'auth/user-disabled':           'Esta cuenta ha sido deshabilitada.',
-  // Silenciosos — no mostrar al usuario
+  // Silenciosos — usuario canceló o ya hay un flujo en curso
   'auth/popup-closed-by-user':    null,
   'auth/cancelled-popup-request': null,
   'auth/popup-blocked':           null,
@@ -39,34 +46,59 @@ const ERR_MSGS = {
 };
 
 export function authErrMsg(code) {
-  if (code in ERR_MSGS) return ERR_MSGS[code];
-  return 'Ocurrió un error. Inténtalo de nuevo.';
+  return code in ERR_MSGS ? ERR_MSGS[code] : 'Ocurrió un error. Inténtalo de nuevo.';
 }
 
-/* ── Google Sign-In (popup → redirect en iOS/móvil) ─ */
+/* ── Google Sign-In ─────────────────────────────────────
+ *  Retorna uno de:
+ *    { user }          → éxito con popup (solo desktop)
+ *    { redirecting }   → la página navegará a Google (móvil / fallback)
+ *    { cancelled }     → usuario cerró popup voluntariamente
+ *    { error }         → mensaje legible para mostrar al usuario
+ * ──────────────────────────────────────────────────────── */
 export async function googleSignIn() {
+  // ── Móvil: ir directo a redirect, sin intentar popup ──
+  if (isMobile) {
+    try {
+      await signInWithRedirect(auth, gProv, browserPopupRedirectResolver);
+      return { redirecting: true };
+    } catch (err) {
+      console.error('[auth] signInWithRedirect error:', err.code, err.message);
+      return { error: authErrMsg(err.code) };
+    }
+  }
+
+  // ── Desktop: popup con fallback a redirect ──
   try {
-    const result = await signInWithPopup(auth, gProv);
+    const result = await signInWithPopup(auth, gProv, browserPopupRedirectResolver);
     return { user: result.user };
   } catch (err) {
-    if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
-      await signInWithRedirect(auth, gProv);
-      return { redirecting: true };
-    }
-    // El usuario cerró el popup: no es error real
+    // El usuario cerró el popup voluntariamente → no mostrar error, solo re-habilitar
     if (err.code === 'auth/popup-closed-by-user') return { cancelled: true };
-    return { error: authErrMsg(err.code) };
+
+    // Cualquier otro error (popup-blocked, internal-error, etc.) → fallback a redirect
+    console.warn('[auth] popup falló, intentando redirect. Código:', err.code);
+    try {
+      await signInWithRedirect(auth, gProv, browserPopupRedirectResolver);
+      return { redirecting: true };
+    } catch (redirectErr) {
+      console.error('[auth] redirect fallback error:', redirectErr.code, redirectErr.message);
+      return { error: authErrMsg(redirectErr.code) };
+    }
   }
 }
 
-/* ── Captura el resultado del redirect al cargar la página ── */
+/* ── Procesa el resultado del redirect al cargar la página ──
+ *  Llamar en TODAS las páginas que tienen Google Sign-In.
+ *  Retorna { user } si volvió de un redirect exitoso,
+ *           { error } si falló, o {} si no había redirect.
+ * ──────────────────────────────────────────────────────── */
 export async function checkRedirectResult() {
   try {
-    const result = await getRedirectResult(auth);
+    const result = await getRedirectResult(auth, browserPopupRedirectResolver);
     return { user: result?.user ?? null };
   } catch (err) {
     if (!err?.code || err.code === 'auth/no-auth-event') return { user: null };
-    // internal-error o unauthorized-domain casi siempre = problema de dominio
     const msg =
       err.code === 'auth/internal-error' || err.code === 'auth/unauthorized-domain'
         ? 'No se pudo completar el inicio de sesión con Google. Intenta con correo y contraseña.'
@@ -75,7 +107,7 @@ export async function checkRedirectResult() {
   }
 }
 
-/* ── Email / Contraseña ─────────────────────────────── */
+/* ── Email / Contraseña ─────────────────────────────────── */
 export async function emailSignIn(email, password) {
   try {
     const result = await signInWithEmailAndPassword(auth, email, password);
@@ -94,6 +126,6 @@ export async function emailRegister(email, password) {
   }
 }
 
-/* ── Utilidades ─────────────────────────────────────── */
+/* ── Utilidades ─────────────────────────────────────────── */
 export const logout    = () => signOut(auth);
 export const watchAuth = (cb) => onAuthStateChanged(auth, cb);

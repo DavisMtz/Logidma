@@ -1783,11 +1783,11 @@ async function sendSheets(){
 window.signInGoogle = async () => {
   const btn = $('btnGoogle');
   btn.disabled = true;
-  const { error, redirecting, cancelled } = await googleSignIn();
-  if (redirecting) return; // La página se redirigirá automáticamente
-  if (cancelled || !error) { btn.disabled = false; return; }
+  const { user, error, redirecting } = await googleSignIn();
+  if (redirecting) return;       // Página va a navegar a Google, no hacer nada más
+  if (user) { finish(); return; } // Éxito con popup (desktop)
   btn.disabled = false;
-  alert(error);
+  if (error) alert(error);       // Mostrar error; si fue cancelled, error es null → silencio
 };
 
 /* ── Resultado del redirect de Google al volver a la página ── */
