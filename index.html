@@ -3763,6 +3763,8 @@ function errMsg(code) {
     'auth/network-request-failed':     'Sin conexión. Verifica tu red.',
     'auth/unauthorized-domain':        'Este dominio no está autorizado. Contacta al administrador.',
     'auth/operation-not-allowed':      'Inicio de sesión con Google no está habilitado.',
+    'auth/internal-error':             'Error interno. Inténtalo de nuevo.',
+    'auth/user-disabled':              'Esta cuenta ha sido deshabilitada.',
   })[code] || 'Ocurrió un error. Inténtalo de nuevo.';
 }
 
@@ -3792,7 +3794,9 @@ googleSignIn && googleSignIn.addEventListener('click', async () => {
     await signInWithPopup(auth, googleProvider);
     closeModal();
   } catch (err) {
-    if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-cancelled') {
+    // auth/popup-blocked → el navegador bloqueó el popup; fallback a redirect
+    // auth/cancelled-popup-request → otra petición de popup en curso; reintentar con redirect
+    if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
       try {
         await signInWithRedirect(auth, googleProvider);
       } catch (redirectErr) {
@@ -3800,6 +3804,7 @@ googleSignIn && googleSignIn.addEventListener('click', async () => {
         if (msg) showErr(msg);
       }
     } else {
+      // auth/popup-closed-by-user → el usuario cerró el popup, no hacer nada
       const msg = errMsg(err.code);
       if (msg) showErr(msg);
     }
@@ -3811,7 +3816,11 @@ getRedirectResult(auth).then(result => {
   if (result && result.user) closeModal();
 }).catch(err => {
   const msg = errMsg(err.code);
-  if (msg) showErr(msg);
+  if (msg) {
+    // Abrir el modal para que el error sea visible al regresar del redirect
+    openModal();
+    showErr(msg);
+  }
 });
 
 /* ── Logout ── */
