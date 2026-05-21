@@ -1199,6 +1199,17 @@
     display: block;
   }
 
+  /* Honeypot anti-bot — invisible para humanos */
+  .pform__honey{
+    position: absolute !important;
+    left: -9999px !important;
+    width: 1px !important;
+    height: 1px !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+  }
+
   /* Newsletter opt-in */
   .pform__optin{
     grid-column: 1 / -1;
@@ -2962,6 +2973,13 @@
         <span class="pform__counter" id="ideaCounter">0 chars · mínimo 10</span>
       </div>
 
+      <!-- Honeypot anti-bot: si un bot lo llena, descartamos el envío en silencio -->
+      <div class="pform__honey" aria-hidden="true">
+        <label>No llenar este campo
+          <input type="text" name="empresa_url" id="pf-honey" tabindex="-1" autocomplete="off" />
+        </label>
+      </div>
+
       <label class="pform__optin" for="pf-newsletter">
         <input type="checkbox" id="pf-newsletter" name="newsletter" value="1" />
         <span class="pform__optin-txt">
@@ -3547,6 +3565,13 @@
       e.preventDefault();
       clearErrors();
 
+      // Honeypot: si está lleno, fingir éxito sin enviar nada
+      const honey = pform.querySelector('#pf-honey');
+      if (honey && honey.value.trim() !== '') {
+        showStatus('success', '¡Recibido!', 'Gracias.');
+        return;
+      }
+
       const formData = new FormData(pform);
       const trackId = genTrackId();
       const data = {
@@ -3896,6 +3921,15 @@ onAuthStateChanged(auth, user => {
     ncObserver.observe(el);
   });
 })();
+</script>
+
+<!-- PWA: registro de service worker (offline + instalable) -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
 </script>
 
 </body>

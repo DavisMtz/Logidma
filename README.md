@@ -16,6 +16,9 @@ Sitio estático multi-página servido desde GitHub Pages, con autenticación y d
 |---|---|
 | `index.html` | Landing — narrativa, oferta, formulario de contacto, modal de auth |
 | `servicios.html` | Catálogo público con 3 rutas (Workspace, Automatización, Blindaje) y CTAs precargando onboarding |
+| `cotizador.html` | Calculadora interactiva de ROI con sliders; el CTA preset al onboarding con ahorro y servicio |
+| `casos.html` | Casos de estudio con métricas reales y filtros por categoría |
+| `recursos.html` | Lead magnets gratuitos (NDA, checklists, guías) con modal de email + honeypot |
 | `acerca-de.html` | Historia, filosofía, equipo (DMA) |
 | `onboarding.html` | Flujo multi-paso para construir tu sistema (acepta prefill por `?nombre=&proyecto=&servicio=`) |
 | `cliente.html` | Panel privado para clientes autenticados (proyectos, hitos, soporte) |
@@ -64,6 +67,9 @@ Luego abre `http://localhost:8000`.
 .
 ├── index.html              # Landing
 ├── servicios.html          # Catálogo de servicios
+├── cotizador.html          # Calculadora interactiva de ROI
+├── casos.html              # Casos de estudio con métricas
+├── recursos.html           # Lead magnets (NDA, checklists, guías)
 ├── acerca-de.html
 ├── onboarding.html
 ├── cliente.html            # Panel autenticado
@@ -71,12 +77,14 @@ Luego abre `http://localhost:8000`.
 ├── galeria.html
 ├── gracias.html            # Confirmación post-submit
 ├── 404.html
+├── sw.js                   # Service Worker (PWA + offline)
 ├── assets/
 │   ├── js/
 │   │   ├── firebase-init.js   # Init único de Firebase
 │   │   ├── sanitize.js        # escHtml, escAttr
 │   │   ├── forms.js           # submitToAppsScript, genTrackId
-│   │   └── analytics.js       # track(), trackPageView()
+│   │   ├── analytics.js       # track(), trackPageView()
+│   │   └── sw-register.js     # Registro del service worker
 │   └── css/
 ├── sitemap.xml
 ├── robots.txt
@@ -87,6 +95,22 @@ Luego abre `http://localhost:8000`.
 ├── CNAME                   # Dominio: logidma.com
 └── README.md
 ```
+
+### PWA + Service Worker
+
+`sw.js` cachea las páginas estáticas y las fuentes para que:
+- El sitio funciona **offline** (excepto Firebase y Apps Script, que requieren red).
+- Las cargas siguientes son **instantáneas**.
+- El sitio puede **instalarse** como app desde el menú del navegador.
+
+Para invalidar el caché, sube la constante `VERSION` en `sw.js`.
+
+### Anti-bot
+
+- **Honeypot** en los forms de `index.html`, `onboarding.html` y `recursos.html`:
+  campo invisible llamado `empresa_url`. Si lo llenan, fingimos éxito sin enviar.
+- Apps Script puede añadir validación adicional server-side (rate-limit por IP,
+  validación de dominios de email, etc.).
 
 ### Módulos JavaScript compartidos (`assets/js/`)
 
