@@ -24,7 +24,7 @@ import { getStorage } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-
 
 export const firebaseConfig = {
   apiKey:            "AIzaSyCiDKiKDvPkPIonnFrsWU-IJkpNIpfQt9g",
-  authDomain:        "logidma-c1df8.firebaseapp.com",
+  authDomain:        "logidma.com",
   projectId:         "logidma-c1df8",
   storageBucket:     "logidma-c1df8.firebasestorage.app",
   messagingSenderId: "1089066225627",
