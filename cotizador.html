@@ -407,17 +407,7 @@
 </head>
 <body>
 
-<nav class="nav">
-  <a href="/" class="nav__brand">
-    <span class="nav__brand-dot" aria-hidden="true"></span>
-    <span>Logidma</span>
-  </a>
-  <div class="nav__links">
-    <a class="nav__link" href="servicios.html">Servicios</a>
-    <a class="nav__link" href="casos.html">Casos</a>
-    <a class="nav__link" href="onboarding.html">Construir</a>
-  </div>
-</nav>
+<div id="siteNav"></div>
 
 <main>
   <section class="hero">
@@ -520,11 +510,9 @@
     Estimación basada en datos promedio de implementaciones previas. Los números reales dependen de tu contexto específico. Una llamada de 30 minutos nos permite afinar mucho más la estimación — y es gratuita.
   </p>
 
-  <footer class="foot">
-    <span class="foot__txt">© Logidma · La lógica, sistematizada</span>
-    <a class="foot__link" href="mailto:contacto@logidma.com">contacto@logidma.com</a>
-  </footer>
 </main>
+
+<div id="siteFooter"></div>
 
 <script type="module">
   import { escHtml } from './assets/js/sanitize.js';
@@ -655,6 +643,10 @@
   trackPageView('/cotizador');
 </script>
 
+<script type="module" src="/assets/js/site-nav.js"></script>
+<script type="module" src="/assets/js/site-footer.js"></script>
+<script type="module" src="/assets/js/reveal.js"></script>
+<script type="module" src="/assets/js/page-transition.js"></script>
 <script type="module" src="/assets/js/sw-register.js"></script>
 
 </body>

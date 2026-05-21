@@ -328,17 +328,7 @@
 </head>
 <body>
 
-<nav class="nav">
-  <a href="/" class="nav__brand">
-    <span class="nav__brand-dot" aria-hidden="true"></span>
-    <span>Logidma</span>
-  </a>
-  <div class="nav__links">
-    <a class="nav__link" href="servicios.html">Servicios</a>
-    <a class="nav__link" href="casos.html">Casos</a>
-    <a class="nav__link" href="cotizador.html">Cotizador</a>
-  </div>
-</nav>
+<div id="siteNav"></div>
 
 <main>
   <section class="hero">
@@ -423,11 +413,9 @@
 
   </section>
 
-  <footer class="foot">
-    <span class="foot__txt">© Logidma · La lógica, sistematizada</span>
-    <a class="foot__link" href="mailto:contacto@logidma.com">contacto@logidma.com</a>
-  </footer>
 </main>
+
+<div id="siteFooter"></div>
 
 <!-- MODAL DE DESCARGA -->
 <div class="modal" id="dlModal" role="dialog" aria-modal="true" aria-labelledby="dlTitle" aria-hidden="true">
@@ -588,6 +576,10 @@
   trackPageView('/recursos');
 </script>
 
+<script type="module" src="/assets/js/site-nav.js"></script>
+<script type="module" src="/assets/js/site-footer.js"></script>
+<script type="module" src="/assets/js/reveal.js"></script>
+<script type="module" src="/assets/js/page-transition.js"></script>
 <script type="module" src="/assets/js/sw-register.js"></script>
 
 </body>
