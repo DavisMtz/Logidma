@@ -3654,20 +3654,14 @@
 
 
 <script type="module">
-import { app, auth, gProv } from './assets/js/firebase-init.js';
-import { getAnalytics }     from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
-import {
-  onAuthStateChanged,
-  signOut,
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signInWithPopup,
-  signInWithRedirect,
-  getRedirectResult
-} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { app }                                          from './assets/js/firebase-init.js';
+import { googleSignIn, checkRedirectResult,
+         emailSignIn, emailRegister,
+         logout, watchAuth }                            from './assets/js/auth.js';
+import { getAnalytics }
+  from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
 
-const analytics      = getAnalytics(app);
-const googleProvider = gProv; // alias para mantener el código existente
+getAnalytics(app);
 
 /* ── DOM refs ── */
 const authModal      = document.getElementById('authModal');
@@ -3678,7 +3672,7 @@ const navUser        = document.getElementById('navUser');
 const navUserAvatar  = document.getElementById('navUserAvatar');
 const navUserName    = document.getElementById('navUserName');
 const navLogout      = document.getElementById('navLogout');
-const googleSignIn   = document.getElementById('googleSignIn');
+const googleSignInBtn= document.getElementById('googleSignIn');
 const authForm       = document.getElementById('authForm');
 const authEmailEl    = document.getElementById('authEmail');
 const authPasswordEl = document.getElementById('authPassword');
@@ -3689,22 +3683,25 @@ const authTitle      = document.getElementById('authTitle');
 const authSubtitle   = document.getElementById('authSubtitle');
 const authToggle     = document.getElementById('authToggle');
 const authToggleText = document.getElementById('authToggleText');
+const mmenuLoginBtn  = document.getElementById('mmenuLoginBtn');
+const mmenuUser      = document.getElementById('mmenuUser');
+const mmenuAvatar    = document.getElementById('mmenuAvatar');
+const mmenuUname     = document.getElementById('mmenuUname');
+const mmenuLogout    = document.getElementById('mmenuLogout');
+const hamburgerEl    = document.getElementById('hamburger');
 
 let isRegister = false;
 
-/* ── Modal open / close ── */
+/* ── Modal ── */
 function openModal() {
   authModal.classList.add('open');
   document.body.style.overflow = 'hidden';
-  setTimeout(() => authEmailEl && authEmailEl.focus(), 450);
+  setTimeout(() => authEmailEl?.focus(), 450);
 }
 function closeModal() {
   authModal.classList.remove('open');
   document.body.style.overflow = '';
-  resetForm();
-}
-function resetForm() {
-  authForm && authForm.reset();
+  authForm?.reset();
   hideErr();
   setLoading(false);
 }
@@ -3713,24 +3710,25 @@ navLoginBtn  && navLoginBtn.addEventListener('click', openModal);
 authBackdrop && authBackdrop.addEventListener('click', closeModal);
 authClose    && authClose.addEventListener('click', closeModal);
 document.addEventListener('keydown', e => {
-  if (e.key === 'Escape' && authModal.classList.contains('open')) closeModal();
+  if (e.key === 'Escape' && authModal?.classList.contains('open')) closeModal();
 });
 
-/* ── Toggle login / register ── */
+/* ── Login / Registro toggle ── */
 function setMode(register) {
   isRegister = register;
-  authTitle.textContent       = register ? 'Crear cuenta'     : 'Acceder';
-  authSubtitle.textContent    = register ? 'Únete a Logidma'  : 'Ingresa a tu cuenta';
-  authSubmitText.textContent  = register ? 'Crear cuenta'     : 'Iniciar sesión';
+  authTitle.textContent       = register ? 'Crear cuenta'       : 'Acceder';
+  authSubtitle.textContent    = register ? 'Únete a Logidma'    : 'Ingresa a tu cuenta';
+  authSubmitText.textContent  = register ? 'Crear cuenta'       : 'Iniciar sesión';
   authToggleText.textContent  = register ? '¿Ya tienes cuenta?' : '¿No tienes cuenta?';
-  authToggle.textContent      = register ? 'Iniciar sesión'   : 'Registrarse';
-  authPasswordEl.autocomplete = register ? 'new-password'     : 'current-password';
+  authToggle.textContent      = register ? 'Iniciar sesión'     : 'Registrarse';
+  authPasswordEl.autocomplete = register ? 'new-password'       : 'current-password';
   hideErr();
 }
 authToggle && authToggle.addEventListener('click', () => setMode(!isRegister));
 
-/* ── Error helpers ── */
+/* ── Mensajes de error ── */
 function showErr(msg) {
+  if (!msg) return;
   authError.textContent = msg;
   authError.classList.add('show');
 }
@@ -3738,37 +3736,13 @@ function hideErr() {
   authError.textContent = '';
   authError.classList.remove('show');
 }
-
-/* ── Loading state ── */
 function setLoading(on) {
   authSubmit.disabled = on;
   authSubmit.classList.toggle('loading', on);
-  if (!on) authSubmitText.textContent = isRegister ? 'Crear cuenta' : 'Iniciar sesión';
-  else authSubmitText.textContent = '';
+  authSubmitText.textContent = on ? '' : (isRegister ? 'Crear cuenta' : 'Iniciar sesión');
 }
 
-/* ── Firebase error → español ── */
-function errMsg(code) {
-  return ({
-    'auth/invalid-email':              'Correo inválido.',
-    'auth/user-not-found':             'No existe una cuenta con ese correo.',
-    'auth/wrong-password':             'Contraseña incorrecta.',
-    'auth/invalid-credential':         'Correo o contraseña incorrectos.',
-    'auth/email-already-in-use':       'Ese correo ya está registrado.',
-    'auth/weak-password':              'La contraseña debe tener al menos 6 caracteres.',
-    'auth/too-many-requests':          'Demasiados intentos. Espera un momento.',
-    'auth/popup-closed-by-user':       null,
-    'auth/cancelled-popup-request':    null,
-    'auth/popup-blocked':              null,
-    'auth/network-request-failed':     'Sin conexión. Verifica tu red.',
-    'auth/unauthorized-domain':        'Este dominio no está autorizado. Contacta al administrador.',
-    'auth/operation-not-allowed':      'Inicio de sesión con Google no está habilitado.',
-    'auth/internal-error':             'Error interno. Inténtalo de nuevo.',
-    'auth/user-disabled':              'Esta cuenta ha sido deshabilitada.',
-  })[code] || 'Ocurrió un error. Inténtalo de nuevo.';
-}
-
-/* ── Email / Password submit ── */
+/* ── Email / Contraseña ── */
 authForm && authForm.addEventListener('submit', async e => {
   e.preventDefault();
   hideErr();
@@ -3776,122 +3750,78 @@ authForm && authForm.addEventListener('submit', async e => {
   const password = authPasswordEl.value;
   if (!email || !password) { showErr('Completa todos los campos.'); return; }
   setLoading(true);
-  try {
-    if (isRegister) await createUserWithEmailAndPassword(auth, email, password);
-    else            await signInWithEmailAndPassword(auth, email, password);
-    closeModal();
-  } catch (err) {
-    const msg = errMsg(err.code);
-    if (msg) showErr(msg);
-    setLoading(false);
-  }
+  const { error } = isRegister
+    ? await emailRegister(email, password)
+    : await emailSignIn(email, password);
+  if (error) { showErr(error); setLoading(false); }
+  else closeModal();
 });
 
-/* ── Google sign-in ── */
-googleSignIn && googleSignIn.addEventListener('click', async () => {
+/* ── Google Sign-In ── */
+googleSignInBtn && googleSignInBtn.addEventListener('click', async () => {
   hideErr();
-  try {
-    await signInWithPopup(auth, googleProvider);
-    closeModal();
-  } catch (err) {
-    // auth/popup-blocked → el navegador bloqueó el popup; fallback a redirect
-    // auth/cancelled-popup-request → otra petición de popup en curso; reintentar con redirect
-    if (err.code === 'auth/popup-blocked' || err.code === 'auth/cancelled-popup-request') {
-      try {
-        await signInWithRedirect(auth, googleProvider);
-      } catch (redirectErr) {
-        const msg = errMsg(redirectErr.code);
-        if (msg) showErr(msg);
-      }
-    } else {
-      // auth/popup-closed-by-user → el usuario cerró el popup, no hacer nada
-      const msg = errMsg(err.code);
-      if (msg) showErr(msg);
-    }
-  }
+  const { error, redirecting } = await googleSignIn();
+  if (redirecting) return; // La página se redirigirá sola
+  if (error) showErr(error);
+  else closeModal();
 });
 
-/* ── Capture redirect result on page load ── */
-getRedirectResult(auth).then(result => {
-  if (result && result.user) closeModal();
-}).catch(err => {
-  // auth/no-auth-event ocurre cuando no había redirect en curso — ignorar
-  if (!err || !err.code || err.code === 'auth/no-auth-event') return;
-  // auth/internal-error del redirect casi siempre = dominio no autorizado en Firebase
-  const msg = err.code === 'auth/internal-error' || err.code === 'auth/unauthorized-domain'
-    ? 'No se pudo completar el inicio de sesión con Google. Intenta con correo y contraseña o espera un momento.'
-    : errMsg(err.code);
-  if (msg) {
-    openModal();
-    showErr(msg);
-  }
+/* ── Resultado del redirect de Google (retorno desde OAuth) ── */
+checkRedirectResult().then(({ user, error }) => {
+  if (user) { closeModal(); return; }
+  if (error) { openModal(); showErr(error); }
 });
 
 /* ── Logout ── */
-navLogout && navLogout.addEventListener('click', () => signOut(auth));
+navLogout   && navLogout.addEventListener('click', logout);
+mmenuLogout && mmenuLogout.addEventListener('click', logout);
 
-/* ── Auto-open modal from URL param (redirect from proyectos.html) ── */
+/* ── Auto-abrir modal desde URL ?auth=login|register ── */
 (function() {
-  const params = new URLSearchParams(window.location.search);
-  const authParam = params.get('auth');
-  if (authParam === 'login' || authParam === 'register') {
+  const p = new URLSearchParams(window.location.search).get('auth');
+  if (p === 'login' || p === 'register') {
     history.replaceState({}, '', window.location.pathname);
-    setTimeout(() => {
-      openModal();
-      if (authParam === 'register') setMode(true);
-    }, 600);
+    setTimeout(() => { openModal(); if (p === 'register') setMode(true); }, 600);
   }
 })();
 
-/* ── Mobile menu auth refs ── */
-const mmenuLoginBtn = document.getElementById('mmenuLoginBtn');
-const mmenuUser     = document.getElementById('mmenuUser');
-const mmenuAvatar   = document.getElementById('mmenuAvatar');
-const mmenuUname    = document.getElementById('mmenuUname');
-const mmenuLogout   = document.getElementById('mmenuLogout');
-const hamburgerEl   = document.getElementById('hamburger');
-
+/* ── Botón de login en menú móvil ── */
 mmenuLoginBtn && mmenuLoginBtn.addEventListener('click', () => {
-  // Close mobile menu first, then open auth modal
-  if (document.getElementById('mobileMenu')) {
-    document.getElementById('mobileMenu').classList.remove('is-open');
-    hamburgerEl && hamburgerEl.classList.remove('is-open');
-    document.body.style.overflow = '';
-  }
+  const mm = document.getElementById('mobileMenu');
+  mm?.classList.remove('is-open');
+  hamburgerEl?.classList.remove('is-open');
+  document.body.style.overflow = '';
   setTimeout(openModal, 120);
 });
-mmenuLogout && mmenuLogout.addEventListener('click', () => signOut(auth));
 
-/* ── Auth state ── */
-onAuthStateChanged(auth, user => {
+/* ── Estado de autenticación → actualiza nav desktop + móvil ── */
+watchAuth(user => {
   if (user) {
-    // Desktop nav
+    const name   = user.displayName || user.email.split('@')[0];
+    const avatar = user.photoURL || '';
+    // Desktop
     if (navLoginBtn)   navLoginBtn.style.display   = 'none';
     if (navUser)       navUser.style.display       = 'flex';
-    if (navUserName)   navUserName.textContent     = user.displayName || user.email.split('@')[0];
+    if (navUserName)   navUserName.textContent     = name;
     if (navUserAvatar) {
-      navUserAvatar.src           = user.photoURL || '';
-      navUserAvatar.style.display = user.photoURL ? 'block' : 'none';
+      navUserAvatar.src           = avatar;
+      navUserAvatar.style.display = avatar ? 'block' : 'none';
     }
-    // Mobile menu
+    // Móvil
     if (mmenuLoginBtn) mmenuLoginBtn.style.display = 'none';
     if (mmenuUser)     mmenuUser.style.display     = 'flex';
-    if (mmenuUname)    mmenuUname.textContent      = user.displayName || user.email.split('@')[0];
+    if (mmenuUname)    mmenuUname.textContent      = name;
     if (mmenuAvatar) {
-      mmenuAvatar.src           = user.photoURL || '';
-      mmenuAvatar.style.display = user.photoURL ? 'block' : 'none';
+      mmenuAvatar.src           = avatar;
+      mmenuAvatar.style.display = avatar ? 'block' : 'none';
     }
-    // Hamburger indicator
-    hamburgerEl && hamburgerEl.setAttribute('data-authed', 'true');
+    hamburgerEl?.setAttribute('data-authed', 'true');
   } else {
-    // Desktop nav
-    if (navLoginBtn) navLoginBtn.style.display = '';
-    if (navUser)     navUser.style.display     = 'none';
-    // Mobile menu
+    if (navLoginBtn)   navLoginBtn.style.display   = '';
+    if (navUser)       navUser.style.display       = 'none';
     if (mmenuLoginBtn) mmenuLoginBtn.style.display = '';
     if (mmenuUser)     mmenuUser.style.display     = 'none';
-    // Hamburger indicator
-    hamburgerEl && hamburgerEl.removeAttribute('data-authed');
+    hamburgerEl?.removeAttribute('data-authed');
   }
 });
 

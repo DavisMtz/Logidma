@@ -1030,8 +1030,9 @@ td .truncate{
      SCRIPTS
 ════════════════════════════════════════════════════ -->
 <script type="module">
-import { auth, db, stor, gProv } from './assets/js/firebase-init.js';
-import { onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { auth, db, stor } from './assets/js/firebase-init.js';
+import { googleSignIn, checkRedirectResult, logout, watchAuth } from './assets/js/auth.js';
+import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc,
   query, orderBy, serverTimestamp, getDoc, setDoc
@@ -1115,46 +1116,22 @@ function toast(msg, type='info') {
 }
 
 /* ── AUTH ───────────────────────────────────────── */
-function errMsgAdmin(code) {
-  return ({
-    'auth/popup-blocked':           'El navegador bloqueó la ventana emergente. Activa las ventanas emergentes e intenta de nuevo.',
-    'auth/popup-closed-by-user':    null,
-    'auth/cancelled-popup-request': null,
-    'auth/network-request-failed':  'Sin conexión. Verifica tu red.',
-    'auth/unauthorized-domain':     'Dominio no autorizado en Firebase. Contacta al administrador.',
-    'auth/operation-not-allowed':   'Inicio de sesión con Google no está habilitado.',
-    'auth/internal-error':          'Error interno. Inténtalo de nuevo.',
-    'auth/user-disabled':           'Esta cuenta ha sido deshabilitada.',
-  })[code] || 'Error al iniciar sesión. Inténtalo de nuevo.';
-}
-
-document.getElementById('btnSignIn').addEventListener('click', async ()=>{
-  try {
-    await signInWithPopup(auth, gProv);
-  } catch(e) {
-    if (e.code === 'auth/popup-blocked' || e.code === 'auth/cancelled-popup-request') {
-      try { await signInWithRedirect(auth, gProv); }
-      catch(re){ const m = errMsgAdmin(re.code); if(m) toast(m,'error'); }
-    } else {
-      const m = errMsgAdmin(e.code);
-      if(m) toast(m,'error');
-    }
-  }
+document.getElementById('btnSignIn').addEventListener('click', async () => {
+  const { error, redirecting } = await googleSignIn();
+  if (redirecting) return;
+  if (error) toast(error, 'error');
 });
 
-getRedirectResult(auth).catch(e=>{
-  if(!e||!e.code||e.code==='auth/no-auth-event') return;
-  const m = e.code==='auth/internal-error'||e.code==='auth/unauthorized-domain'
-    ? 'No se pudo completar el inicio de sesión con Google. Asegúrate de que el dominio esté autorizado en Firebase.'
-    : errMsgAdmin(e.code);
-  if(m) toast(m,'error');
+checkRedirectResult().then(({ error }) => {
+  if (error) toast(error, 'error');
 });
-['btnSideLogout','btnTopLogout','btnDeniedLogout'].forEach(id=>{
+
+['btnSideLogout','btnTopLogout','btnDeniedLogout'].forEach(id => {
   const el = document.getElementById(id);
-  if(el) el.addEventListener('click', ()=>signOut(auth));
+  if (el) el.addEventListener('click', logout);
 });
 
-onAuthStateChanged(auth, user=>{
+watchAuth(user => {
   if (!user) { showAuth(); return; }
   const role = ADMINS[user.email];
   if (!role) { showDenied(); return; }
