@@ -1219,23 +1219,10 @@
 
 <!-- ══ FIREBASE AUTH ══ -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { app, auth } from './assets/js/firebase-init.js';
 import {
-  getAuth, onAuthStateChanged, signOut
+  onAuthStateChanged, signOut
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-
-const firebaseConfig = {
-  apiKey:            "AIzaSyCiDKiKDvPkPIonnFrsWU-IJkpNIpfQt9g",
-  authDomain:        "logidma-c1df8.firebaseapp.com",
-  projectId:         "logidma-c1df8",
-  storageBucket:     "logidma-c1df8.firebasestorage.app",
-  messagingSenderId: "1089066225627",
-  appId:             "1:1089066225627:web:29add3b175fb959fe221fe",
-  measurementId:     "G-W5RG7GTTDK"
-};
-
-const app  = initializeApp(firebaseConfig);
-const auth = getAuth(app);
 
 /* DOM refs */
 const stateLoading   = document.getElementById('stateLoading');

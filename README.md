@@ -132,6 +132,20 @@ import { track } from './assets/js/analytics.js';
 
 Push a `main` → GitHub Pages publica automáticamente.
 
+CI (`.github/workflows/ci.yml`) valida en cada push:
+- HTMLhint sobre todos los `.html`
+- Que los módulos JS parseen (`node --check`)
+- Que existan `sitemap.xml`, `robots.txt`, `404.html`, `manifest.json`
+- Smoke test: cada página devuelve 200 desde un server local
+
+### Scripts útiles (`package.json`)
+
+```bash
+npm run serve         # Servidor local en http://localhost:8000
+npm run lint:html     # Validar HTML con htmlhint
+npm run format:check  # Verificar formato con Prettier
+```
+
 ### Despliegue de reglas de Firebase
 
 Solo necesario cuando cambies `firestore.rules` o `storage.rules`:
@@ -141,6 +155,15 @@ Solo necesario cuando cambies `firestore.rules` o `storage.rules`:
 firebase login
 firebase deploy --only firestore:rules,storage
 ```
+
+### Apps Script (CRM backend)
+
+El código que recibe los formularios vive en `apps-script/Code.gs`. Ver
+`apps-script/README.md` para instalación y despliegue. Hace:
+- Persistencia en 3 pestañas de Sheets (Contacto, Onboarding, Lead Magnets).
+- Auto-respuesta al lead con plantilla HTML estilo Logidma.
+- Notificación al equipo.
+- Envío del recurso descargable cuando origen es `lead_magnet`.
 
 ---
 

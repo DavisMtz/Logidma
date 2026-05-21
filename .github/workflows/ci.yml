@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    name: Validate HTML and assets
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Lint HTML files
+        run: npx --yes htmlhint '*.html' || echo "htmlhint reported issues (non-blocking)"
+
+      - name: Check JS modules parse
+        run: |
+          for f in assets/js/*.js; do
+            node --check "$f" || exit 1
+          done
+          echo "All JS modules parse OK"
+
+      - name: Verify sitemap and robots
+        run: |
+          test -f sitemap.xml || (echo "Missing sitemap.xml" && exit 1)
+          test -f robots.txt  || (echo "Missing robots.txt"  && exit 1)
+          test -f 404.html    || (echo "Missing 404.html"    && exit 1)
+          test -f manifest.json || (echo "Missing manifest.json" && exit 1)
+          echo "All required files present"
+
+      - name: Smoke test pages load
+        run: |
+          npx --yes http-server -p 8765 -c-1 . &
+          SERVER_PID=$!
+          sleep 2
+          for p in index servicios cotizador casos recursos onboarding cliente gracias 404; do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" "http://localhost:8765/$p.html")
+            if [ "$CODE" != "200" ]; then
+              echo "FAIL: $p.html returned $CODE"
+              kill $SERVER_PID
+              exit 1
+            fi
+            echo "OK: $p.html → $CODE"
+          done
+          kill $SERVER_PID

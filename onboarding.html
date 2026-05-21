@@ -1369,24 +1369,11 @@ nav,main{position:relative;z-index:2;}
 </main>
 
 <script type="module">
-import { initializeApp }    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-import { getStorage, ref as sRef, uploadBytes, getDownloadURL }
+import { app, auth, stor, gProv } from './assets/js/firebase-init.js';
+import { ref as sRef, uploadBytes, getDownloadURL }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
-import { getAuth, signInWithPopup, GoogleAuthProvider }
+import { signInWithPopup }
   from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-
-const fbCfg = {
-  apiKey:"AIzaSyCiDKiKDvPkPIonnFrsWU-IJkpNIpfQt9g",
-  authDomain:"logidma-c1df8.firebaseapp.com",
-  projectId:"logidma-c1df8",
-  storageBucket:"logidma-c1df8.firebasestorage.app",
-  messagingSenderId:"1089066225627",
-  appId:"1:1089066225627:web:29add3b175fb959fe221fe"
-};
-const fbApp = initializeApp(fbCfg);
-const stor  = getStorage(fbApp);
-const auth  = getAuth(fbApp);
-const gProv = new GoogleAuthProvider();
 
 /* ── STATE ── */
 const s={
