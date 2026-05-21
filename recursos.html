@@ -12,11 +12,11 @@
 
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io;
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io https://www.gstatic.com/firebasejs/;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com;
   img-src 'self' data: https:;
-  connect-src 'self' https://script.google.com https://script.googleusercontent.com https://plausible.io;
+  connect-src 'self' https://script.google.com https://script.googleusercontent.com https://plausible.io https://firestore.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com https://firebasestorage.googleapis.com;
   object-src 'none';
   base-uri 'self';
   form-action 'self' https://script.google.com;
@@ -461,6 +461,51 @@
   import { escHtml } from './assets/js/sanitize.js';
   import { submitToAppsScript, genTrackId, isValidEmail, nowMX } from './assets/js/forms.js';
   import { track, trackPageView } from './assets/js/analytics.js';
+  import { db } from './assets/js/firebase-init.js';
+  import { collection, getDocs, query, orderBy, where }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+  // Cargar recursos adicionales desde Firebase y añadirlos al grid
+  (async () => {
+    try {
+      const snap = await getDocs(query(
+        collection(db, 'recursos'),
+        where('visible', '==', true),
+        orderBy('createdAt', 'desc')
+      ));
+      const grid = document.querySelector('.grid');
+      snap.docs.forEach(d => {
+        const r = d.data();
+        const card = document.createElement('article');
+        card.className = 'card';
+        const hasFile = r.fileUrl;
+        card.innerHTML = `
+          <div class="card__icon" aria-hidden="true">${escHtml((r.icon || r.title || 'R').charAt(0).toUpperCase())}</div>
+          <div class="card__cat">${escHtml(r.category || 'General')}</div>
+          <h2 class="card__title">${escHtml(r.title || '')}</h2>
+          <p class="card__desc">${escHtml(r.description || '')}</p>
+          <div class="card__meta"><span>${escHtml(r.fileType || 'PDF')}</span><span>${escHtml(r.fileName || '')}</span></div>
+          ${hasFile
+            ? `<a class="card__cta" href="${escHtml(r.fileUrl)}" target="_blank" rel="noopener" download>
+                Descargar gratis
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 15V3m0 12l-4-4m4 4l4-4M3 21h18"/></svg>
+               </a>`
+            : `<button class="card__cta" data-resource="${escHtml(d.id)}" data-title="${escHtml(r.title || '')}" type="button">
+                Recibir gratis
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+               </button>`
+          }
+        `;
+        if (!hasFile) {
+          const btn = card.querySelector('.card__cta');
+          btn.addEventListener('click', () => openModal(btn.dataset.resource, btn.dataset.title));
+        }
+        grid.appendChild(card);
+      });
+    } catch {
+      // silencioso: los recursos estáticos siguen visibles
+    }
+  })();
 
   // Hero título
   const lines = ['Recursos para', 'empezar <em>hoy</em>.'];

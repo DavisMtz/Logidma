@@ -1,0 +1,1992 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#0a0908" />
+<title>Admin — Logidma</title>
+<meta name="robots" content="noindex, nofollow" />
+<link rel="manifest" href="/manifest.json" />
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.gstatic.com/firebasejs/;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: blob: https:;
+  connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://identitytoolkit.googleapis.com https://securetoken.googleapis.com https://www.googleapis.com;
+  frame-src https://accounts.google.com https://*.firebaseapp.com;
+  object-src 'none';
+  base-uri 'self';
+">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@200;300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0a0908; --sidebar-bg:#0d0c0b; --surface:#16140f; --surface-2:#1b1915;
+  --line:rgba(235,229,214,.08); --line-strong:rgba(235,229,214,.18);
+  --cream:#ebe5d6; --cream-soft:#c9c2b0; --muted:#9a9181;
+  --accent:#c4ff3a; --accent-soft:rgba(196,255,58,.12); --accent-glow:rgba(196,255,58,.35);
+  --bronze:#b08d57; --bronze-soft:rgba(176,141,87,.15);
+  --red:#ff4d4d; --red-soft:rgba(255,77,77,.12);
+  --green:#4dff91; --green-soft:rgba(77,255,145,.12);
+  --amber:#ffb84d; --amber-soft:rgba(255,184,77,.12);
+  --blue:#4db8ff; --blue-soft:rgba(77,184,255,.12);
+  --sidebar-w:240px;
+  --topbar-h:56px;
+  --radius:6px;
+  --e-expo:cubic-bezier(.16,1,.3,1);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%;}
+body{
+  background:var(--bg);color:var(--cream);
+  font-family:'Manrope',system-ui,sans-serif;
+  font-weight:300;line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;min-height:100vh;
+}
+
+/* ── SCROLLBAR ─────────────────────────────── */
+::-webkit-scrollbar{width:6px;height:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:rgba(235,229,214,.15);border-radius:3px;}
+
+/* ── AUTH SCREEN ───────────────────────────── */
+#authScreen{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;gap:24px;padding:24px;
+}
+#authScreen .logo{
+  font-family:'Instrument Serif',serif;font-size:2rem;letter-spacing:-.02em;
+  color:var(--cream);
+}
+#authScreen .logo span{color:var(--accent);}
+#authScreen p{color:var(--muted);font-size:.875rem;text-align:center;}
+.btn-google{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface);border:1px solid var(--line-strong);
+  color:var(--cream);padding:12px 24px;border-radius:var(--radius);
+  font-family:'Manrope',sans-serif;font-size:.875rem;font-weight:500;
+  cursor:pointer;transition:border-color .2s,background .2s;
+}
+.btn-google:hover{border-color:var(--accent);background:var(--surface-2);}
+.btn-google svg{width:18px;height:18px;}
+
+#deniedScreen{
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+  min-height:100vh;gap:16px;padding:24px;text-align:center;
+}
+#deniedScreen h2{font-family:'Instrument Serif',serif;color:var(--red);font-size:1.5rem;}
+#deniedScreen p{color:var(--muted);max-width:360px;}
+.btn-link{
+  background:none;border:none;color:var(--accent);cursor:pointer;
+  font-family:'Manrope',sans-serif;font-size:.875rem;text-decoration:underline;
+}
+
+/* ── TOP BAR ───────────────────────────────── */
+#topBar{
+  display:none;position:fixed;top:0;left:0;right:0;z-index:100;
+  height:var(--topbar-h);background:var(--sidebar-bg);
+  border-bottom:1px solid var(--line);
+  align-items:center;padding:0 20px;gap:16px;
+}
+#topBar .logo{
+  font-family:'Instrument Serif',serif;font-size:1.2rem;
+  color:var(--cream);white-space:nowrap;
+}
+#topBar .logo span{color:var(--accent);}
+#topBar .admin-badge{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;font-weight:500;
+  background:var(--accent-soft);color:var(--accent);
+  padding:2px 8px;border-radius:2px;letter-spacing:.06em;
+  white-space:nowrap;
+}
+#topBar .spacer{flex:1;}
+#topBar .user-email{
+  font-size:.75rem;color:var(--muted);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;max-width:180px;
+}
+.hamburger{
+  display:none;background:none;border:none;color:var(--cream);
+  cursor:pointer;padding:6px;font-size:1.2rem;line-height:1;
+}
+@media(max-width:768px){
+  .hamburger{display:flex;align-items:center;}
+  #topBar .user-email{display:none;}
+}
+
+/* ── LAYOUT ────────────────────────────────── */
+#appLayout{
+  display:none;padding-top:var(--topbar-h);min-height:100vh;
+}
+
+/* ── SIDEBAR ───────────────────────────────── */
+#sidebar{
+  position:fixed;top:var(--topbar-h);left:0;bottom:0;
+  width:var(--sidebar-w);background:var(--sidebar-bg);
+  border-right:1px solid var(--line);
+  display:flex;flex-direction:column;overflow-y:auto;
+  z-index:90;transition:transform .3s var(--e-expo);
+}
+#sidebar .role-badge{
+  margin:16px 16px 8px;
+  background:var(--bronze-soft);border:1px solid rgba(176,141,87,.3);
+  border-radius:var(--radius);padding:8px 12px;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  color:var(--bronze);letter-spacing:.06em;text-align:center;
+}
+#sideNav{list-style:none;padding:8px 0;flex:1;}
+#sideNav li a{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;color:var(--cream-soft);
+  text-decoration:none;font-size:.83rem;font-weight:400;
+  transition:background .15s,color .15s;
+  border-left:2px solid transparent;
+}
+#sideNav li a .nav-icon{font-size:1rem;width:20px;text-align:center;flex-shrink:0;}
+#sideNav li a:hover{background:rgba(235,229,214,.04);color:var(--cream);}
+#sideNav li a.active{
+  background:var(--accent-soft);color:var(--accent);
+  border-left-color:var(--accent);font-weight:500;
+}
+#sideNav li.nav-sep{
+  height:1px;background:var(--line);margin:8px 16px;
+}
+.sidebar-footer{
+  padding:16px;border-top:1px solid var(--line);
+}
+.btn-logout{
+  width:100%;display:flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--red-soft);border:1px solid rgba(255,77,77,.25);
+  color:var(--red);padding:9px 16px;border-radius:var(--radius);
+  font-family:'Manrope',sans-serif;font-size:.8rem;font-weight:500;
+  cursor:pointer;transition:background .2s,border-color .2s;
+}
+.btn-logout:hover{background:rgba(255,77,77,.2);border-color:rgba(255,77,77,.5);}
+
+@media(max-width:768px){
+  #sidebar{transform:translateX(-100%);}
+  #sidebar.open{transform:translateX(0);}
+}
+
+/* ── CONTENT ───────────────────────────────── */
+#content{
+  margin-left:var(--sidebar-w);padding:32px;
+  min-height:calc(100vh - var(--topbar-h));
+}
+@media(max-width:768px){
+  #content{margin-left:0;padding:20px 16px;}
+}
+.section-page{display:none;}
+.section-page.active{display:block;}
+
+.page-header{
+  display:flex;align-items:flex-start;justify-content:space-between;
+  gap:16px;margin-bottom:28px;flex-wrap:wrap;
+}
+.page-header h1{
+  font-family:'Instrument Serif',serif;font-size:1.75rem;
+  font-weight:400;letter-spacing:-.02em;
+}
+.page-header p{color:var(--muted);font-size:.83rem;margin-top:4px;}
+
+/* ── BUTTONS ───────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;gap:7px;
+  padding:9px 18px;border-radius:var(--radius);
+  font-family:'Manrope',sans-serif;font-size:.8rem;font-weight:500;
+  cursor:pointer;transition:all .2s;border:1px solid transparent;
+  white-space:nowrap;
+}
+.btn-primary{background:var(--accent);color:#0a0908;border-color:var(--accent);}
+.btn-primary:hover{background:#d4ff5a;box-shadow:0 0 16px var(--accent-glow);}
+.btn-secondary{background:var(--surface);color:var(--cream);border-color:var(--line-strong);}
+.btn-secondary:hover{border-color:var(--cream-soft);}
+.btn-danger{background:var(--red-soft);color:var(--red);border-color:rgba(255,77,77,.25);}
+.btn-danger:hover{background:rgba(255,77,77,.2);}
+.btn-sm{padding:5px 12px;font-size:.75rem;}
+.btn-icon{padding:6px;border-radius:4px;}
+
+/* ── STAT CARDS ────────────────────────────── */
+.stats-grid{
+  display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));
+  gap:16px;margin-bottom:32px;
+}
+.stat-card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:20px;
+  display:flex;flex-direction:column;gap:8px;
+  transition:border-color .2s;
+}
+.stat-card:hover{border-color:var(--line-strong);}
+.stat-card .stat-label{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  color:var(--muted);letter-spacing:.08em;text-transform:uppercase;
+}
+.stat-card .stat-num{
+  font-family:'Instrument Serif',serif;font-size:2.2rem;
+  color:var(--accent);line-height:1;
+}
+.stat-card .stat-desc{font-size:.75rem;color:var(--muted);}
+
+/* ── TABLES ────────────────────────────────── */
+.table-wrap{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);overflow:hidden;margin-bottom:24px;
+}
+.table-toolbar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px;border-bottom:1px solid var(--line);gap:12px;flex-wrap:wrap;
+}
+.table-toolbar h3{font-size:.9rem;font-weight:600;}
+table{width:100%;border-collapse:collapse;font-size:.8rem;}
+thead th{
+  background:rgba(235,229,214,.04);
+  padding:10px 14px;text-align:left;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
+  border-bottom:1px solid var(--line);white-space:nowrap;
+}
+tbody tr{border-bottom:1px solid var(--line);transition:background .15s;}
+tbody tr:last-child{border-bottom:none;}
+tbody tr:nth-child(even){background:rgba(235,229,214,.02);}
+tbody tr:hover{background:rgba(235,229,214,.05);}
+td{padding:10px 14px;color:var(--cream-soft);vertical-align:middle;}
+td .truncate{
+  max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+}
+.td-actions{display:flex;gap:6px;align-items:center;}
+
+/* ── TOGGLE ────────────────────────────────── */
+.toggle{position:relative;display:inline-block;width:36px;height:20px;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-slider{
+  position:absolute;cursor:pointer;inset:0;
+  background:rgba(235,229,214,.15);border-radius:20px;
+  transition:.25s;
+}
+.toggle-slider:before{
+  content:"";position:absolute;height:14px;width:14px;
+  left:3px;bottom:3px;background:var(--muted);
+  border-radius:50%;transition:.25s;
+}
+.toggle input:checked + .toggle-slider{background:var(--accent-soft);border:1px solid var(--accent);}
+.toggle input:checked + .toggle-slider:before{transform:translateX(16px);background:var(--accent);}
+
+/* ── BADGES ────────────────────────────────── */
+.badge{
+  display:inline-block;padding:2px 8px;border-radius:3px;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  font-weight:500;letter-spacing:.04em;
+}
+.badge-green{background:var(--green-soft);color:var(--green);}
+.badge-amber{background:var(--amber-soft);color:var(--amber);}
+.badge-blue{background:var(--blue-soft);color:var(--blue);}
+.badge-red{background:var(--red-soft);color:var(--red);}
+.badge-muted{background:rgba(235,229,214,.08);color:var(--muted);}
+.badge-accent{background:var(--accent-soft);color:var(--accent);}
+
+/* ── FORMS / PANELS ────────────────────────── */
+.panel{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:24px;margin-bottom:24px;
+}
+.panel h3{
+  font-size:.9rem;font-weight:600;margin-bottom:20px;
+  padding-bottom:12px;border-bottom:1px solid var(--line);
+}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}}
+.form-grid.full{grid-template-columns:1fr;}
+.field{display:flex;flex-direction:column;gap:6px;}
+.field label{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  color:var(--muted);letter-spacing:.06em;text-transform:uppercase;
+}
+.field input,.field textarea,.field select{
+  background:rgba(235,229,214,.04);
+  border:1px solid var(--line-strong);
+  border-radius:4px;padding:9px 12px;
+  color:var(--cream);font-family:'Manrope',sans-serif;font-size:.83rem;
+  outline:none;transition:border-color .2s,box-shadow .2s;width:100%;
+}
+.field input:focus,.field textarea:focus,.field select:focus{
+  border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft);
+}
+.field textarea{resize:vertical;min-height:90px;line-height:1.5;}
+.field select option{background:#1b1915;}
+.field .hint{font-size:.72rem;color:var(--muted);}
+.field .err{font-size:.72rem;color:var(--red);}
+.form-actions{
+  display:flex;gap:10px;margin-top:20px;flex-wrap:wrap;
+  padding-top:16px;border-top:1px solid var(--line);
+}
+.metrics-list{display:flex;flex-direction:column;gap:8px;}
+.metric-row{display:flex;gap:8px;align-items:center;}
+.metric-row input{flex:1;}
+.metric-row .btn-icon{flex-shrink:0;background:var(--red-soft);border:1px solid rgba(255,77,77,.2);color:var(--red);}
+
+/* ── PROGRESS BAR ──────────────────────────── */
+.progress-wrap{
+  height:4px;background:rgba(235,229,214,.08);border-radius:2px;
+  overflow:hidden;margin-top:8px;display:none;
+}
+.progress-bar{height:100%;background:var(--accent);border-radius:2px;width:0%;transition:width .2s;}
+
+/* ── TOAST ─────────────────────────────────── */
+#toastContainer{
+  position:fixed;bottom:24px;right:24px;z-index:9999;
+  display:flex;flex-direction:column;gap:8px;pointer-events:none;
+}
+.toast{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface-2);border:1px solid var(--line-strong);
+  border-radius:var(--radius);padding:12px 16px;
+  font-size:.82rem;color:var(--cream);
+  box-shadow:0 8px 24px rgba(0,0,0,.5);
+  pointer-events:auto;animation:slideIn .3s var(--e-expo) forwards;
+  min-width:240px;max-width:340px;
+}
+.toast.success{border-left:3px solid var(--green);}
+.toast.error{border-left:3px solid var(--red);}
+.toast.info{border-left:3px solid var(--blue);}
+@keyframes slideIn{from{transform:translateX(110%);opacity:0;}to{transform:translateX(0);opacity:1;}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1;}to{transform:translateX(110%);opacity:0;}}
+
+/* ── LOADING ───────────────────────────────── */
+.loading-row td{text-align:center;padding:32px;color:var(--muted);font-size:.83rem;}
+.empty-row td{text-align:center;padding:32px;color:var(--muted);font-size:.83rem;}
+
+/* ── CARDS (proyectos) ─────────────────────── */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:16px;}
+.proj-card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:20px;cursor:pointer;
+  transition:border-color .2s,transform .15s;
+}
+.proj-card:hover{border-color:var(--line-strong);transform:translateY(-2px);}
+.proj-card h4{font-size:.92rem;font-weight:600;margin-bottom:6px;}
+.proj-card .meta{font-size:.75rem;color:var(--muted);margin-bottom:12px;}
+.proj-card .bottom{display:flex;align-items:center;justify-content:space-between;}
+
+/* ── DETAIL VIEW ───────────────────────────── */
+.detail-view{display:none;}
+.detail-view.active{display:block;}
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  color:var(--muted);font-size:.8rem;cursor:pointer;
+  background:none;border:none;margin-bottom:20px;
+  font-family:'Manrope',sans-serif;transition:color .15s;
+}
+.back-btn:hover{color:var(--cream);}
+
+/* ── MILESTONE ─────────────────────────────── */
+.milestone-list{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.milestone-item{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 12px;background:rgba(235,229,214,.03);
+  border:1px solid var(--line);border-radius:4px;font-size:.83rem;
+}
+.milestone-item input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--accent);cursor:pointer;flex-shrink:0;
+}
+.milestone-item.done span{text-decoration:line-through;color:var(--muted);}
+
+/* ── PLAN CARDS ────────────────────────────── */
+.plans-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:20px;}
+.plan-card{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:22px;position:relative;
+}
+.plan-card.highlighted{border-color:var(--accent);}
+.plan-card .plan-order{
+  position:absolute;top:12px;right:12px;
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  color:var(--muted);display:flex;gap:4px;
+}
+.plan-card .plan-order button{
+  background:none;border:1px solid var(--line);border-radius:3px;
+  color:var(--muted);cursor:pointer;padding:1px 5px;font-size:.7rem;
+  transition:color .15s,border-color .15s;
+}
+.plan-card .plan-order button:hover{color:var(--cream);border-color:var(--cream-soft);}
+.plan-card h4{font-family:'Instrument Serif',serif;font-size:1.2rem;margin-bottom:4px;}
+.plan-price{font-size:1.8rem;font-family:'Instrument Serif',serif;color:var(--accent);}
+.plan-price span{font-size:.85rem;color:var(--muted);font-family:'Manrope',sans-serif;}
+.plan-features{margin:12px 0;padding-left:16px;font-size:.8rem;color:var(--cream-soft);}
+.plan-features li{margin-bottom:4px;}
+.plan-edit-actions{display:flex;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--line);}
+
+/* ── RESOURCES UPLOAD ──────────────────────── */
+.upload-zone{
+  border:2px dashed var(--line-strong);border-radius:var(--radius);
+  padding:28px;text-align:center;color:var(--muted);
+  font-size:.83rem;cursor:pointer;transition:border-color .2s;
+}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);color:var(--cream);}
+.upload-zone input{display:none;}
+
+/* ── CONFIG ────────────────────────────────── */
+.config-section{
+  background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--radius);padding:24px;margin-bottom:20px;
+}
+.config-section h3{
+  font-size:.85rem;font-weight:600;margin-bottom:16px;
+  padding-bottom:10px;border-bottom:1px solid var(--line);
+  font-family:'JetBrains Mono',monospace;letter-spacing:.04em;
+  color:var(--muted);
+}
+
+/* ── OVERLAY (mobile sidebar) ──────────────── */
+#overlay{
+  display:none;position:fixed;inset:0;z-index:85;
+  background:rgba(0,0,0,.5);
+}
+#overlay.active{display:block;}
+
+/* ── BLOG EDITOR ───────────────────────────── */
+.blog-content textarea{min-height:260px;font-family:'JetBrains Mono',monospace;font-size:.8rem;}
+.tag-input-wrap{display:flex;flex-wrap:wrap;gap:6px;align-items:center;
+  background:rgba(235,229,214,.04);border:1px solid var(--line-strong);
+  border-radius:4px;padding:6px 10px;min-height:40px;}
+.tag-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  background:var(--accent-soft);color:var(--accent);
+  border-radius:3px;padding:2px 8px;font-size:.73rem;
+}
+.tag-pill button{background:none;border:none;color:var(--accent);cursor:pointer;padding:0;font-size:.8rem;line-height:1;}
+.tag-input-wrap input{
+  background:none;border:none;outline:none;
+  color:var(--cream);font-family:'Manrope',sans-serif;font-size:.83rem;
+  min-width:80px;flex:1;
+}
+
+/* ── NOTES LOG ─────────────────────────────── */
+.notes-log{
+  max-height:240px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;
+  margin-top:10px;
+}
+.note-entry{
+  background:rgba(235,229,214,.03);border:1px solid var(--line);
+  border-radius:4px;padding:10px 12px;font-size:.8rem;
+}
+.note-entry .note-ts{
+  font-family:'JetBrains Mono',monospace;font-size:.65rem;
+  color:var(--muted);margin-bottom:4px;
+}
+
+/* ── RESOURCES (read-only row for limited roles) ── */
+.badge-role{
+  font-family:'JetBrains Mono',monospace;font-size:.6rem;
+  padding:2px 6px;border-radius:2px;background:var(--bronze-soft);color:var(--bronze);
+  letter-spacing:.05em;
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════════════
+     AUTH SCREEN
+════════════════════════════════════════════════════ -->
+<div id="authScreen">
+  <div class="logo">Logidma <span>·</span> Admin</div>
+  <p>Acceso restringido. Inicia sesión con tu cuenta de Google autorizada.</p>
+  <button class="btn-google" id="btnSignIn">
+    <svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+      <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+      <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+      <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+      <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+    </svg>
+    Continuar con Google
+  </button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     DENIED SCREEN
+════════════════════════════════════════════════════ -->
+<div id="deniedScreen">
+  <h2>⛔ Acceso denegado</h2>
+  <p>Tu cuenta no tiene permisos para acceder al panel de administración de Logidma.</p>
+  <button class="btn-link" id="btnDeniedLogout">Cerrar sesión</button>
+</div>
+
+<!-- ═══════════════════════════════════════════════════
+     TOP BAR
+════════════════════════════════════════════════════ -->
+<header id="topBar">
+  <button class="hamburger" id="hamburger" aria-label="Menú">&#9776;</button>
+  <div class="logo">Logidma <span>·</span> <span style="color:var(--muted);font-family:'Manrope',sans-serif;font-size:.85rem;font-weight:300;">Admin</span></div>
+  <div class="admin-badge" id="roleBadgeTop">SUPER_ADMIN</div>
+  <div class="spacer"></div>
+  <span class="user-email" id="userEmailTop"></span>
+  <button class="btn btn-secondary btn-sm" id="btnTopLogout">Salir</button>
+</header>
+
+<!-- ═══════════════════════════════════════════════════
+     OVERLAY (mobile)
+════════════════════════════════════════════════════ -->
+<div id="overlay"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     APP LAYOUT
+════════════════════════════════════════════════════ -->
+<div id="appLayout">
+  <!-- SIDEBAR -->
+  <nav id="sidebar">
+    <div class="role-badge" id="roleBadgeSide">SUPER_ADMIN</div>
+    <ul id="sideNav">
+      <li data-roles="SUPER_ADMIN"><a href="#" class="nav-link active" data-section="dashboard"><span class="nav-icon">📊</span> Dashboard</a></li>
+      <li data-roles="SUPER_ADMIN"><a href="#" class="nav-link" data-section="casos"><span class="nav-icon">🏆</span> Casos de Éxito</a></li>
+      <li data-roles="SUPER_ADMIN"><a href="#" class="nav-link" data-section="recursos"><span class="nav-icon">📁</span> Recursos</a></li>
+      <li data-roles="SUPER_ADMIN"><a href="#" class="nav-link" data-section="planes"><span class="nav-icon">💳</span> Planes de Precio</a></li>
+      <li data-roles="SUPER_ADMIN"><a href="#" class="nav-link" data-section="blog"><span class="nav-icon">✍️</span> Blog</a></li>
+      <li data-roles="SUPER_ADMIN"><a href="#" class="nav-link" data-section="config"><span class="nav-icon">⚙️</span> Configuración</a></li>
+      <li class="nav-sep" data-roles="TECH_ADMIN LEGAL_ADMIN SUPER_ADMIN"></li>
+      <li data-roles="TECH_ADMIN LEGAL_ADMIN SUPER_ADMIN"><a href="#" class="nav-link" data-section="proyectos"><span class="nav-icon">📋</span> Proyectos</a></li>
+      <li data-roles="TECH_ADMIN LEGAL_ADMIN"><a href="#" class="nav-link" data-section="recursos"><span class="nav-icon">📁</span> Recursos</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <button class="btn-logout" id="btnSideLogout">⏻ Cerrar sesión</button>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main id="content">
+
+    <!-- ─── DASHBOARD ─────────────────────────── -->
+    <div class="section-page active" id="section-dashboard">
+      <div class="page-header">
+        <div>
+          <h1>Dashboard</h1>
+          <p>Resumen general del contenido publicado en Logidma.</p>
+        </div>
+      </div>
+      <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+          <div class="stat-label">Casos de Éxito</div>
+          <div class="stat-num" id="statCasos">—</div>
+          <div class="stat-desc">publicados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Blog Posts</div>
+          <div class="stat-num" id="statBlog">—</div>
+          <div class="stat-desc">publicados</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Recursos</div>
+          <div class="stat-num" id="statRecursos">—</div>
+          <div class="stat-desc">disponibles</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Proyectos</div>
+          <div class="stat-num" id="statProyectos">—</div>
+          <div class="stat-desc">en seguimiento</div>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Actividad reciente</h3>
+        <p style="color:var(--muted);font-size:.83rem;">Bienvenido al panel de administración de Logidma. Usa la barra lateral para navegar entre secciones.</p>
+      </div>
+    </div>
+
+    <!-- ─── CASOS DE ÉXITO ────────────────────── -->
+    <div class="section-page" id="section-casos">
+      <div class="page-header">
+        <div><h1>Casos de Éxito</h1><p>Gestiona los casos publicados en la colección <code style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);">casos_exito</code>.</p></div>
+        <button class="btn btn-primary" id="btnNuevoCaso">+ Nuevo caso</button>
+      </div>
+
+      <!-- FORM PANEL -->
+      <div class="panel" id="casoFormPanel" style="display:none;">
+        <h3 id="casoFormTitle">Nuevo caso de éxito</h3>
+        <input type="hidden" id="casoEditId" />
+        <div class="form-grid">
+          <div class="field">
+            <label>Nombre del cliente / empresa *</label>
+            <input type="text" id="casoName" placeholder="Ej. Despacho Vértice" />
+          </div>
+          <div class="field">
+            <label>Industria *</label>
+            <input type="text" id="casoIndustry" placeholder="Ej. Legal, Manufactura…" />
+          </div>
+          <div class="field">
+            <label>Ubicación</label>
+            <input type="text" id="casoLocation" placeholder="Ej. Morelia, Mich." />
+          </div>
+          <div class="field">
+            <label>Tag visible</label>
+            <input type="text" id="casoTag" placeholder="Ej. #MigraciónWorkspace" />
+          </div>
+          <div class="field">
+            <label>Categoría *</label>
+            <select id="casoCategory">
+              <option value="">— Selecciona —</option>
+              <option value="automatizacion">Automatización</option>
+              <option value="workspace">Workspace</option>
+              <option value="blindaje">Blindaje Legal</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Visible al público</label>
+            <select id="casoVisible">
+              <option value="true">Sí</option>
+              <option value="false">No (oculto)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid full" style="margin-top:14px;">
+          <div class="field">
+            <label>Problema / contexto *</label>
+            <textarea id="casoProblem" placeholder="Describe el reto que enfrentaba el cliente…"></textarea>
+          </div>
+          <div class="field">
+            <label>Cita (quote)</label>
+            <textarea id="casoQuote" placeholder='"Frase del cliente…"' style="min-height:70px;"></textarea>
+          </div>
+          <div class="field">
+            <label>Autor de la cita</label>
+            <input type="text" id="casoAuthor" placeholder="Ej. Lic. García, Director" />
+          </div>
+        </div>
+        <!-- Metrics -->
+        <div style="margin-top:16px;">
+          <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+            <label style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;">Métricas (máx. 4)</label>
+            <button class="btn btn-secondary btn-sm" id="btnAddMetric" type="button">+ Métrica</button>
+          </div>
+          <div class="metrics-list" id="metricsList"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btnSaveCaso">Guardar caso</button>
+          <button class="btn btn-secondary" id="btnCancelCaso">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <div class="table-toolbar">
+          <h3>Todos los casos</h3>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>Nombre</th><th>Industria</th><th>Categoría</th>
+              <th>Visible</th><th>Creado</th><th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="casosTableBody">
+            <tr class="loading-row"><td colspan="6">Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── RECURSOS ──────────────────────────── -->
+    <div class="section-page" id="section-recursos">
+      <div class="page-header">
+        <div><h1>Recursos</h1><p>Archivos descargables. Colección <code style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);">recursos</code>.</p></div>
+        <button class="btn btn-primary" id="btnNuevoRecurso">+ Nuevo recurso</button>
+      </div>
+
+      <!-- FORM PANEL -->
+      <div class="panel" id="recursoFormPanel" style="display:none;">
+        <h3 id="recursoFormTitle">Nuevo recurso</h3>
+        <input type="hidden" id="recursoEditId" />
+        <div class="form-grid">
+          <div class="field">
+            <label>Título *</label>
+            <input type="text" id="recursoTitle" placeholder="Nombre del recurso" />
+          </div>
+          <div class="field">
+            <label>Categoría *</label>
+            <select id="recursoCategory">
+              <option value="">— Selecciona —</option>
+              <option value="legal">Legal</option>
+              <option value="workspace">Workspace</option>
+              <option value="automatizacion">Automatización</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Ícono (emoji)</label>
+            <input type="text" id="recursoIcon" placeholder="📄" maxlength="4" />
+          </div>
+          <div class="field">
+            <label>Visible</label>
+            <select id="recursoVisible">
+              <option value="true">Sí</option>
+              <option value="false">No</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-grid full" style="margin-top:14px;">
+          <div class="field">
+            <label>Descripción *</label>
+            <textarea id="recursoDesc" placeholder="¿Qué contiene este recurso y para quién es?" style="min-height:80px;"></textarea>
+          </div>
+        </div>
+        <!-- File upload -->
+        <div style="margin-top:16px;" id="recursoUploadSection">
+          <label style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.06em;text-transform:uppercase;display:block;margin-bottom:8px;">Archivo (PDF / DOCX / ZIP)</label>
+          <div class="upload-zone" id="uploadZone">
+            <input type="file" id="recursoFile" accept=".pdf,.doc,.docx,.zip,.xlsx" />
+            <span id="uploadZoneLabel">Arrastra un archivo aquí o <u>haz clic para seleccionar</u></span>
+          </div>
+          <div class="progress-wrap" id="uploadProgressWrap">
+            <div class="progress-bar" id="uploadProgressBar"></div>
+          </div>
+          <div style="margin-top:8px;" id="currentFileInfo" style="display:none;"></div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btnSaveRecurso">Guardar recurso</button>
+          <button class="btn btn-secondary" id="btnCancelRecurso">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <div class="table-toolbar"><h3>Todos los recursos</h3></div>
+        <table>
+          <thead>
+            <tr><th>Título</th><th>Categoría</th><th>Tipo</th><th>Descargas</th><th>Visible</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="recursosTableBody">
+            <tr class="loading-row"><td colspan="6">Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── PLANES DE PRECIO ───────────────────── -->
+    <div class="section-page" id="section-planes">
+      <div class="page-header">
+        <div><h1>Planes de Precio</h1><p>Edita y reordena los planes. Colección <code style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);">planes_precio</code>.</p></div>
+        <button class="btn btn-primary" id="btnNuevoPlan">+ Nuevo plan</button>
+      </div>
+
+      <!-- FORM PANEL -->
+      <div class="panel" id="planFormPanel" style="display:none;">
+        <h3 id="planFormTitle">Nuevo plan</h3>
+        <input type="hidden" id="planEditId" />
+        <div class="form-grid">
+          <div class="field"><label>Nombre del plan *</label><input type="text" id="planName" placeholder="Ej. Starter" /></div>
+          <div class="field"><label>Precio *</label><input type="text" id="planPrice" placeholder="Ej. $9,900" /></div>
+          <div class="field"><label>Periodo</label><input type="text" id="planPeriod" placeholder="Ej. / mes" /></div>
+          <div class="field"><label>CTA (botón)</label><input type="text" id="planCta" placeholder="Ej. Solicitar propuesta" /></div>
+          <div class="field"><label>Destacado</label><select id="planHighlighted"><option value="false">No</option><option value="true">Sí (borde accent)</option></select></div>
+          <div class="field"><label>Orden</label><input type="number" id="planOrder" placeholder="1" min="1" /></div>
+        </div>
+        <div class="form-grid full" style="margin-top:14px;">
+          <div class="field"><label>Descripción</label><textarea id="planDescription" placeholder="Ideal para…" style="min-height:70px;"></textarea></div>
+          <div class="field">
+            <label>Características (una por línea)</label>
+            <textarea id="planFeatures" placeholder="Migración Workspace&#10;Soporte 30 días&#10;1 automatización" style="min-height:120px;"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btnSavePlan">Guardar plan</button>
+          <button class="btn btn-secondary" id="btnCancelPlan">Cancelar</button>
+        </div>
+      </div>
+
+      <div class="plans-grid" id="planesGrid">
+        <div style="color:var(--muted);font-size:.83rem;padding:20px;">Cargando planes…</div>
+      </div>
+    </div>
+
+    <!-- ─── BLOG ──────────────────────────────── -->
+    <div class="section-page" id="section-blog">
+      <div class="page-header">
+        <div><h1>Blog</h1><p>Artículos y posts. Colección <code style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);">blog_posts</code>.</p></div>
+        <button class="btn btn-primary" id="btnNuevoPost">+ Nuevo post</button>
+      </div>
+
+      <!-- EDITOR PANEL -->
+      <div class="panel blog-content" id="blogFormPanel" style="display:none;">
+        <h3 id="blogFormTitle">Nuevo post</h3>
+        <input type="hidden" id="blogEditId" />
+        <div class="form-grid">
+          <div class="field">
+            <label>Título *</label>
+            <input type="text" id="blogTitle" placeholder="Título del artículo" />
+          </div>
+          <div class="field">
+            <label>Slug (URL)</label>
+            <input type="text" id="blogSlug" placeholder="se genera automático" />
+            <span class="hint">Formato: mi-titulo-del-post</span>
+          </div>
+          <div class="field">
+            <label>Autor *</label>
+            <input type="text" id="blogAuthor" placeholder="Nombre del autor" />
+          </div>
+          <div class="field">
+            <label>Email del autor</label>
+            <input type="email" id="blogAuthorEmail" placeholder="autor@logidma.com" />
+          </div>
+          <div class="field">
+            <label>Categoría</label>
+            <select id="blogCategory">
+              <option value="">— Selecciona —</option>
+              <option value="automatizacion">Automatización</option>
+              <option value="workspace">Workspace</option>
+              <option value="legal">Legal TI</option>
+              <option value="infraestructura">Infraestructura</option>
+              <option value="general">General</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Estado</label>
+            <select id="blogStatus">
+              <option value="draft">Borrador</option>
+              <option value="published">Publicado</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Imagen de portada (URL)</label>
+            <input type="url" id="blogCoverImage" placeholder="https://…" />
+          </div>
+        </div>
+        <div class="form-grid full" style="margin-top:14px;">
+          <div class="field">
+            <label>Tags</label>
+            <div class="tag-input-wrap" id="tagInputWrap">
+              <input type="text" id="tagInput" placeholder="Escribe y presiona Enter…" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Extracto / resumen *</label>
+            <textarea id="blogExcerpt" placeholder="Breve descripción para SEO y listados…" style="min-height:80px;"></textarea>
+          </div>
+          <div class="field">
+            <label>Contenido (Markdown soportado)</label>
+            <textarea id="blogContent" placeholder="## Introducción&#10;&#10;Escribe el artículo en Markdown…"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button class="btn btn-primary" id="btnSavePost">Guardar post</button>
+          <button class="btn btn-secondary" id="btnPreviewPost">Vista previa ↗</button>
+          <button class="btn btn-secondary" id="btnCancelPost">Cancelar</button>
+        </div>
+      </div>
+
+      <!-- TABLE -->
+      <div class="table-wrap">
+        <div class="table-toolbar"><h3>Todos los posts</h3></div>
+        <table>
+          <thead>
+            <tr><th>Título</th><th>Categoría</th><th>Estado</th><th>Autor</th><th>Fecha</th><th>Acciones</th></tr>
+          </thead>
+          <tbody id="blogTableBody">
+            <tr class="loading-row"><td colspan="6">Cargando…</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ─── CONFIGURACIÓN ─────────────────────── -->
+    <div class="section-page" id="section-config">
+      <div class="page-header">
+        <div><h1>Configuración del sitio</h1><p>Datos globales. Documento <code style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);">config_site / main</code>.</p></div>
+      </div>
+      <div class="config-section">
+        <h3>Hero / portada</h3>
+        <div class="form-grid">
+          <div class="field"><label>Título Hero</label><input type="text" id="cfgHeroTitle" /></div>
+          <div class="field"><label>Subtítulo Hero</label><input type="text" id="cfgHeroSubtitle" /></div>
+          <div class="field"><label>Tagline</label><input type="text" id="cfgTagline" /></div>
+        </div>
+      </div>
+      <div class="config-section">
+        <h3>Contacto</h3>
+        <div class="form-grid">
+          <div class="field"><label>Email de contacto</label><input type="email" id="cfgContactEmail" /></div>
+          <div class="field"><label>WhatsApp (con código país)</label><input type="text" id="cfgWhatsapp" placeholder="+521234567890" /></div>
+        </div>
+      </div>
+      <div class="config-section">
+        <h3>SEO / descripción</h3>
+        <div class="form-grid full">
+          <div class="field"><label>Descripción del sitio</label><textarea id="cfgDescription" style="min-height:80px;"></textarea></div>
+        </div>
+      </div>
+      <div class="form-actions" style="padding-top:0;border-top:none;">
+        <button class="btn btn-primary" id="btnSaveConfig">Guardar configuración</button>
+      </div>
+    </div>
+
+    <!-- ─── PROYECTOS ─────────────────────────── -->
+    <div class="section-page" id="section-proyectos">
+      <div class="page-header">
+        <div><h1>Proyectos</h1><p>Seguimiento de proyectos activos. Colección <code style="font-family:'JetBrains Mono',monospace;font-size:.75rem;color:var(--muted);">proyectos_admin</code>.</p></div>
+        <button class="btn btn-primary" id="btnNuevoProyecto">+ Nuevo proyecto</button>
+      </div>
+
+      <!-- LIST VIEW -->
+      <div id="proyListView">
+        <!-- FORM PANEL -->
+        <div class="panel" id="proyFormPanel" style="display:none;">
+          <h3 id="proyFormTitle">Nuevo proyecto</h3>
+          <input type="hidden" id="proyEditId" />
+          <div class="form-grid">
+            <div class="field"><label>Cliente *</label><input type="text" id="proyClientName" /></div>
+            <div class="field"><label>Tipo de proyecto *</label><input type="text" id="proyType" placeholder="Ej. Implementación Workspace" /></div>
+            <div class="field"><label>Estado</label>
+              <select id="proyStatus">
+                <option value="activo">Activo</option>
+                <option value="pausado">Pausado</option>
+                <option value="completado">Completado</option>
+              </select>
+            </div>
+            <div class="field"><label>Asignado a</label><input type="text" id="proyAssigned" placeholder="Nombre del responsable" /></div>
+            <div class="field"><label>Fecha inicio</label><input type="date" id="proyStartDate" /></div>
+          </div>
+          <div class="form-grid full" style="margin-top:14px;">
+            <div class="field"><label>Notas iniciales</label><textarea id="proyNotes" style="min-height:80px;"></textarea></div>
+          </div>
+          <div class="form-actions">
+            <button class="btn btn-primary" id="btnSaveProyecto">Guardar proyecto</button>
+            <button class="btn btn-secondary" id="btnCancelProyecto">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="cards-grid" id="proyCardsGrid">
+          <div style="color:var(--muted);font-size:.83rem;padding:20px;">Cargando proyectos…</div>
+        </div>
+      </div>
+
+      <!-- DETAIL VIEW -->
+      <div id="proyDetailView" class="detail-view">
+        <button class="back-btn" id="btnBackProyectos">← Volver a proyectos</button>
+        <div class="panel" id="proyDetailPanel">
+          <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap;margin-bottom:20px;">
+            <div>
+              <h2 id="dClientName" style="font-family:'Instrument Serif',serif;font-size:1.4rem;font-weight:400;"></h2>
+              <p id="dProjectType" style="color:var(--muted);font-size:.83rem;margin-top:4px;"></p>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+              <select id="dStatusSelect" style="background:var(--surface-2);border:1px solid var(--line-strong);color:var(--cream);padding:7px 12px;border-radius:4px;font-family:'Manrope',sans-serif;font-size:.83rem;outline:none;">
+                <option value="activo">Activo</option>
+                <option value="pausado">Pausado</option>
+                <option value="completado">Completado</option>
+              </select>
+              <button class="btn btn-primary btn-sm" id="btnUpdateStatus">Actualizar estado</button>
+            </div>
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;" class="detail-meta">
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.06em;margin-bottom:4px;">ASIGNADO A</div>
+              <div id="dAssigned" style="font-size:.85rem;"></div>
+            </div>
+            <div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:.65rem;color:var(--muted);letter-spacing:.06em;margin-bottom:4px;">INICIO</div>
+              <div id="dStartDate" style="font-size:.85rem;"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- MILESTONES -->
+        <div class="panel">
+          <h3>Hitos / Milestones</h3>
+          <div class="milestone-list" id="milestoneList"></div>
+          <div style="display:flex;gap:8px;margin-top:14px;">
+            <input type="text" id="newMilestoneInput" placeholder="Nuevo hito…" style="background:rgba(235,229,214,.04);border:1px solid var(--line-strong);border-radius:4px;padding:8px 12px;color:var(--cream);font-family:'Manrope',sans-serif;font-size:.83rem;outline:none;flex:1;" />
+            <button class="btn btn-secondary btn-sm" id="btnAddMilestone">+ Agregar</button>
+          </div>
+        </div>
+
+        <!-- RESOURCES -->
+        <div class="panel">
+          <h3>Recursos vinculados</h3>
+          <div id="projResourcesList" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px;"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap;">
+            <input type="text" id="newResName" placeholder="Nombre del recurso" style="background:rgba(235,229,214,.04);border:1px solid var(--line-strong);border-radius:4px;padding:8px 12px;color:var(--cream);font-family:'Manrope',sans-serif;font-size:.83rem;outline:none;flex:1;min-width:140px;" />
+            <input type="url" id="newResUrl" placeholder="https://…" style="background:rgba(235,229,214,.04);border:1px solid var(--line-strong);border-radius:4px;padding:8px 12px;color:var(--cream);font-family:'Manrope',sans-serif;font-size:.83rem;outline:none;flex:2;min-width:200px;" />
+            <button class="btn btn-secondary btn-sm" id="btnAddResource">+ Agregar</button>
+          </div>
+        </div>
+
+        <!-- NOTES -->
+        <div class="panel">
+          <h3>Bitácora de notas</h3>
+          <div class="notes-log" id="notesLog"></div>
+          <div style="display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;">
+            <textarea id="newNoteInput" placeholder="Agregar nota…" rows="2" style="background:rgba(235,229,214,.04);border:1px solid var(--line-strong);border-radius:4px;padding:8px 12px;color:var(--cream);font-family:'Manrope',sans-serif;font-size:.83rem;outline:none;flex:1;resize:none;min-width:200px;"></textarea>
+            <button class="btn btn-secondary btn-sm" id="btnAddNote" style="align-self:flex-end;">+ Nota</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main><!-- /#content -->
+</div><!-- /#appLayout -->
+
+<!-- TOASTS -->
+<div id="toastContainer"></div>
+
+<!-- ═══════════════════════════════════════════════════
+     SCRIPTS
+════════════════════════════════════════════════════ -->
+<script type="module">
+import { auth, db, stor, gProv } from './assets/js/firebase-init.js';
+import { onAuthStateChanged, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import {
+  collection, getDocs, addDoc, updateDoc, deleteDoc, doc,
+  query, orderBy, serverTimestamp, getDoc, setDoc
+} from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+import { ref, uploadBytesResumable, getDownloadURL } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+
+/* ── CONSTANTS ──────────────────────────────────── */
+const ADMINS = {
+  'david.martinez@logidma.com':  'SUPER_ADMIN',
+  'octavio.juarez@logidma.com':  'TECH_ADMIN',
+  'nisay.gomez@logidma.com':     'LEGAL_ADMIN',
+};
+const ROLE_LABELS = {
+  SUPER_ADMIN: 'SUPER ADMIN',
+  TECH_ADMIN:  'TECH ADMIN',
+  LEGAL_ADMIN: 'LEGAL ADMIN',
+};
+
+/* ── STATE ──────────────────────────────────────── */
+let currentUser = null;
+let currentRole = null;
+let currentSection = 'dashboard';
+let activeProyecto = null; // full doc snapshot
+let blogTags = [];
+
+/* ── UTILS ──────────────────────────────────────── */
+function esc(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+function slugify(str) {
+  return str.toLowerCase()
+    .normalize('NFD').replace(/[̀-ͯ]/g,'')
+    .replace(/[^a-z0-9\s-]/g,'').trim()
+    .replace(/\s+/g,'-').replace(/-+/g,'-');
+}
+function fmtDate(ts) {
+  if (!ts) return '—';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleDateString('es-MX',{day:'2-digit',month:'short',year:'numeric'});
+}
+function fmtDatetime(ts) {
+  if (!ts) return '';
+  const d = ts.toDate ? ts.toDate() : new Date(ts);
+  return d.toLocaleString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'});
+}
+function statusBadge(status) {
+  const map = {
+    activo:     ['badge-green','Activo'],
+    pausado:    ['badge-amber','Pausado'],
+    completado: ['badge-blue','Completado'],
+    draft:      ['badge-muted','Borrador'],
+    published:  ['badge-accent','Publicado'],
+  };
+  const [cls,label] = map[status] || ['badge-muted', status || '—'];
+  return `<span class="badge ${cls}">${esc(label)}</span>`;
+}
+function catBadge(cat) {
+  const map = {
+    automatizacion:'badge-blue', workspace:'badge-green',
+    blindaje:'badge-amber', legal:'badge-amber',
+    general:'badge-muted', infraestructura:'badge-accent',
+  };
+  return `<span class="badge ${map[cat]||'badge-muted'}">${esc(cat||'—')}</span>`;
+}
+
+/* ── TOAST ──────────────────────────────────────── */
+function toast(msg, type='info') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(()=>{
+    t.style.animation = 'slideOut .3s ease forwards';
+    setTimeout(()=>t.remove(), 300);
+  }, 3000);
+}
+
+/* ── AUTH ───────────────────────────────────────── */
+document.getElementById('btnSignIn').addEventListener('click', async ()=>{
+  try { await signInWithPopup(auth, gProv); }
+  catch(e){ toast('Error al iniciar sesión: '+e.message,'error'); }
+});
+['btnSideLogout','btnTopLogout','btnDeniedLogout'].forEach(id=>{
+  const el = document.getElementById(id);
+  if(el) el.addEventListener('click', ()=>signOut(auth));
+});
+
+onAuthStateChanged(auth, user=>{
+  if (!user) { showAuth(); return; }
+  const role = ADMINS[user.email];
+  if (!role) { showDenied(); return; }
+  currentUser = user;
+  currentRole = role;
+  showApp();
+});
+
+function showAuth() {
+  document.getElementById('authScreen').style.display='flex';
+  document.getElementById('deniedScreen').style.display='none';
+  document.getElementById('topBar').style.display='none';
+  document.getElementById('appLayout').style.display='none';
+}
+function showDenied() {
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('deniedScreen').style.display='flex';
+  document.getElementById('topBar').style.display='none';
+  document.getElementById('appLayout').style.display='none';
+}
+function showApp() {
+  document.getElementById('authScreen').style.display='none';
+  document.getElementById('deniedScreen').style.display='none';
+  document.getElementById('topBar').style.display='flex';
+  document.getElementById('appLayout').style.display='block';
+  document.getElementById('userEmailTop').textContent = currentUser.email;
+  document.getElementById('roleBadgeTop').textContent = ROLE_LABELS[currentRole];
+  document.getElementById('roleBadgeSide').textContent = ROLE_LABELS[currentRole];
+  buildNav();
+  navigateTo(currentRole === 'SUPER_ADMIN' ? 'dashboard' : 'proyectos');
+  if (currentRole === 'SUPER_ADMIN') loadDashboardStats();
+}
+
+/* ── NAV ────────────────────────────────────────── */
+function buildNav() {
+  const items = document.querySelectorAll('#sideNav li[data-roles]');
+  items.forEach(li=>{
+    const roles = li.getAttribute('data-roles').split(' ');
+    li.style.display = roles.includes(currentRole) ? '' : 'none';
+  });
+}
+
+document.getElementById('sideNav').addEventListener('click', e=>{
+  const a = e.target.closest('.nav-link');
+  if (!a) return;
+  e.preventDefault();
+  const section = a.dataset.section;
+  navigateTo(section);
+  closeSidebar();
+});
+
+function navigateTo(section) {
+  currentSection = section;
+  document.querySelectorAll('.nav-link').forEach(a=>{
+    a.classList.toggle('active', a.dataset.section === section);
+  });
+  document.querySelectorAll('.section-page').forEach(p=>{
+    p.classList.toggle('active', p.id === 'section-'+section);
+  });
+  // Load data on navigate
+  if (section==='dashboard' && currentRole==='SUPER_ADMIN') loadDashboardStats();
+  if (section==='casos') loadCasos();
+  if (section==='recursos') loadRecursos();
+  if (section==='planes') loadPlanes();
+  if (section==='blog') loadBlog();
+  if (section==='config') loadConfig();
+  if (section==='proyectos') { loadProyectos(); showProyList(); }
+}
+
+/* ── MOBILE SIDEBAR ─────────────────────────────── */
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('overlay');
+document.getElementById('hamburger').addEventListener('click', ()=>{
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('active');
+});
+overlay.addEventListener('click', closeSidebar);
+function closeSidebar(){sidebar.classList.remove('open');overlay.classList.remove('active');}
+
+/* ══════════════════════════════════════════════════
+   DASHBOARD
+══════════════════════════════════════════════════ */
+async function loadDashboardStats() {
+  const colls = [
+    {col:'casos_exito', el:'statCasos', filter: d=>d.visible===true},
+    {col:'blog_posts',  el:'statBlog',  filter: d=>d.status==='published'},
+    {col:'recursos',    el:'statRecursos', filter: ()=>true},
+    {col:'proyectos_admin', el:'statProyectos', filter: ()=>true},
+  ];
+  for (const {col,el,filter} of colls) {
+    try {
+      const snap = await getDocs(collection(db,col));
+      const count = snap.docs.filter(d=>filter(d.data())).length;
+      document.getElementById(el).textContent = count;
+    } catch(e) {
+      document.getElementById(el).textContent = '—';
+    }
+  }
+}
+
+/* ══════════════════════════════════════════════════
+   CASOS DE ÉXITO
+══════════════════════════════════════════════════ */
+let casosData = [];
+let metricCount = 0;
+
+function addMetricRow(num='', label='') {
+  if (metricCount >= 4) { toast('Máximo 4 métricas','info'); return; }
+  metricCount++;
+  const idx = metricCount;
+  const row = document.createElement('div');
+  row.className = 'metric-row';
+  row.dataset.idx = idx;
+  row.innerHTML = `
+    <input type="text" placeholder="Número (ej. 40%)" value="${esc(num)}" data-mnum="${idx}" />
+    <input type="text" placeholder="Etiqueta (ej. Ahorro de tiempo)" value="${esc(label)}" data-mlabel="${idx}" />
+    <button type="button" class="btn btn-icon" onclick="this.closest('.metric-row').remove();metricCount=Math.max(0,metricCount-1);">✕</button>
+  `;
+  document.getElementById('metricsList').appendChild(row);
+}
+
+document.getElementById('btnAddMetric').addEventListener('click', ()=>addMetricRow());
+document.getElementById('btnNuevoCaso').addEventListener('click', ()=>openCasoForm());
+document.getElementById('btnCancelCaso').addEventListener('click', ()=>closeCasoForm());
+document.getElementById('btnSaveCaso').addEventListener('click', saveCaso);
+
+function openCasoForm(data=null, id=null) {
+  const panel = document.getElementById('casoFormPanel');
+  document.getElementById('casoFormTitle').textContent = id ? 'Editar caso' : 'Nuevo caso de éxito';
+  document.getElementById('casoEditId').value = id || '';
+  document.getElementById('casoName').value = data?.name || '';
+  document.getElementById('casoIndustry').value = data?.industry || '';
+  document.getElementById('casoLocation').value = data?.location || '';
+  document.getElementById('casoTag').value = data?.tag || '';
+  document.getElementById('casoCategory').value = data?.category || '';
+  document.getElementById('casoVisible').value = String(data?.visible !== false);
+  document.getElementById('casoProblem').value = data?.problem || '';
+  document.getElementById('casoQuote').value = data?.quote || '';
+  document.getElementById('casoAuthor').value = data?.author || '';
+  document.getElementById('metricsList').innerHTML = '';
+  metricCount = 0;
+  (data?.metrics || []).forEach(m=>addMetricRow(m.num, m.label));
+  panel.style.display = 'block';
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeCasoForm() {
+  document.getElementById('casoFormPanel').style.display='none';
+  document.getElementById('metricsList').innerHTML='';
+  metricCount=0;
+}
+
+function getMetrics() {
+  return Array.from(document.querySelectorAll('.metric-row')).map(row=>({
+    num: row.querySelector('[data-mnum]')?.value?.trim()||'',
+    label: row.querySelector('[data-mlabel]')?.value?.trim()||'',
+  })).filter(m=>m.num||m.label);
+}
+
+async function saveCaso() {
+  const id = document.getElementById('casoEditId').value;
+  const name = document.getElementById('casoName').value.trim();
+  const industry = document.getElementById('casoIndustry').value.trim();
+  const category = document.getElementById('casoCategory').value;
+  const problem = document.getElementById('casoProblem').value.trim();
+  if (!name||!industry||!category||!problem) { toast('Completa los campos requeridos (*)','error'); return; }
+  const data = {
+    name, industry,
+    location: document.getElementById('casoLocation').value.trim(),
+    tag: document.getElementById('casoTag').value.trim(),
+    category,
+    visible: document.getElementById('casoVisible').value === 'true',
+    problem,
+    quote: document.getElementById('casoQuote').value.trim(),
+    author: document.getElementById('casoAuthor').value.trim(),
+    metrics: getMetrics(),
+  };
+  try {
+    if (id) {
+      await updateDoc(doc(db,'casos_exito',id), {...data, updatedAt:serverTimestamp()});
+      toast('Caso actualizado','success');
+    } else {
+      data.createdAt = serverTimestamp();
+      await addDoc(collection(db,'casos_exito'), data);
+      toast('Caso creado','success');
+    }
+    closeCasoForm();
+    loadCasos();
+  } catch(e){ toast('Error: '+e.message,'error'); }
+}
+
+async function loadCasos() {
+  const tbody = document.getElementById('casosTableBody');
+  tbody.innerHTML = '<tr class="loading-row"><td colspan="6">Cargando…</td></tr>';
+  try {
+    const snap = await getDocs(query(collection(db,'casos_exito'), orderBy('createdAt','desc')));
+    casosData = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderCasosTable();
+  } catch(e){ tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Error: ${esc(e.message)}</td></tr>`; }
+}
+
+function renderCasosTable() {
+  const tbody = document.getElementById('casosTableBody');
+  if (!casosData.length) { tbody.innerHTML='<tr class="empty-row"><td colspan="6">Sin casos aún.</td></tr>'; return; }
+  tbody.innerHTML = casosData.map(c=>`
+    <tr>
+      <td><span class="truncate">${esc(c.name)}</span></td>
+      <td>${esc(c.industry)}</td>
+      <td>${catBadge(c.category)}</td>
+      <td>
+        <label class="toggle">
+          <input type="checkbox" ${c.visible?'checked':''} onchange="toggleCasoVisible('${esc(c.id)}',this.checked)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+      <td>${fmtDate(c.createdAt)}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-secondary btn-sm" onclick="editCaso('${esc(c.id)}')">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteCaso('${esc(c.id)}')">Eliminar</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.toggleCasoVisible = async (id, visible)=>{
+  try { await updateDoc(doc(db,'casos_exito',id),{visible, updatedAt:serverTimestamp()}); toast(visible?'Publicado':'Ocultado','success'); }
+  catch(e){ toast('Error: '+e.message,'error'); }
+};
+window.editCaso = (id)=>{
+  const c = casosData.find(x=>x.id===id);
+  if(c) openCasoForm(c,id);
+};
+window.deleteCaso = async(id)=>{
+  if(!confirm('¿Eliminar este caso? Esta acción no se puede deshacer.')) return;
+  try { await deleteDoc(doc(db,'casos_exito',id)); toast('Caso eliminado','success'); loadCasos(); }
+  catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+/* ══════════════════════════════════════════════════
+   RECURSOS
+══════════════════════════════════════════════════ */
+let recursosData = [];
+
+document.getElementById('btnNuevoRecurso').addEventListener('click', ()=>openRecursoForm());
+document.getElementById('btnCancelRecurso').addEventListener('click', ()=>closeRecursoForm());
+document.getElementById('btnSaveRecurso').addEventListener('click', saveRecurso);
+
+// Upload zone drag-n-drop
+const uploadZone = document.getElementById('uploadZone');
+const recursoFileInput = document.getElementById('recursoFile');
+uploadZone.addEventListener('click', ()=>recursoFileInput.click());
+uploadZone.addEventListener('dragover', e=>{ e.preventDefault(); uploadZone.classList.add('drag'); });
+uploadZone.addEventListener('dragleave', ()=>uploadZone.classList.remove('drag'));
+uploadZone.addEventListener('drop', e=>{ e.preventDefault(); uploadZone.classList.remove('drag'); if(e.dataTransfer.files[0]) handleFileSelect(e.dataTransfer.files[0]); });
+recursoFileInput.addEventListener('change', ()=>{ if(recursoFileInput.files[0]) handleFileSelect(recursoFileInput.files[0]); });
+
+let selectedFile = null;
+function handleFileSelect(file) {
+  selectedFile = file;
+  document.getElementById('uploadZoneLabel').textContent = `✓ ${file.name} (${(file.size/1024).toFixed(1)} KB)`;
+}
+
+function openRecursoForm(data=null, id=null) {
+  const panel = document.getElementById('recursoFormPanel');
+  const isReadOnly = (currentRole==='TECH_ADMIN'||currentRole==='LEGAL_ADMIN') && id;
+  document.getElementById('recursoFormTitle').textContent = id ? 'Editar recurso' : 'Nuevo recurso';
+  document.getElementById('recursoEditId').value = id||'';
+  document.getElementById('recursoTitle').value = data?.title||'';
+  document.getElementById('recursoCategory').value = data?.category||'';
+  document.getElementById('recursoIcon').value = data?.icon||'📄';
+  document.getElementById('recursoVisible').value = String(data?.visible !== false);
+  document.getElementById('recursoDesc').value = data?.description||'';
+  selectedFile = null;
+  document.getElementById('uploadZoneLabel').textContent = 'Arrastra un archivo aquí o haz clic para seleccionar';
+  const cfi = document.getElementById('currentFileInfo');
+  if (data?.fileName) { cfi.innerHTML=`<span style="font-size:.75rem;color:var(--muted);">Archivo actual: <strong>${esc(data.fileName)}</strong></span>`; cfi.style.display='block'; }
+  else { cfi.style.display='none'; }
+  const uploadSection = document.getElementById('recursoUploadSection');
+  uploadSection.style.display = (currentRole==='SUPER_ADMIN'||!id) ? 'block' : 'none';
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeRecursoForm() {
+  document.getElementById('recursoFormPanel').style.display='none';
+  selectedFile=null;
+}
+
+async function saveRecurso() {
+  const id = document.getElementById('recursoEditId').value;
+  const title = document.getElementById('recursoTitle').value.trim();
+  const category = document.getElementById('recursoCategory').value;
+  const description = document.getElementById('recursoDesc').value.trim();
+  if (!title||!category||!description){ toast('Completa los campos requeridos','error'); return; }
+
+  const data = {
+    title, category, description,
+    icon: document.getElementById('recursoIcon').value.trim()||'📄',
+    visible: document.getElementById('recursoVisible').value==='true',
+  };
+
+  try {
+    let fileUrl = null, fileName = null, fileType = null;
+    if (selectedFile) {
+      const storRef = ref(stor, `recursos/${Date.now()}_${selectedFile.name}`);
+      const progressWrap = document.getElementById('uploadProgressWrap');
+      const progressBar = document.getElementById('uploadProgressBar');
+      progressWrap.style.display='block';
+      await new Promise((resolve,reject)=>{
+        const task = uploadBytesResumable(storRef, selectedFile);
+        task.on('state_changed',
+          snap=>{ progressBar.style.width=(snap.bytesTransferred/snap.totalBytes*100)+'%'; },
+          reject,
+          async()=>{ fileUrl=await getDownloadURL(storRef); fileName=selectedFile.name; fileType=selectedFile.type; resolve(); }
+        );
+      });
+      progressWrap.style.display='none';
+      data.fileUrl=fileUrl; data.fileName=fileName; data.fileType=fileType;
+    }
+
+    if (id) {
+      await updateDoc(doc(db,'recursos',id), {...data, updatedAt:serverTimestamp()});
+      toast('Recurso actualizado','success');
+    } else {
+      data.createdAt=serverTimestamp(); data.downloads=0;
+      await addDoc(collection(db,'recursos'), data);
+      toast('Recurso creado','success');
+    }
+    closeRecursoForm();
+    loadRecursos();
+  } catch(e){ toast('Error: '+e.message,'error'); }
+}
+
+async function loadRecursos() {
+  const tbody = document.getElementById('recursosTableBody');
+  tbody.innerHTML='<tr class="loading-row"><td colspan="6">Cargando…</td></tr>';
+  try {
+    const snap = await getDocs(query(collection(db,'recursos'), orderBy('createdAt','desc')));
+    recursosData = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderRecursosTable();
+  } catch(e){ tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Error: ${esc(e.message)}</td></tr>`; }
+}
+
+function renderRecursosTable() {
+  const tbody = document.getElementById('recursosTableBody');
+  const canEdit = currentRole==='SUPER_ADMIN';
+  // Also hide add button for limited roles when editing
+  document.getElementById('btnNuevoRecurso').style.display = (currentRole==='SUPER_ADMIN') ? '' : '';
+  if (!recursosData.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="6">Sin recursos.</td></tr>'; return; }
+  tbody.innerHTML = recursosData.map(r=>`
+    <tr>
+      <td><span class="truncate">${esc(r.icon||'📄')} ${esc(r.title)}</span></td>
+      <td>${catBadge(r.category)}</td>
+      <td><span style="font-family:'JetBrains Mono',monospace;font-size:.7rem;color:var(--muted);">${esc(r.fileType||'—')}</span></td>
+      <td>${r.downloads||0}</td>
+      <td>
+        <label class="toggle" ${!canEdit?'title="Sin permisos de edición"':''}>
+          <input type="checkbox" ${r.visible?'checked':''} ${!canEdit?'disabled':''} onchange="toggleRecursoVisible('${esc(r.id)}',this.checked)" />
+          <span class="toggle-slider"></span>
+        </label>
+      </td>
+      <td>
+        <div class="td-actions">
+          ${canEdit?`<button class="btn btn-secondary btn-sm" onclick="editRecurso('${esc(r.id)}')">Editar</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteRecurso('${esc(r.id)}')">Eliminar</button>`
+          :'<span class="badge-role">Solo lectura</span>'}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.toggleRecursoVisible = async (id, visible)=>{
+  if(currentRole!=='SUPER_ADMIN'){ toast('Sin permisos','error'); return; }
+  try { await updateDoc(doc(db,'recursos',id),{visible,updatedAt:serverTimestamp()}); toast(visible?'Publicado':'Ocultado','success'); }
+  catch(e){ toast('Error: '+e.message,'error'); }
+};
+window.editRecurso = (id)=>{ const r=recursosData.find(x=>x.id===id); if(r) openRecursoForm(r,id); };
+window.deleteRecurso = async(id)=>{
+  if(currentRole!=='SUPER_ADMIN'){ toast('Sin permisos','error'); return; }
+  if(!confirm('¿Eliminar este recurso?')) return;
+  try { await deleteDoc(doc(db,'recursos',id)); toast('Recurso eliminado','success'); loadRecursos(); }
+  catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+/* ══════════════════════════════════════════════════
+   PLANES DE PRECIO
+══════════════════════════════════════════════════ */
+let planesData = [];
+
+document.getElementById('btnNuevoPlan').addEventListener('click', ()=>openPlanForm());
+document.getElementById('btnCancelPlan').addEventListener('click', ()=>closePlanForm());
+document.getElementById('btnSavePlan').addEventListener('click', savePlan);
+
+function openPlanForm(data=null, id=null) {
+  const panel = document.getElementById('planFormPanel');
+  document.getElementById('planFormTitle').textContent = id?'Editar plan':'Nuevo plan';
+  document.getElementById('planEditId').value = id||'';
+  document.getElementById('planName').value = data?.name||'';
+  document.getElementById('planPrice').value = data?.price||'';
+  document.getElementById('planPeriod').value = data?.period||'';
+  document.getElementById('planCta').value = data?.cta||'';
+  document.getElementById('planHighlighted').value = String(data?.highlighted||false);
+  document.getElementById('planOrder').value = data?.order||planesData.length+1;
+  document.getElementById('planDescription').value = data?.description||'';
+  document.getElementById('planFeatures').value = (data?.features||[]).join('\n');
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closePlanForm(){ document.getElementById('planFormPanel').style.display='none'; }
+
+async function savePlan() {
+  const id = document.getElementById('planEditId').value;
+  const name = document.getElementById('planName').value.trim();
+  const price = document.getElementById('planPrice').value.trim();
+  if(!name||!price){ toast('Nombre y precio son requeridos','error'); return; }
+  const data = {
+    name, price,
+    period: document.getElementById('planPeriod').value.trim(),
+    cta: document.getElementById('planCta').value.trim(),
+    highlighted: document.getElementById('planHighlighted').value==='true',
+    order: parseInt(document.getElementById('planOrder').value)||1,
+    description: document.getElementById('planDescription').value.trim(),
+    features: document.getElementById('planFeatures').value.split('\n').map(f=>f.trim()).filter(Boolean),
+  };
+  try {
+    if(id){ await updateDoc(doc(db,'planes_precio',id),{...data,updatedAt:serverTimestamp()}); toast('Plan actualizado','success'); }
+    else { data.createdAt=serverTimestamp(); await addDoc(collection(db,'planes_precio'),data); toast('Plan creado','success'); }
+    closePlanForm(); loadPlanes();
+  } catch(e){ toast('Error: '+e.message,'error'); }
+}
+
+async function loadPlanes() {
+  const grid = document.getElementById('planesGrid');
+  grid.innerHTML='<div style="color:var(--muted);font-size:.83rem;padding:20px;">Cargando…</div>';
+  try {
+    const snap = await getDocs(query(collection(db,'planes_precio'), orderBy('order','asc')));
+    planesData = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderPlanes();
+  } catch(e){ grid.innerHTML=`<div style="color:var(--red);font-size:.83rem;padding:20px;">Error: ${esc(e.message)}</div>`; }
+}
+
+function renderPlanes() {
+  const grid = document.getElementById('planesGrid');
+  if(!planesData.length){ grid.innerHTML='<div style="color:var(--muted);font-size:.83rem;padding:20px;">Sin planes.</div>'; return; }
+  grid.innerHTML = planesData.map((p,i)=>`
+    <div class="plan-card ${p.highlighted?'highlighted':''}">
+      <div class="plan-order">
+        <button onclick="movePlan('${esc(p.id)}','up')" ${i===0?'disabled':''}>▲</button>
+        <button onclick="movePlan('${esc(p.id)}','down')" ${i===planesData.length-1?'disabled':''}>▼</button>
+      </div>
+      <h4>${esc(p.name)}</h4>
+      ${p.highlighted?'<span class="badge badge-accent" style="margin-bottom:8px;">Destacado</span>':''}
+      <div class="plan-price">${esc(p.price)}<span>${esc(p.period||'')}</span></div>
+      <p style="font-size:.78rem;color:var(--muted);margin-top:6px;">${esc(p.description||'')}</p>
+      <ul class="plan-features">
+        ${(p.features||[]).map(f=>`<li>${esc(f)}</li>`).join('')}
+      </ul>
+      <div class="plan-edit-actions">
+        <button class="btn btn-secondary btn-sm" onclick="editPlan('${esc(p.id)}')">Editar</button>
+        <button class="btn btn-danger btn-sm" onclick="deletePlan('${esc(p.id)}')">Eliminar</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.editPlan = (id)=>{ const p=planesData.find(x=>x.id===id); if(p) openPlanForm(p,id); };
+window.deletePlan = async(id)=>{
+  if(!confirm('¿Eliminar este plan?')) return;
+  try { await deleteDoc(doc(db,'planes_precio',id)); toast('Plan eliminado','success'); loadPlanes(); }
+  catch(e){ toast('Error: '+e.message,'error'); }
+};
+window.movePlan = async(id, dir)=>{
+  const idx = planesData.findIndex(x=>x.id===id);
+  const swapIdx = dir==='up'?idx-1:idx+1;
+  if(swapIdx<0||swapIdx>=planesData.length) return;
+  const a=planesData[idx], b=planesData[swapIdx];
+  try {
+    await Promise.all([
+      updateDoc(doc(db,'planes_precio',a.id),{order:b.order,updatedAt:serverTimestamp()}),
+      updateDoc(doc(db,'planes_precio',b.id),{order:a.order,updatedAt:serverTimestamp()}),
+    ]);
+    toast('Orden actualizado','success'); loadPlanes();
+  } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+/* ══════════════════════════════════════════════════
+   BLOG
+══════════════════════════════════════════════════ */
+let blogData = [];
+blogTags = [];
+
+document.getElementById('btnNuevoPost').addEventListener('click', ()=>openBlogForm());
+document.getElementById('btnCancelPost').addEventListener('click', ()=>closeBlogForm());
+document.getElementById('btnSavePost').addEventListener('click', saveBlogPost);
+document.getElementById('btnPreviewPost').addEventListener('click', ()=>{
+  const id = document.getElementById('blogEditId').value;
+  if(id) window.open(`/blog-post.html?id=${encodeURIComponent(id)}`,'_blank');
+  else toast('Guarda el post primero para previsualizarlo','info');
+});
+
+// Auto-slug from title
+document.getElementById('blogTitle').addEventListener('input', e=>{
+  const slug = document.getElementById('blogSlug');
+  if(!slug.dataset.manual) slug.value = slugify(e.target.value);
+});
+document.getElementById('blogSlug').addEventListener('input', e=>{
+  e.target.dataset.manual = e.target.value ? '1' : '';
+});
+
+// Tag input
+document.getElementById('tagInput').addEventListener('keydown', e=>{
+  if(e.key==='Enter'||e.key===','){
+    e.preventDefault();
+    const val = e.target.value.trim().replace(/,$/,'');
+    if(val && !blogTags.includes(val)){ blogTags.push(val); renderTags(); }
+    e.target.value='';
+  }
+});
+function renderTags(){
+  const wrap = document.getElementById('tagInputWrap');
+  wrap.querySelectorAll('.tag-pill').forEach(p=>p.remove());
+  blogTags.forEach((t,i)=>{
+    const pill = document.createElement('span');
+    pill.className='tag-pill';
+    pill.innerHTML=`${esc(t)} <button type="button" onclick="removeTag(${i})">×</button>`;
+    wrap.insertBefore(pill, document.getElementById('tagInput'));
+  });
+}
+window.removeTag = (i)=>{ blogTags.splice(i,1); renderTags(); };
+
+function openBlogForm(data=null, id=null){
+  const panel = document.getElementById('blogFormPanel');
+  document.getElementById('blogFormTitle').textContent = id?'Editar post':'Nuevo post';
+  document.getElementById('blogEditId').value = id||'';
+  document.getElementById('blogTitle').value = data?.title||'';
+  const slugEl = document.getElementById('blogSlug');
+  slugEl.value = data?.slug||''; slugEl.dataset.manual = data?.slug?'1':'';
+  document.getElementById('blogAuthor').value = data?.author||currentUser?.displayName||'';
+  document.getElementById('blogAuthorEmail').value = data?.authorEmail||currentUser?.email||'';
+  document.getElementById('blogCategory').value = data?.category||'';
+  document.getElementById('blogStatus').value = data?.status||'draft';
+  document.getElementById('blogCoverImage').value = data?.coverImage||'';
+  document.getElementById('blogExcerpt').value = data?.excerpt||'';
+  document.getElementById('blogContent').value = data?.content||'';
+  blogTags = data?.tags||[];
+  renderTags();
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeBlogForm(){ document.getElementById('blogFormPanel').style.display='none'; blogTags=[]; renderTags(); }
+
+async function saveBlogPost(){
+  const id = document.getElementById('blogEditId').value;
+  const title = document.getElementById('blogTitle').value.trim();
+  const slug = document.getElementById('blogSlug').value.trim()||slugify(title);
+  const author = document.getElementById('blogAuthor').value.trim();
+  const excerpt = document.getElementById('blogExcerpt').value.trim();
+  const content = document.getElementById('blogContent').value.trim();
+  if(!title||!author||!excerpt){ toast('Título, autor y extracto son requeridos','error'); return; }
+  const status = document.getElementById('blogStatus').value;
+  const data = {
+    title, slug, author,
+    authorEmail: document.getElementById('blogAuthorEmail').value.trim(),
+    category: document.getElementById('blogCategory').value,
+    tags: [...blogTags],
+    status, excerpt, content,
+    coverImage: document.getElementById('blogCoverImage').value.trim(),
+  };
+  if(status==='published') data.publishedAt=serverTimestamp();
+  try {
+    if(id){ await updateDoc(doc(db,'blog_posts',id),{...data,updatedAt:serverTimestamp()}); toast('Post actualizado','success'); }
+    else { data.createdAt=serverTimestamp(); await addDoc(collection(db,'blog_posts'),data); toast('Post creado','success'); }
+    closeBlogForm(); loadBlog();
+  } catch(e){ toast('Error: '+e.message,'error'); }
+}
+
+async function loadBlog(){
+  const tbody = document.getElementById('blogTableBody');
+  tbody.innerHTML='<tr class="loading-row"><td colspan="6">Cargando…</td></tr>';
+  try {
+    const snap = await getDocs(query(collection(db,'blog_posts'), orderBy('createdAt','desc')));
+    blogData = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderBlogTable();
+  } catch(e){ tbody.innerHTML=`<tr class="empty-row"><td colspan="6">Error: ${esc(e.message)}</td></tr>`; }
+}
+
+function renderBlogTable(){
+  const tbody = document.getElementById('blogTableBody');
+  if(!blogData.length){ tbody.innerHTML='<tr class="empty-row"><td colspan="6">Sin posts.</td></tr>'; return; }
+  tbody.innerHTML = blogData.map(p=>`
+    <tr>
+      <td><span class="truncate">${esc(p.title)}</span></td>
+      <td>${catBadge(p.category)}</td>
+      <td>${statusBadge(p.status)}</td>
+      <td><span style="font-size:.78rem;">${esc(p.author||'—')}</span></td>
+      <td>${fmtDate(p.publishedAt||p.createdAt)}</td>
+      <td>
+        <div class="td-actions">
+          <button class="btn btn-secondary btn-sm" onclick="editPost('${esc(p.id)}')">Editar</button>
+          <button class="btn btn-secondary btn-sm" onclick="window.open('/blog-post.html?id=${esc(p.id)}','_blank')">↗</button>
+          <button class="btn btn-danger btn-sm" onclick="deletePost('${esc(p.id)}')">Eliminar</button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+window.editPost = (id)=>{ const p=blogData.find(x=>x.id===id); if(p) openBlogForm(p,id); };
+window.deletePost = async(id)=>{
+  if(!confirm('¿Eliminar este post?')) return;
+  try { await deleteDoc(doc(db,'blog_posts',id)); toast('Post eliminado','success'); loadBlog(); }
+  catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+/* ══════════════════════════════════════════════════
+   CONFIGURACIÓN
+══════════════════════════════════════════════════ */
+async function loadConfig(){
+  try {
+    const snap = await getDoc(doc(db,'config_site','main'));
+    if(snap.exists()){
+      const d=snap.data();
+      document.getElementById('cfgHeroTitle').value = d.heroTitle||'';
+      document.getElementById('cfgHeroSubtitle').value = d.heroSubtitle||'';
+      document.getElementById('cfgTagline').value = d.tagline||'';
+      document.getElementById('cfgContactEmail').value = d.contactEmail||'';
+      document.getElementById('cfgWhatsapp').value = d.whatsapp||'';
+      document.getElementById('cfgDescription').value = d.description||'';
+    }
+  } catch(e){ toast('Error al cargar config: '+e.message,'error'); }
+}
+
+document.getElementById('btnSaveConfig').addEventListener('click', async()=>{
+  const data={
+    heroTitle: document.getElementById('cfgHeroTitle').value.trim(),
+    heroSubtitle: document.getElementById('cfgHeroSubtitle').value.trim(),
+    tagline: document.getElementById('cfgTagline').value.trim(),
+    contactEmail: document.getElementById('cfgContactEmail').value.trim(),
+    whatsapp: document.getElementById('cfgWhatsapp').value.trim(),
+    description: document.getElementById('cfgDescription').value.trim(),
+    updatedAt: serverTimestamp(),
+  };
+  try {
+    await setDoc(doc(db,'config_site','main'), data, {merge:true});
+    toast('Configuración guardada','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+});
+
+/* ══════════════════════════════════════════════════
+   PROYECTOS
+══════════════════════════════════════════════════ */
+let proyectosData = [];
+
+function showProyList(){ document.getElementById('proyListView').style.display='block'; document.getElementById('proyDetailView').classList.remove('active'); }
+function showProyDetail(){ document.getElementById('proyListView').style.display='none'; document.getElementById('proyDetailView').classList.add('active'); }
+
+document.getElementById('btnNuevoProyecto').addEventListener('click', ()=>openProyForm());
+document.getElementById('btnCancelProyecto').addEventListener('click', ()=>closeProyForm());
+document.getElementById('btnSaveProyecto').addEventListener('click', saveProyecto);
+document.getElementById('btnBackProyectos').addEventListener('click', ()=>{ showProyList(); loadProyectos(); });
+
+function openProyForm(data=null, id=null){
+  const panel = document.getElementById('proyFormPanel');
+  document.getElementById('proyFormTitle').textContent = id?'Editar proyecto':'Nuevo proyecto';
+  document.getElementById('proyEditId').value = id||'';
+  document.getElementById('proyClientName').value = data?.clientName||'';
+  document.getElementById('proyType').value = data?.projectType||'';
+  document.getElementById('proyStatus').value = data?.status||'activo';
+  document.getElementById('proyAssigned').value = data?.assignedTo||'';
+  document.getElementById('proyStartDate').value = data?.startDate||'';
+  document.getElementById('proyNotes').value = '';
+  panel.style.display='block';
+  panel.scrollIntoView({behavior:'smooth',block:'start'});
+}
+function closeProyForm(){ document.getElementById('proyFormPanel').style.display='none'; }
+
+async function saveProyecto(){
+  const id = document.getElementById('proyEditId').value;
+  const clientName = document.getElementById('proyClientName').value.trim();
+  const projectType = document.getElementById('proyType').value.trim();
+  if(!clientName||!projectType){ toast('Cliente y tipo de proyecto son requeridos','error'); return; }
+  const notes = document.getElementById('proyNotes').value.trim();
+  const data = {
+    clientName, projectType,
+    status: document.getElementById('proyStatus').value,
+    assignedTo: document.getElementById('proyAssigned').value.trim(),
+    startDate: document.getElementById('proyStartDate').value,
+    lastUpdated: serverTimestamp(),
+  };
+  if(!id){ data.milestones=[]; data.resources=[]; data.notesLog=[]; data.createdAt=serverTimestamp(); }
+  if(notes && !id) data.notesLog=[{text:notes, ts:new Date().toISOString()}];
+  try {
+    if(id){ await updateDoc(doc(db,'proyectos_admin',id),{...data}); toast('Proyecto actualizado','success'); }
+    else { await addDoc(collection(db,'proyectos_admin'),data); toast('Proyecto creado','success'); }
+    closeProyForm(); loadProyectos();
+  } catch(e){ toast('Error: '+e.message,'error'); }
+}
+
+async function loadProyectos(){
+  const grid = document.getElementById('proyCardsGrid');
+  grid.innerHTML='<div style="color:var(--muted);font-size:.83rem;padding:20px;">Cargando…</div>';
+  try {
+    const snap = await getDocs(query(collection(db,'proyectos_admin'), orderBy('createdAt','desc')));
+    proyectosData = snap.docs.map(d=>({id:d.id,...d.data()}));
+    renderProyCards();
+  } catch(e){ grid.innerHTML=`<div style="color:var(--red);font-size:.83rem;padding:20px;">Error: ${esc(e.message)}</div>`; }
+}
+
+function renderProyCards(){
+  const grid = document.getElementById('proyCardsGrid');
+  if(!proyectosData.length){ grid.innerHTML='<div style="color:var(--muted);font-size:.83rem;padding:20px;">Sin proyectos.</div>'; return; }
+  grid.innerHTML = proyectosData.map(p=>`
+    <div class="proj-card" onclick="openProyecto('${esc(p.id)}')">
+      <h4>${esc(p.clientName)}</h4>
+      <div class="meta">${esc(p.projectType)} · ${esc(p.assignedTo||'Sin asignar')}</div>
+      <div class="bottom">
+        ${statusBadge(p.status)}
+        <span style="font-size:.73rem;color:var(--muted);">${fmtDate(p.startDate?{toDate:()=>new Date(p.startDate)}:p.createdAt)}</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.openProyecto = async(id)=>{
+  try {
+    const snap = await getDoc(doc(db,'proyectos_admin',id));
+    if(!snap.exists()){ toast('Proyecto no encontrado','error'); return; }
+    activeProyecto = {id:snap.id,...snap.data()};
+    renderProyDetail();
+    showProyDetail();
+  } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+function renderProyDetail(){
+  const p = activeProyecto;
+  document.getElementById('dClientName').textContent = p.clientName||'—';
+  document.getElementById('dProjectType').textContent = p.projectType||'—';
+  document.getElementById('dAssigned').textContent = p.assignedTo||'Sin asignar';
+  document.getElementById('dStartDate').textContent = p.startDate||'—';
+  document.getElementById('dStatusSelect').value = p.status||'activo';
+  renderMilestones();
+  renderProjResources();
+  renderNotes();
+}
+
+// STATUS UPDATE
+document.getElementById('btnUpdateStatus').addEventListener('click', async()=>{
+  if(!activeProyecto) return;
+  const status = document.getElementById('dStatusSelect').value;
+  try {
+    await updateDoc(doc(db,'proyectos_admin',activeProyecto.id),{status,lastUpdated:serverTimestamp()});
+    activeProyecto.status=status;
+    toast('Estado actualizado','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+});
+
+// MILESTONES
+function renderMilestones(){
+  const list = document.getElementById('milestoneList');
+  const milestones = activeProyecto.milestones||[];
+  if(!milestones.length){ list.innerHTML='<div style="color:var(--muted);font-size:.8rem;">Sin hitos aún.</div>'; return; }
+  list.innerHTML = milestones.map((m,i)=>`
+    <div class="milestone-item ${m.done?'done':''}">
+      <input type="checkbox" ${m.done?'checked':''} onchange="toggleMilestone(${i},this.checked)" />
+      <span>${esc(m.title)}</span>
+    </div>
+  `).join('');
+}
+
+window.toggleMilestone = async(idx, done)=>{
+  if(!activeProyecto) return;
+  const milestones = [...(activeProyecto.milestones||[])];
+  milestones[idx]={...milestones[idx], done};
+  try {
+    await updateDoc(doc(db,'proyectos_admin',activeProyecto.id),{milestones,lastUpdated:serverTimestamp()});
+    activeProyecto.milestones=milestones;
+    renderMilestones();
+    toast(done?'Hito completado':'Hito reabierto','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+document.getElementById('btnAddMilestone').addEventListener('click', async()=>{
+  const input = document.getElementById('newMilestoneInput');
+  const title = input.value.trim();
+  if(!title){ toast('Escribe el título del hito','error'); return; }
+  const milestones = [...(activeProyecto.milestones||[]), {title, done:false}];
+  try {
+    await updateDoc(doc(db,'proyectos_admin',activeProyecto.id),{milestones,lastUpdated:serverTimestamp()});
+    activeProyecto.milestones=milestones;
+    input.value='';
+    renderMilestones();
+    toast('Hito agregado','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+});
+
+// PROJ RESOURCES
+function renderProjResources(){
+  const list = document.getElementById('projResourcesList');
+  const res = activeProyecto.resources||[];
+  if(!res.length){ list.innerHTML='<div style="color:var(--muted);font-size:.8rem;">Sin recursos vinculados.</div>'; return; }
+  list.innerHTML = res.map((r,i)=>`
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 12px;background:rgba(235,229,214,.03);border:1px solid var(--line);border-radius:4px;">
+      <a href="${esc(r.url)}" target="_blank" rel="noopener" style="color:var(--accent);font-size:.83rem;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc(r.name)}</a>
+      <button class="btn btn-danger btn-sm btn-icon" onclick="removeResource(${i})" title="Eliminar">✕</button>
+    </div>
+  `).join('');
+}
+
+window.removeResource = async(idx)=>{
+  const resources = (activeProyecto.resources||[]).filter((_,i)=>i!==idx);
+  try {
+    await updateDoc(doc(db,'proyectos_admin',activeProyecto.id),{resources,lastUpdated:serverTimestamp()});
+    activeProyecto.resources=resources;
+    renderProjResources();
+    toast('Recurso eliminado','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+};
+
+document.getElementById('btnAddResource').addEventListener('click', async()=>{
+  const name = document.getElementById('newResName').value.trim();
+  const url = document.getElementById('newResUrl').value.trim();
+  if(!name||!url){ toast('Nombre y URL son requeridos','error'); return; }
+  const resources = [...(activeProyecto.resources||[]), {name, url}];
+  try {
+    await updateDoc(doc(db,'proyectos_admin',activeProyecto.id),{resources,lastUpdated:serverTimestamp()});
+    activeProyecto.resources=resources;
+    document.getElementById('newResName').value='';
+    document.getElementById('newResUrl').value='';
+    renderProjResources();
+    toast('Recurso agregado','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+});
+
+// NOTES
+function renderNotes(){
+  const log = document.getElementById('notesLog');
+  const notes = activeProyecto.notesLog||[];
+  if(!notes.length){ log.innerHTML='<div style="color:var(--muted);font-size:.8rem;padding:8px;">Sin notas aún.</div>'; return; }
+  log.innerHTML = [...notes].reverse().map(n=>`
+    <div class="note-entry">
+      <div class="note-ts">${n.ts ? new Date(n.ts).toLocaleString('es-MX',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—'}</div>
+      <div>${esc(n.text)}</div>
+    </div>
+  `).join('');
+  log.scrollTop=0;
+}
+
+document.getElementById('btnAddNote').addEventListener('click', async()=>{
+  const input = document.getElementById('newNoteInput');
+  const text = input.value.trim();
+  if(!text){ toast('Escribe algo en la nota','error'); return; }
+  const notesLog = [...(activeProyecto.notesLog||[]), {text, ts:new Date().toISOString()}];
+  try {
+    await updateDoc(doc(db,'proyectos_admin',activeProyecto.id),{notesLog,lastUpdated:serverTimestamp()});
+    activeProyecto.notesLog=notesLog;
+    input.value='';
+    renderNotes();
+    toast('Nota agregada','success');
+  } catch(e){ toast('Error: '+e.message,'error'); }
+});
+
+</script>
+</body>
+</html>

@@ -3,6 +3,7 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
 
+    // ── Helpers de autenticación ──
     function isSignedIn() {
       return request.auth != null;
     }
@@ -11,8 +12,24 @@ service cloud.firestore {
       return isSignedIn() && request.auth.uid == uid;
     }
 
-    function notSpam() {
-      return request.time > resource.data.createdAt + duration.value(2, 's');
+    function userEmail() {
+      return request.auth.token.email;
+    }
+
+    function isSuperAdmin() {
+      return isSignedIn() && userEmail() == 'david.martinez@logidma.com';
+    }
+
+    function isTechAdmin() {
+      return isSignedIn() && userEmail() == 'octavio.juarez@logidma.com';
+    }
+
+    function isLegalAdmin() {
+      return isSignedIn() && userEmail() == 'nisay.gomez@logidma.com';
+    }
+
+    function isAnyAdmin() {
+      return isSuperAdmin() || isTechAdmin() || isLegalAdmin();
     }
 
     // ── POSTS (galería pública) ──
@@ -24,18 +41,17 @@ service cloud.firestore {
                     && request.resource.data.description.size() <= 500
                     && request.resource.data.likesCount == 0;
       allow update: if isOwner(resource.data.userId)
+                    || isSuperAdmin()
                     || (isSignedIn()
                         && request.resource.data.diff(resource.data).affectedKeys()
                            .hasOnly(['likesCount', 'commentsCount']));
-      allow delete: if isOwner(resource.data.userId);
+      allow delete: if isOwner(resource.data.userId) || isSuperAdmin();
 
-      // Likes: un documento por usuario
       match /likes/{userId} {
         allow read: if isSignedIn();
         allow write: if isOwner(userId);
       }
 
-      // Comentarios
       match /comments/{commentId} {
         allow read: if true;
         allow create: if isSignedIn()
@@ -43,16 +59,15 @@ service cloud.firestore {
                       && request.resource.data.text is string
                       && request.resource.data.text.size() > 0
                       && request.resource.data.text.size() <= 500;
-        allow update: if isOwner(resource.data.userId);
-        allow delete: if isOwner(resource.data.userId);
+        allow update: if isOwner(resource.data.userId) || isSuperAdmin();
+        allow delete: if isOwner(resource.data.userId) || isSuperAdmin();
       }
     }
 
     // ── CHALLENGES (retos mensuales) ──
-    // Solo lectura desde el cliente. Edición desde consola/admin.
     match /challenges/{challengeId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if isSuperAdmin();
     }
 
     // ── USERS (perfil opcional) ──
@@ -65,7 +80,55 @@ service cloud.firestore {
       }
     }
 
-    // Bloqueo por defecto a cualquier otra ruta
+    // ── CASOS DE ÉXITO ──
+    // Lectura pública para los visibles; escritura solo admins.
+    match /casos_exito/{casoId} {
+      allow read: if true;
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // ── RECURSOS DESCARGABLES ──
+    // Lectura pública; SUPER_ADMIN puede todo; TECH y LEGAL pueden agregar/leer.
+    match /recursos/{recursoId} {
+      allow read: if true;
+      allow create: if isAnyAdmin();
+      allow update, delete: if isSuperAdmin();
+    }
+
+    // ── PLANES DE PRECIO ──
+    // Lectura pública; solo SUPER_ADMIN puede modificar.
+    match /planes_precio/{planId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // ── BLOG POSTS ──
+    // Publicados son de lectura pública; borradores solo admins; escritura SUPER_ADMIN.
+    match /blog_posts/{postId} {
+      allow read: if resource.data.status == 'published' || isAnyAdmin();
+      allow create, update, delete: if isSuperAdmin();
+    }
+
+    // ── PROYECTOS ADMIN ──
+    // Solo admins. TECH y LEGAL pueden ver y actualizar status/milestones/recursos.
+    // SUPER_ADMIN puede todo (crear, eliminar, editar completo).
+    match /proyectos_admin/{proyectoId} {
+      allow read: if isAnyAdmin();
+      allow create, delete: if isSuperAdmin();
+      allow update: if isSuperAdmin()
+                    || (isAnyAdmin()
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                           .hasOnly(['status', 'milestones', 'resources', 'notes', 'lastUpdated']));
+    }
+
+    // ── CONFIGURACIÓN DEL SITIO ──
+    // Lectura pública (para que el frontend pueda leer textos); solo SUPER_ADMIN escribe.
+    match /config_site/{docId} {
+      allow read: if true;
+      allow write: if isSuperAdmin();
+    }
+
+    // Bloqueo por defecto
     match /{document=**} {
       allow read, write: if false;
     }

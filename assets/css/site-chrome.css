@@ -193,10 +193,11 @@
   animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 .snav__mobile.is-open .snav__mlink:nth-child(1){ animation-delay: 0.08s; }
-.snav__mobile.is-open .snav__mlink:nth-child(2){ animation-delay: 0.14s; }
-.snav__mobile.is-open .snav__mlink:nth-child(3){ animation-delay: 0.20s; }
-.snav__mobile.is-open .snav__mlink:nth-child(4){ animation-delay: 0.26s; }
-.snav__mobile.is-open .snav__mlink:nth-child(5){ animation-delay: 0.32s; }
+.snav__mobile.is-open .snav__mlink:nth-child(2){ animation-delay: 0.13s; }
+.snav__mobile.is-open .snav__mlink:nth-child(3){ animation-delay: 0.18s; }
+.snav__mobile.is-open .snav__mlink:nth-child(4){ animation-delay: 0.23s; }
+.snav__mobile.is-open .snav__mlink:nth-child(5){ animation-delay: 0.28s; }
+.snav__mobile.is-open .snav__mlink:nth-child(6){ animation-delay: 0.33s; }
 @keyframes snavMobileItem{
   to { opacity: 1; transform: translateY(0); }
 }
@@ -220,7 +221,7 @@
               box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .snav__mobile.is-open .snav__mcta{
-  animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.38s forwards;
+  animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.42s forwards;
 }
 .snav__mcta:hover{ transform: translateY(-2px); box-shadow: 0 14px 36px rgba(196, 255, 58, 0.4); }
 
@@ -241,9 +242,9 @@
   transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .snav__mobile.is-open .snav__mcontact{
-  animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.44s forwards;
+  animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.48s forwards;
 }
-.snav__mobile.is-open .snav__mcontact:nth-of-type(2){ animation-delay: 0.50s; }
+.snav__mobile.is-open .snav__mcontact:nth-of-type(2){ animation-delay: 0.54s; }
 .snav__mcontact:hover{ border-color: #c4ff3a; color: #c4ff3a; }
 
 /* ── RESPONSIVE NAV ── */

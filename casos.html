@@ -12,11 +12,11 @@
 
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io;
+  script-src 'self' 'unsafe-inline' https://www.googletagmanager.com https://plausible.io https://www.gstatic.com/firebasejs/;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com;
   img-src 'self' data: https:;
-  connect-src 'self' https://plausible.io;
+  connect-src 'self' https://plausible.io https://firestore.googleapis.com https://*.firebaseio.com https://identitytoolkit.googleapis.com;
   object-src 'none';
   base-uri 'self';
 ">
@@ -324,6 +324,33 @@
 
   .case[hidden]{ display:none !important; }
 
+  /* Loading skeleton */
+  .case-skeleton{
+    padding:34px 30px;
+    background:linear-gradient(180deg, var(--bg-2) 0%, rgba(17,17,16,.4) 100%);
+    border:1px solid var(--line); border-radius:16px;
+    animation:shimmer 1.6s ease-in-out infinite;
+  }
+  .case-skeleton .sk-line{
+    height:14px; border-radius:4px;
+    background:linear-gradient(90deg, var(--surface) 25%, var(--surface-2) 50%, var(--surface) 75%);
+    background-size:200% 100%;
+    animation:shimmerMove 1.6s ease-in-out infinite;
+    margin-bottom:12px;
+  }
+  .case-skeleton .sk-line:first-child{ width:40%; height:10px; margin-bottom:20px; }
+  .case-skeleton .sk-line:nth-child(2){ width:70%; height:20px; margin-bottom:16px; }
+  .case-skeleton .sk-line:nth-child(3){ width:90%; }
+  .case-skeleton .sk-line:nth-child(4){ width:80%; }
+  @keyframes shimmerMove{ from{background-position:200% 0;} to{background-position:-200% 0;} }
+
+  /* Empty state */
+  .cases-empty{
+    grid-column:1/-1; text-align:center; padding:64px 24px;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:.08em;
+  }
+
   @media (prefers-reduced-motion: reduce){
     *, *::before, *::after{ animation-duration:.001ms !important; }
   }
@@ -348,103 +375,10 @@
   </div>
 
   <section class="cases" id="casesGrid" aria-label="Casos de estudio">
-
-    <article class="case" data-cat="automatizacion">
-      <div class="case__head">
-        <span class="case__industry">E-commerce · CDMX</span>
-        <span class="case__tag">Automatización</span>
-      </div>
-      <h2 class="case__name">Tienda online de <em>productos artesanales</em></h2>
-      <span class="case__problem-label">Problema</span>
-      <p class="case__problem">Cada pedido se procesaba manualmente: copiar de WhatsApp a Excel, generar guía, enviar tracking. 2 personas dedicadas full-time a coordinación logística.</p>
-      <div class="case__metrics">
-        <div class="metric"><div class="metric__num">−87%</div><div class="metric__label">Tiempo de procesamiento</div></div>
-        <div class="metric"><div class="metric__num">$22k</div><div class="metric__label">Ahorro mensual MXN</div></div>
-      </div>
-      <p class="case__quote">"Pasé de coordinar pedidos todo el día a revisar reportes en 15 minutos por la mañana."</p>
-      <p class="case__author">— Fundadora · Industria artesanal</p>
-    </article>
-
-    <article class="case" data-cat="workspace">
-      <div class="case__head">
-        <span class="case__industry">Constructora · Morelia</span>
-        <span class="case__tag">Workspace</span>
-      </div>
-      <h2 class="case__name">Constructora con <em>14 colaboradores</em> dispersos</h2>
-      <span class="case__problem-label">Problema</span>
-      <p class="case__problem">Archivos en correos personales, fotos de obra perdidas en WhatsApp, sin estructura para compartir planos con clientes. Cada proyecto era un caos diferente.</p>
-      <div class="case__metrics">
-        <div class="metric"><div class="metric__num">14</div><div class="metric__label">Cuentas migradas</div></div>
-        <div class="metric"><div class="metric__num">3 días</div><div class="metric__label">Setup completo</div></div>
-      </div>
-      <p class="case__quote">"Ya no perdemos planos. Cada obra tiene su carpeta, su calendario y sus permisos. El cliente lo ve en tiempo real."</p>
-      <p class="case__author">— Director de operaciones</p>
-    </article>
-
-    <article class="case" data-cat="automatizacion">
-      <div class="case__head">
-        <span class="case__industry">Despacho contable · GDL</span>
-        <span class="case__tag">Automatización</span>
-      </div>
-      <h2 class="case__name">Despacho contable con <em>60 clientes</em> activos</h2>
-      <span class="case__problem-label">Problema</span>
-      <p class="case__problem">Generación de reportes mensuales manualmente: 4 horas por cliente, 240 horas al mes solo en compilar datos de SAT y Sheets.</p>
-      <div class="case__metrics">
-        <div class="metric"><div class="metric__num">240h</div><div class="metric__label">Horas/mes ahorradas</div></div>
-        <div class="metric"><div class="metric__num">×3</div><div class="metric__label">Capacidad de clientes</div></div>
-      </div>
-      <p class="case__quote">"Lo que antes me tomaba toda la última semana del mes, ahora corre solo cada noche."</p>
-      <p class="case__author">— Contador titular</p>
-    </article>
-
-    <article class="case" data-cat="blindaje">
-      <div class="case__head">
-        <span class="case__industry">Startup SaaS · Querétaro</span>
-        <span class="case__tag">Blindaje legal</span>
-      </div>
-      <h2 class="case__name">SaaS pre-seed cerrando <em>contratos</em></h2>
-      <span class="case__problem-label">Problema</span>
-      <p class="case__problem">A punto de cerrar un cliente enterprise, sin NDA, sin contrato de prestación de servicios, sin aviso de privacidad. Riesgo legal real.</p>
-      <div class="case__metrics">
-        <div class="metric"><div class="metric__num">5</div><div class="metric__label">Documentos blindados</div></div>
-        <div class="metric"><div class="metric__num">$180k</div><div class="metric__label">Contrato cerrado MXN</div></div>
-      </div>
-      <p class="case__quote">"Sin esos contratos no firmábamos nada. Logidma nos dio el blindaje en 4 días."</p>
-      <p class="case__author">— CEO &amp; cofundador</p>
-    </article>
-
-    <article class="case" data-cat="automatizacion">
-      <div class="case__head">
-        <span class="case__industry">Clínica dental · León</span>
-        <span class="case__tag">Automatización</span>
-      </div>
-      <h2 class="case__name">Clínica con <em>citas dispersas</em> en 3 canales</h2>
-      <span class="case__problem-label">Problema</span>
-      <p class="case__problem">Citas en WhatsApp, llamadas, Instagram. Recordatorios manuales. 18% de no-shows mensual.</p>
-      <div class="case__metrics">
-        <div class="metric"><div class="metric__num">−68%</div><div class="metric__label">No-shows</div></div>
-        <div class="metric"><div class="metric__num">+22%</div><div class="metric__label">Citas confirmadas</div></div>
-      </div>
-      <p class="case__quote">"Los recordatorios automáticos cambiaron el juego. Ya no pierdo dinero en sillones vacíos."</p>
-      <p class="case__author">— Director clínico</p>
-    </article>
-
-    <article class="case" data-cat="workspace">
-      <div class="case__head">
-        <span class="case__industry">Agencia creativa · Puebla</span>
-        <span class="case__tag">Workspace</span>
-      </div>
-      <h2 class="case__name">Agencia con <em>freelancers</em> rotando cada mes</h2>
-      <span class="case__problem-label">Problema</span>
-      <p class="case__problem">Cada nuevo freelance necesitaba acceso a archivos, calendarios, herramientas. Onboarding tomaba 3 días por persona.</p>
-      <div class="case__metrics">
-        <div class="metric"><div class="metric__num">2h</div><div class="metric__label">Onboarding nuevo</div></div>
-        <div class="metric"><div class="metric__num">100%</div><div class="metric__label">Permisos auditados</div></div>
-      </div>
-      <p class="case__quote">"Cuando alguien sale del equipo, en 5 minutos cierro todos sus accesos. Antes era una pesadilla."</p>
-      <p class="case__author">— Productora ejecutiva</p>
-    </article>
-
+    <div class="case-skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>
+    <div class="case-skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>
+    <div class="case-skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>
+    <div class="case-skeleton"><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div><div class="sk-line"></div></div>
   </section>
 
   <section class="final">
@@ -469,6 +403,9 @@
 <script type="module">
   import { escHtml } from './assets/js/sanitize.js';
   import { track, trackPageView } from './assets/js/analytics.js';
+  import { db } from './assets/js/firebase-init.js';
+  import { collection, getDocs, query, orderBy, where }
+    from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 
   // Hero título
   const lines = ['Resultados', 'reales, métricas <em>concretas</em>.'];
@@ -485,23 +422,121 @@
     return `<span style="display:block;">${inner}</span>`;
   }).join('');
 
-  // Filtros
-  const filters = document.querySelectorAll('.filter');
-  const cases = document.querySelectorAll('.case');
-  filters.forEach(btn => {
-    btn.addEventListener('click', () => {
-      filters.forEach(f => { f.classList.remove('is-active'); f.setAttribute('aria-selected','false'); });
-      btn.classList.add('is-active'); btn.setAttribute('aria-selected','true');
-      const cat = btn.dataset.filter;
-      let visible = 0;
-      cases.forEach(c => {
-        const show = cat === 'all' || c.dataset.cat === cat;
-        c.hidden = !show;
-        if (show) visible++;
+  // Renderizar un caso como HTML
+  function renderCase(id, d, idx) {
+    const delay = (1.7 + idx * 0.12).toFixed(2);
+    const metrics = Array.isArray(d.metrics) ? d.metrics.slice(0, 4) : [];
+    const metricsHtml = metrics.map(m => `
+      <div class="metric">
+        <div class="metric__num">${escHtml(m.num || '')}</div>
+        <div class="metric__label">${escHtml(m.label || '')}</div>
+      </div>`).join('');
+    const nameParts = (d.name || '').split(/\*(.+?)\*/);
+    const nameHtml = nameParts.map((p, i) => i % 2 === 1 ? `<em>${escHtml(p)}</em>` : escHtml(p)).join('');
+    return `
+      <article class="case" data-cat="${escHtml(d.category || 'general')}" style="animation-delay:${delay}s">
+        <div class="case__head">
+          <span class="case__industry">${escHtml(d.industry || '')}${d.location ? ' · ' + escHtml(d.location) : ''}</span>
+          <span class="case__tag">${escHtml(d.tag || d.category || '')}</span>
+        </div>
+        <h2 class="case__name">${nameHtml}</h2>
+        <span class="case__problem-label">Problema</span>
+        <p class="case__problem">${escHtml(d.problem || '')}</p>
+        <div class="case__metrics">${metricsHtml}</div>
+        <p class="case__quote">${escHtml(d.quote || '')}</p>
+        <p class="case__author">— ${escHtml(d.author || '')}</p>
+      </article>`;
+  }
+
+  // Datos de respaldo por si Firebase no tiene casos aún
+  const FALLBACK = [
+    { category:'automatizacion', industry:'E-commerce', location:'CDMX', tag:'Automatización',
+      name:'Tienda online de *productos artesanales*',
+      problem:'Cada pedido se procesaba manualmente: copiar de WhatsApp a Excel, generar guía, enviar tracking. 2 personas dedicadas full-time.',
+      metrics:[{num:'−87%',label:'Tiempo de procesamiento'},{num:'$22k',label:'Ahorro mensual MXN'}],
+      quote:'"Pasé de coordinar pedidos todo el día a revisar reportes en 15 minutos por la mañana."',
+      author:'Fundadora · Industria artesanal' },
+    { category:'workspace', industry:'Constructora', location:'Morelia', tag:'Workspace',
+      name:'Constructora con *14 colaboradores* dispersos',
+      problem:'Archivos en correos personales, fotos de obra perdidas en WhatsApp, sin estructura para compartir planos con clientes.',
+      metrics:[{num:'14',label:'Cuentas migradas'},{num:'3 días',label:'Setup completo'}],
+      quote:'"Ya no perdemos planos. Cada obra tiene su carpeta, su calendario y sus permisos."',
+      author:'Director de operaciones' },
+    { category:'automatizacion', industry:'Despacho contable', location:'GDL', tag:'Automatización',
+      name:'Despacho contable con *60 clientes* activos',
+      problem:'Generación de reportes mensuales manualmente: 4 horas por cliente, 240 horas al mes solo en compilar datos.',
+      metrics:[{num:'240h',label:'Horas/mes ahorradas'},{num:'×3',label:'Capacidad de clientes'}],
+      quote:'"Lo que antes me tomaba toda la última semana del mes, ahora corre solo cada noche."',
+      author:'Contador titular' },
+    { category:'blindaje', industry:'Startup SaaS', location:'Querétaro', tag:'Blindaje legal',
+      name:'SaaS pre-seed cerrando *contratos*',
+      problem:'A punto de cerrar un cliente enterprise, sin NDA, sin contrato de prestación de servicios, sin aviso de privacidad.',
+      metrics:[{num:'5',label:'Documentos blindados'},{num:'$180k',label:'Contrato cerrado MXN'}],
+      quote:'"Sin esos contratos no firmábamos nada. Logidma nos dio el blindaje en 4 días."',
+      author:'CEO & cofundador' },
+    { category:'automatizacion', industry:'Clínica dental', location:'León', tag:'Automatización',
+      name:'Clínica con *citas dispersas* en 3 canales',
+      problem:'Citas en WhatsApp, llamadas, Instagram. Recordatorios manuales. 18% de no-shows mensual.',
+      metrics:[{num:'−68%',label:'No-shows'},{num:'+22%',label:'Citas confirmadas'}],
+      quote:'"Los recordatorios automáticos cambiaron el juego. Ya no pierdo dinero en sillones vacíos."',
+      author:'Director clínico' },
+    { category:'workspace', industry:'Agencia creativa', location:'Puebla', tag:'Workspace',
+      name:'Agencia con *freelancers* rotando cada mes',
+      problem:'Cada nuevo freelance necesitaba acceso a archivos, calendarios, herramientas. Onboarding tomaba 3 días.',
+      metrics:[{num:'2h',label:'Onboarding nuevo'},{num:'100%',label:'Permisos auditados'}],
+      quote:'"Cuando alguien sale del equipo, en 5 minutos cierro todos sus accesos."',
+      author:'Productora ejecutiva' }
+  ];
+
+  const grid = document.getElementById('casesGrid');
+  let allCases = [];
+
+  function renderAll(data) {
+    allCases = data;
+    grid.innerHTML = data.length
+      ? data.map((d, i) => renderCase(d.id || i, d, i)).join('')
+      : '<p class="cases-empty">Próximamente más casos de éxito.</p>';
+    bindFilters();
+  }
+
+  function bindFilters() {
+    const filters = document.querySelectorAll('.filter');
+    filters.forEach(btn => {
+      btn.addEventListener('click', () => {
+        filters.forEach(f => { f.classList.remove('is-active'); f.setAttribute('aria-selected','false'); });
+        btn.classList.add('is-active'); btn.setAttribute('aria-selected','true');
+        const cat = btn.dataset.filter;
+        let visible = 0;
+        grid.querySelectorAll('.case').forEach(c => {
+          const show = cat === 'all' || c.dataset.cat === cat;
+          c.hidden = !show;
+          if (show) visible++;
+        });
+        if (!visible) {
+          let empty = grid.querySelector('.cases-empty');
+          if (!empty) { empty = document.createElement('p'); empty.className = 'cases-empty'; grid.appendChild(empty); }
+          empty.textContent = 'No hay casos en esta categoría todavía.';
+        } else {
+          const empty = grid.querySelector('.cases-empty');
+          if (empty) empty.remove();
+        }
+        track('casos_filter', { categoria: cat, visibles: visible });
       });
-      track('casos_filter', { categoria: cat, visibles: visible });
     });
-  });
+  }
+
+  // Cargar desde Firebase; usar fallback si la colección está vacía
+  try {
+    const snap = await getDocs(query(
+      collection(db, 'casos_exito'),
+      where('visible', '==', true),
+      orderBy('createdAt', 'desc')
+    ));
+    const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    renderAll(docs.length ? docs : FALLBACK);
+  } catch {
+    renderAll(FALLBACK);
+  }
 
   trackPageView('/casos');
 </script>
