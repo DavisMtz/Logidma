@@ -3661,7 +3661,9 @@ import {
   signOut,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
-  signInWithPopup
+  signInWithPopup,
+  signInWithRedirect,
+  getRedirectResult
 } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
 const analytics      = getAnalytics(app);
@@ -3748,15 +3750,19 @@ function setLoading(on) {
 /* ── Firebase error → español ── */
 function errMsg(code) {
   return ({
-    'auth/invalid-email':          'Correo inválido.',
-    'auth/user-not-found':         'No existe una cuenta con ese correo.',
-    'auth/wrong-password':         'Contraseña incorrecta.',
-    'auth/invalid-credential':     'Correo o contraseña incorrectos.',
-    'auth/email-already-in-use':   'Ese correo ya está registrado.',
-    'auth/weak-password':          'La contraseña debe tener al menos 6 caracteres.',
-    'auth/too-many-requests':      'Demasiados intentos. Espera un momento.',
-    'auth/popup-closed-by-user':   null,
-    'auth/network-request-failed': 'Sin conexión. Verifica tu red.',
+    'auth/invalid-email':              'Correo inválido.',
+    'auth/user-not-found':             'No existe una cuenta con ese correo.',
+    'auth/wrong-password':             'Contraseña incorrecta.',
+    'auth/invalid-credential':         'Correo o contraseña incorrectos.',
+    'auth/email-already-in-use':       'Ese correo ya está registrado.',
+    'auth/weak-password':              'La contraseña debe tener al menos 6 caracteres.',
+    'auth/too-many-requests':          'Demasiados intentos. Espera un momento.',
+    'auth/popup-closed-by-user':       null,
+    'auth/cancelled-popup-request':    null,
+    'auth/popup-blocked':              null,
+    'auth/network-request-failed':     'Sin conexión. Verifica tu red.',
+    'auth/unauthorized-domain':        'Este dominio no está autorizado. Contacta al administrador.',
+    'auth/operation-not-allowed':      'Inicio de sesión con Google no está habilitado.',
   })[code] || 'Ocurrió un error. Inténtalo de nuevo.';
 }
 
@@ -3786,9 +3792,26 @@ googleSignIn && googleSignIn.addEventListener('click', async () => {
     await signInWithPopup(auth, googleProvider);
     closeModal();
   } catch (err) {
-    const msg = errMsg(err.code);
-    if (msg) showErr(msg);
+    if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-cancelled') {
+      try {
+        await signInWithRedirect(auth, googleProvider);
+      } catch (redirectErr) {
+        const msg = errMsg(redirectErr.code);
+        if (msg) showErr(msg);
+      }
+    } else {
+      const msg = errMsg(err.code);
+      if (msg) showErr(msg);
+    }
   }
+});
+
+/* ── Capture redirect result on page load ── */
+getRedirectResult(auth).then(result => {
+  if (result && result.user) closeModal();
+}).catch(err => {
+  const msg = errMsg(err.code);
+  if (msg) showErr(msg);
 });
 
 /* ── Logout ── */

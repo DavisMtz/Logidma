@@ -1031,7 +1031,7 @@ td .truncate{
 ════════════════════════════════════════════════════ -->
 <script type="module">
 import { auth, db, stor, gProv } from './assets/js/firebase-init.js';
-import { onAuthStateChanged, signInWithPopup, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { onAuthStateChanged, signInWithPopup, signInWithRedirect, getRedirectResult, signOut } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 import {
   collection, getDocs, addDoc, updateDoc, deleteDoc, doc,
   query, orderBy, serverTimestamp, getDoc, setDoc
@@ -1116,9 +1116,19 @@ function toast(msg, type='info') {
 
 /* ── AUTH ───────────────────────────────────────── */
 document.getElementById('btnSignIn').addEventListener('click', async ()=>{
-  try { await signInWithPopup(auth, gProv); }
-  catch(e){ toast('Error al iniciar sesión: '+e.message,'error'); }
+  try {
+    await signInWithPopup(auth, gProv);
+  } catch(e) {
+    if (e.code === 'auth/popup-blocked' || e.code === 'auth/popup-cancelled') {
+      try { await signInWithRedirect(auth, gProv); }
+      catch(re){ toast('Error al iniciar sesión: '+re.message,'error'); }
+    } else {
+      toast('Error al iniciar sesión: '+e.message,'error');
+    }
+  }
 });
+
+getRedirectResult(auth).catch(e=>{ if(e&&e.message) toast('Error al iniciar sesión: '+e.message,'error'); });
 ['btnSideLogout','btnTopLogout','btnDeniedLogout'].forEach(id=>{
   const el = document.getElementById(id);
   if(el) el.addEventListener('click', ()=>signOut(auth));
