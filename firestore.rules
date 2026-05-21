@@ -1,0 +1,73 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(uid) {
+      return isSignedIn() && request.auth.uid == uid;
+    }
+
+    function notSpam() {
+      return request.time > resource.data.createdAt + duration.value(2, 's');
+    }
+
+    // ── POSTS (galería pública) ──
+    match /posts/{postId} {
+      allow read: if true;
+      allow create: if isSignedIn()
+                    && request.resource.data.userId == request.auth.uid
+                    && request.resource.data.description is string
+                    && request.resource.data.description.size() <= 500
+                    && request.resource.data.likesCount == 0;
+      allow update: if isOwner(resource.data.userId)
+                    || (isSignedIn()
+                        && request.resource.data.diff(resource.data).affectedKeys()
+                           .hasOnly(['likesCount', 'commentsCount']));
+      allow delete: if isOwner(resource.data.userId);
+
+      // Likes: un documento por usuario
+      match /likes/{userId} {
+        allow read: if isSignedIn();
+        allow write: if isOwner(userId);
+      }
+
+      // Comentarios
+      match /comments/{commentId} {
+        allow read: if true;
+        allow create: if isSignedIn()
+                      && request.resource.data.userId == request.auth.uid
+                      && request.resource.data.text is string
+                      && request.resource.data.text.size() > 0
+                      && request.resource.data.text.size() <= 500;
+        allow update: if isOwner(resource.data.userId);
+        allow delete: if isOwner(resource.data.userId);
+      }
+    }
+
+    // ── CHALLENGES (retos mensuales) ──
+    // Solo lectura desde el cliente. Edición desde consola/admin.
+    match /challenges/{challengeId} {
+      allow read: if true;
+      allow write: if false;
+    }
+
+    // ── USERS (perfil opcional) ──
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow write: if isOwner(userId);
+
+      match /projects/{projectId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // Bloqueo por defecto a cualquier otra ruta
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

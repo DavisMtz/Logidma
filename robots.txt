@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /proyectos.html
+Disallow: /galeria.html
+
+Sitemap: https://logidma.com/sitemap.xml

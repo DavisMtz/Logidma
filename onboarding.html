@@ -5,7 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <meta name="theme-color" content="#0a0908"/>
 <title>Construye tu sistema — Logidma</title>
+<meta name="description" content="Cuéntanos tu idea paso a paso. En minutos construimos un sistema a medida: web, automatización y blindaje legal. La lógica, sistematizada." />
+<meta name="author" content="Logidma" />
+
+<link rel="canonical" href="https://logidma.com/onboarding.html" />
+<link rel="manifest" href="/manifest.json" />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:site_name" content="Logidma" />
+<meta property="og:title" content="Construye tu sistema — Logidma" />
+<meta property="og:description" content="Cuéntanos tu idea paso a paso. Construimos web, automatización y blindaje legal a medida." />
+<meta property="og:url" content="https://logidma.com/onboarding.html" />
+<meta property="og:locale" content="es_MX" />
+<meta property="og:image" content="https://raw.githubusercontent.com/DavisMtz/logidma-assets/main/og-cover.png" />
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Construye tu sistema con Logidma" />
+<meta name="twitter:description" content="De la idea al sistema, en minutos." />
+<meta name="twitter:image" content="https://raw.githubusercontent.com/DavisMtz/logidma-assets/main/og-cover.png" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="preconnect" href="https://firebasestorage.googleapis.com">
+<link rel="preconnect" href="https://script.google.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@300;400;500;700&family=Manrope:wght@200;300;400;500;700&display=swap" rel="stylesheet">
 <style>
@@ -1719,11 +1743,20 @@ $('btnContacto').addEventListener('click',async()=>{
 
 /* ── SHEETS ── */
 const SURL='https://script.google.com/macros/s/AKfycbyeHTmABdGjckQ04nPUbMh0KblMNbXXVa3lq_-UzJhEsiHx4oPvFdRgM6gvLtpZuCGV/exec';
+function genTrackId(){
+  const ts=Date.now().toString(36).toUpperCase();
+  const rand=Math.random().toString(36).slice(2,6).toUpperCase();
+  return 'LGD-'+ts+'-'+rand;
+}
+s.trackId=s.trackId||genTrackId();
 async function sendSheets(){
   try{
     await fetch(SURL,{
       method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},
       body:JSON.stringify({
+        fecha:new Date().toLocaleString('es-MX',{timeZone:'America/Mexico_City'}),
+        trackId:s.trackId,
+        origen:'onboarding',
         nombre:s.nombre,proyecto:s.proyecto,giro:s.giro,
         rutaElegida:s.rutaElegida,estilo:s.estilo,publico:s.publico,
         proposito:s.proposito,dominio:s.dominio,colores:s.colores,
@@ -1747,7 +1780,64 @@ window.finish=()=>{
   const p=$('stagePill');if(p){p.textContent='Completado';p.className='ob-nav__stage-pill active';}
   $('successScreen').style.display='block';
   window.scrollTo({top:0,behavior:'smooth'});
+  // Limpiar borrador local — el flujo terminó
+  try{ localStorage.removeItem('logidma:onboarding'); }catch(e){}
+  // Continuar al funnel: página de gracias con datos para personalización
+  const qp=new URLSearchParams({nombre:s.nombre||'',id:s.trackId||''});
+  setTimeout(()=>{ window.location.href='gracias.html?'+qp.toString(); }, 2200);
 };
+
+/* ── PRE-FILL DESDE URL Y BORRADOR LOCAL ── */
+(function initFromContext(){
+  const LS_KEY='logidma:onboarding';
+  // 1) Restaurar borrador previo si existe
+  try{
+    const draft=JSON.parse(localStorage.getItem(LS_KEY)||'null');
+    if(draft && typeof draft==='object'){
+      ['nombre','proyecto','giro','rutaElegida','estilo','publico','proposito','dominio','contexto','procesos','stack','correo','telefono','trackId'].forEach(k=>{
+        if(typeof draft[k]==='string' && draft[k]) s[k]=draft[k];
+      });
+    }
+  }catch(e){}
+
+  // 2) Override con query string (UTM / pre-fill desde landing)
+  const qs=new URLSearchParams(location.search);
+  const SAFE=/^[\w\s\-.,áéíóúñÁÉÍÓÚÑ@()]{1,200}$/i;
+  const RUTAS={'web':'web','automatizacion':'auto','auto':'auto','workspace':'auto','blindaje':'auto'};
+  const ruta=qs.get('servicio');
+  if(ruta && RUTAS[ruta.toLowerCase()]) s.rutaElegida=RUTAS[ruta.toLowerCase()];
+  ['nombre','proyecto','giro'].forEach(k=>{
+    const v=qs.get(k);
+    if(v && SAFE.test(v)) s[k]=v.slice(0,150);
+  });
+
+  // 3) Inyectar valores en inputs si ya existen en el DOM
+  const map={nombre:'inputNombre',proyecto:'inputProyecto',giro:'inputGiro'};
+  Object.entries(map).forEach(([k,id])=>{
+    const el=document.getElementById(id);
+    if(el && s[k] && !el.value){ el.value=s[k]; }
+  });
+
+  // 4) Auto-guardado del borrador (debounced)
+  let saveT;
+  function saveDraft(){
+    clearTimeout(saveT);
+    saveT=setTimeout(()=>{
+      try{
+        const snap={};
+        ['nombre','proyecto','giro','rutaElegida','estilo','publico','proposito','dominio','contexto','procesos','stack','correo','telefono','trackId'].forEach(k=>{snap[k]=s[k]||'';});
+        localStorage.setItem(LS_KEY,JSON.stringify(snap));
+      }catch(e){}
+    },350);
+  }
+  document.addEventListener('input',saveDraft,{capture:true,passive:true});
+  document.addEventListener('change',saveDraft,{capture:true,passive:true});
+  document.addEventListener('click',e=>{
+    if(e.target && (e.target.matches('.ob-suggestion')||e.target.matches('.ob-starter')||e.target.matches('[data-step-next]'))){
+      saveDraft();
+    }
+  },{capture:true,passive:true});
+})();
 
 /* ── INIT ── */
 buildSegments();
