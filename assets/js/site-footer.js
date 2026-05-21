@@ -18,6 +18,7 @@ const SECTIONS = [
     title: 'Empresa',
     links: [
       { href: '/acerca-de.html', label: 'Acerca de DMA' },
+      { href: '/blog.html', label: 'Blog' },
       { href: '/onboarding.html', label: 'Construir sistema' },
       { href: '/cliente.html', label: 'Panel de cliente' },
       { href: '/galeria.html', label: 'Galería comunitaria' }

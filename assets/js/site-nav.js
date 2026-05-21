@@ -15,6 +15,7 @@ const ITEMS = [
   { href: '/cotizador.html',  label: 'Cotizador' },
   { href: '/casos.html',      label: 'Casos' },
   { href: '/recursos.html',   label: 'Recursos' },
+  { href: '/blog.html',       label: 'Blog' },
   { href: '/acerca-de.html',  label: 'Acerca' }
 ];
 
