@@ -1324,6 +1324,13 @@ nav,main{position:relative;z-index:2;}
     <div class="ob-error" id="errTel">Ingresa un número de teléfono.</div>
   </div>
 
+  <!-- Honeypot anti-bot: invisible para humanos -->
+  <div style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;" aria-hidden="true">
+    <label>No llenar este campo
+      <input type="text" name="empresa_url" id="ob-honey" tabindex="-1" autocomplete="off" />
+    </label>
+  </div>
+
   <div class="ob-actions">
     <button class="ob-btn ob-btn--primary" id="btnContacto">Enviar información →</button>
     <button class="ob-back" onclick="goStep('resumen',true)">← Regresar</button>
@@ -1742,6 +1749,10 @@ $('btnResumen').addEventListener('click',()=>goStep('contacto'));
 
 /* ── CONTACTO ── */
 $('btnContacto').addEventListener('click',async()=>{
+  // Honeypot: si está lleno, fingir éxito sin enviar nada
+  const honey=$('ob-honey');
+  if(honey && honey.value.trim()!==''){ goStep('portal'); return; }
+
   const co=$('inputCorreo').value.trim(),te=$('inputTel').value.trim();
   const re=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   let ok=true;
@@ -1857,5 +1868,15 @@ window.finish=()=>{
 buildSegments();
 updateProgress();
 </script>
+
+<!-- PWA: registro de service worker -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function(){
+      navigator.serviceWorker.register('/sw.js').catch(function(){});
+    });
+  }
+</script>
+
 </body>
 </html>
