@@ -12,6 +12,21 @@
 <link rel="canonical" href="https://logidma.com/" />
 <link rel="manifest" href="/manifest.json" />
 
+<!-- Content Security Policy: permite los servicios actuales (Firebase, Google Fonts, Apps Script, LinkedIn) -->
+<meta http-equiv="Content-Security-Policy" content="
+  default-src 'self';
+  script-src 'self' 'unsafe-inline' https://www.gstatic.com https://platform.linkedin.com https://www.googletagmanager.com https://plausible.io;
+  style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+  font-src 'self' https://fonts.gstatic.com;
+  img-src 'self' data: blob: https:;
+  connect-src 'self' https://*.googleapis.com https://*.firebaseio.com https://firebasestorage.googleapis.com https://script.google.com https://script.googleusercontent.com https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://stats.g.doubleclick.net https://www.google.com https://plausible.io;
+  frame-src https://accounts.google.com https://*.firebaseapp.com https://www.linkedin.com https://platform.linkedin.com;
+  media-src 'self' https:;
+  object-src 'none';
+  base-uri 'self';
+  form-action 'self' https://script.google.com;
+">
+
 <!-- Open Graph -->
 <meta property="og:type" content="website" />
 <meta property="og:site_name" content="Logidma" />
@@ -1182,6 +1197,56 @@
     letter-spacing: 1px;
     min-height: 14px;
     display: block;
+  }
+
+  /* Newsletter opt-in */
+  .pform__optin{
+    grid-column: 1 / -1;
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 14px 18px;
+    margin-top: 8px;
+    background: rgba(22,20,15,.5);
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    cursor: pointer;
+    transition: border-color .3s var(--e-expo), background .3s var(--e-expo);
+    user-select: none;
+  }
+  .pform__optin:hover{
+    border-color: var(--line-strong);
+    background: rgba(22,20,15,.7);
+  }
+  .pform__optin input{
+    appearance: none; -webkit-appearance: none;
+    width: 18px; height: 18px;
+    margin: 1px 0 0;
+    border: 1.5px solid var(--line-strong);
+    border-radius: 4px;
+    background: var(--bg);
+    cursor: pointer;
+    flex-shrink: 0;
+    position: relative;
+    transition: all .3s var(--e-expo);
+  }
+  .pform__optin input:checked{
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+  .pform__optin input:checked::after{
+    content:""; position:absolute;
+    left: 5px; top: 1px;
+    width: 5px; height: 10px;
+    border: solid #0a0908;
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg);
+  }
+  .pform__optin-txt{
+    font-size: 13px; line-height: 1.5;
+    color: var(--cream-soft);
+  }
+  .pform__optin-txt strong{
+    color: var(--cream); font-weight: 500;
+    display: block; margin-bottom: 2px;
   }
 
   .pform__bottom{
@@ -2897,6 +2962,14 @@
         <span class="pform__counter" id="ideaCounter">0 chars · mínimo 10</span>
       </div>
 
+      <label class="pform__optin" for="pf-newsletter">
+        <input type="checkbox" id="pf-newsletter" name="newsletter" value="1" />
+        <span class="pform__optin-txt">
+          <strong>Recibir notas ocasionales de Logidma</strong>
+          Tips de automatización, casos de estudio y novedades. Sin spam. Te puedes dar de baja cuando quieras.
+        </span>
+      </label>
+
       <div class="pform__status" id="pformStatus" role="status" aria-live="polite"></div>
 
       <div class="pform__bottom">
@@ -3484,7 +3557,10 @@
         email: formData.get('email') || '',
         telefono: formData.get('telefono') || '',
         correo: formData.get('correo') || '',
-        idea: formData.get('idea') || ''
+        idea: formData.get('idea') || '',
+        newsletter: formData.get('newsletter') === '1' ? 'si' : 'no',
+        utm_source: new URLSearchParams(location.search).get('utm_source') || '',
+        utm_campaign: new URLSearchParams(location.search).get('utm_campaign') || ''
       };
 
       if (!validate(data)) {

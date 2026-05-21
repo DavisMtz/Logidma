@@ -15,11 +15,13 @@ Sitio estático multi-página servido desde GitHub Pages, con autenticación y d
 | Ruta | Propósito |
 |---|---|
 | `index.html` | Landing — narrativa, oferta, formulario de contacto, modal de auth |
+| `servicios.html` | Catálogo público con 3 rutas (Workspace, Automatización, Blindaje) y CTAs precargando onboarding |
 | `acerca-de.html` | Historia, filosofía, equipo (DMA) |
-| `onboarding.html` | Flujo multi-paso para construir tu sistema |
+| `onboarding.html` | Flujo multi-paso para construir tu sistema (acepta prefill por `?nombre=&proyecto=&servicio=`) |
+| `cliente.html` | Panel privado para clientes autenticados (proyectos, hitos, soporte) |
 | `proyectos.html` | Área de proyectos (requiere autenticación) |
 | `galeria.html` | Galería comunitaria con retos mensuales (requiere autenticación) |
-| `gracias.html` | Confirmación post-envío con próximos pasos |
+| `gracias.html` | Confirmación post-envío con próximos pasos, ID de seguimiento y WhatsApp personalizado |
 | `404.html` | Página de error con la estética del sitio |
 
 ---
@@ -61,12 +63,21 @@ Luego abre `http://localhost:8000`.
 ```
 .
 ├── index.html              # Landing
+├── servicios.html          # Catálogo de servicios
 ├── acerca-de.html
 ├── onboarding.html
+├── cliente.html            # Panel autenticado
 ├── proyectos.html
 ├── galeria.html
 ├── gracias.html            # Confirmación post-submit
 ├── 404.html
+├── assets/
+│   ├── js/
+│   │   ├── firebase-init.js   # Init único de Firebase
+│   │   ├── sanitize.js        # escHtml, escAttr
+│   │   ├── forms.js           # submitToAppsScript, genTrackId
+│   │   └── analytics.js       # track(), trackPageView()
+│   └── css/
 ├── sitemap.xml
 ├── robots.txt
 ├── manifest.json
@@ -75,6 +86,20 @@ Luego abre `http://localhost:8000`.
 ├── storage.rules           # Reglas de seguridad de Storage
 ├── CNAME                   # Dominio: logidma.com
 └── README.md
+```
+
+### Módulos JavaScript compartidos (`assets/js/`)
+
+Las nuevas páginas (`servicios.html`, `cliente.html`) usan módulos ES6 importables.
+Las páginas legacy (`index.html`, `onboarding.html`, etc.) mantienen su Firebase config
+inline para no romper su flujo actual — la consolidación es un refactor futuro.
+
+```javascript
+// Ejemplo de uso en una nueva página
+import { auth, db } from './assets/js/firebase-init.js';
+import { escHtml } from './assets/js/sanitize.js';
+import { submitToAppsScript, genTrackId } from './assets/js/forms.js';
+import { track } from './assets/js/analytics.js';
 ```
 
 ---
