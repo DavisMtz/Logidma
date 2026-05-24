@@ -9,6 +9,7 @@
  */
 
 import { escHtml } from './sanitize.js';
+import { initGSAP } from './gsap-init.js';
 
 const ITEMS = [
   { href: '/servicios.html',  label: 'Servicios' },
@@ -90,39 +91,63 @@ function bindMobile(root){
   const mobile = root.querySelector('#snavMobile');
   if (!burger || !mobile) return;
 
-  function open(){
+  let isOpen = false;
+
+  async function open(){
+    if (isOpen) return;
+    isOpen = true;
     burger.classList.add('is-open');
-    mobile.classList.add('is-open');
     burger.setAttribute('aria-expanded', 'true');
     mobile.setAttribute('aria-hidden', 'false');
     document.body.style.overflow = 'hidden';
+
+    const { gsap } = await initGSAP();
+    const items = mobile.querySelectorAll('.snav__mlink, .snav__mcta, .snav__mcontact');
+    mobile.style.pointerEvents = 'auto';
+
+    gsap.timeline()
+      .to(mobile,  { opacity: 1, duration: 0.38, ease: 'expo.out' })
+      .from(items, { opacity: 0, y: 22, duration: 0.55, stagger: 0.06, ease: 'expo.out' }, 0.1);
   }
-  function close(){
+
+  async function close(){
+    if (!isOpen) return;
+    isOpen = false;
     burger.classList.remove('is-open');
-    mobile.classList.remove('is-open');
     burger.setAttribute('aria-expanded', 'false');
     mobile.setAttribute('aria-hidden', 'true');
-    document.body.style.overflow = '';
+
+    const { gsap } = await initGSAP();
+    gsap.to(mobile, {
+      opacity: 0,
+      duration: 0.28,
+      ease: 'power2.in',
+      onComplete: () => {
+        mobile.style.pointerEvents = 'none';
+        document.body.style.overflow = '';
+      }
+    });
   }
-  burger.addEventListener('click', () => {
-    burger.classList.contains('is-open') ? close() : open();
-  });
-  mobile.addEventListener('click', e => {
-    if (e.target === mobile) close();
-  });
+
+  burger.addEventListener('click', () => isOpen ? close() : open());
+  mobile.addEventListener('click', e => { if (e.target === mobile) close(); });
   document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && mobile.classList.contains('is-open')) close();
+    if (e.key === 'Escape' && isOpen) close();
   });
   mobile.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
 }
 
-export function mountNav(targetId = 'siteNav'){
+export async function mountNav(targetId = 'siteNav'){
   ensureStyle();
   const target = document.getElementById(targetId);
   if (!target) return;
   target.classList.add('snav');
   target.innerHTML = buildHtml();
   bindMobile(target);
+
+  // Animate nav entrance with GSAP
+  const { gsap } = await initGSAP();
+  gsap.from(target, { opacity: 0, y: -14, duration: 0.9, ease: 'expo.out', delay: 0.15 });
 }
 
 // Auto-mount si hay un elemento esperándolo
