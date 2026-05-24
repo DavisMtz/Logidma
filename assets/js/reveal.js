@@ -1,68 +1,70 @@
 /**
- * reveal.js — Scroll reveal cinemático compartido.
+ * reveal.js — Scroll reveal cinemático con GSAP ScrollTrigger.
  *
  * Cualquier elemento con [data-reveal] se anima al entrar al viewport.
- * Variantes opcionales:
+ * Variantes:
  *   data-reveal="up"     (default — translateY)
- *   data-reveal="left"   (translateX desde la izquierda)
- *   data-reveal="right"  (translateX desde la derecha)
- *   data-reveal="zoom"   (scale up)
+ *   data-reveal="left"   (translateX)
+ *   data-reveal="right"  (translateX)
+ *   data-reveal="zoom"   (scale + translateY)
  *   data-reveal="fade"   (solo opacity)
  *   data-reveal-delay="120"  (ms de delay)
  *
+ * Grupos: [data-reveal-group] anima a sus hijos con stagger.
  * Respeta prefers-reduced-motion.
  */
 
-const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+import { initGSAP } from './gsap-init.js';
 
-function ensureStyle(){
-  if (document.getElementById('reveal-style')) return;
-  const style = document.createElement('style');
-  style.id = 'reveal-style';
-  style.textContent = `
-    [data-reveal]{
-      opacity: 0;
-      transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
-      will-change: opacity, transform;
-    }
-    [data-reveal="up"]    { transform: translateY(36px); }
-    [data-reveal="left"]  { transform: translateX(-36px); }
-    [data-reveal="right"] { transform: translateX(36px); }
-    [data-reveal="zoom"]  { transform: scale(.94); }
-    [data-reveal="fade"]  { transform: none; }
-    [data-reveal].is-revealed{
-      opacity: 1;
-      transform: none;
-    }
-    @media (prefers-reduced-motion: reduce){
-      [data-reveal]{ opacity: 1 !important; transform: none !important; transition: none !important; }
-    }
-  `;
-  document.head.appendChild(style);
+const REDUCE = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+function getFromVars(dir) {
+  if (dir === 'left')  return { x: -44 };
+  if (dir === 'right') return { x:  44 };
+  if (dir === 'zoom')  return { scale: 0.93, y: 18 };
+  if (dir === 'fade')  return {};
+  return { y: 44 };
 }
 
-function init(){
-  if (reduce) {
-    document.querySelectorAll('[data-reveal]').forEach(el => el.classList.add('is-revealed'));
+async function init() {
+  const els   = document.querySelectorAll('[data-reveal]');
+  const groups = document.querySelectorAll('[data-reveal-group]');
+  if (!els.length && !groups.length) return;
+
+  if (REDUCE) {
+    els.forEach(el => { el.style.opacity = '1'; el.style.transform = 'none'; });
     return;
   }
-  ensureStyle();
 
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting){
-        const el = entry.target;
-        const delay = parseInt(el.dataset.revealDelay || '0', 10);
-        setTimeout(() => el.classList.add('is-revealed'), delay);
-        io.unobserve(el);
-      }
+  const { gsap, ScrollTrigger } = await initGSAP();
+
+  els.forEach(el => {
+    const dir   = el.dataset.reveal || 'up';
+    const delay = parseInt(el.dataset.revealDelay || '0', 10) / 1000;
+
+    gsap.from(el, {
+      opacity: 0,
+      duration: 1,
+      delay,
+      ...getFromVars(dir),
+      scrollTrigger: { trigger: el, start: 'top 88%', once: true }
     });
-  }, { threshold: 0.12, rootMargin: '0px 0px -80px 0px' });
+  });
 
-  document.querySelectorAll('[data-reveal]').forEach(el => io.observe(el));
+  groups.forEach(group => {
+    const items = Array.from(group.children);
+    if (!items.length) return;
+    gsap.from(items, {
+      opacity: 0,
+      y: 32,
+      duration: 0.85,
+      stagger: 0.1,
+      scrollTrigger: { trigger: group, start: 'top 85%', once: true }
+    });
+  });
 }
 
-if (document.readyState === 'loading'){
+if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', init);
 } else {
   init();

@@ -15,7 +15,7 @@
 <!-- Content Security Policy: permite los servicios actuales (Firebase, Google Fonts, Apps Script, LinkedIn) -->
 <meta http-equiv="Content-Security-Policy" content="
   default-src 'self';
-  script-src 'self' 'unsafe-inline' https://www.gstatic.com https://platform.linkedin.com https://www.googletagmanager.com https://plausible.io;
+  script-src 'self' 'unsafe-inline' https://www.gstatic.com https://platform.linkedin.com https://www.googletagmanager.com https://plausible.io https://cdn.jsdelivr.net;
   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
   font-src 'self' https://fonts.gstatic.com;
   img-src 'self' data: blob: https:;
@@ -235,13 +235,10 @@
       linear-gradient(rgba(196,255,58,0.055) 1px, transparent 1px),
       linear-gradient(90deg, rgba(196,255,58,0.055) 1px, transparent 1px);
     background-size: 64px 64px;
-    opacity: 0;
     animation: iGridIn 1s var(--e-expo) 0.2s forwards;
+    opacity: 0;
   }
-  @keyframes iGridIn{
-    from{ opacity: 0; }
-    to{ opacity: 1; }
-  }
+  @keyframes iGridIn{ from{ opacity: 0; } to{ opacity: 1; } }
 
   /* Vignette */
   .intro::before{
@@ -285,7 +282,7 @@
     text-align:center; padding:0 24px;
   }
 
-  /* Logo — comet from upper-right to center */
+  /* Logo — comet from upper-right to center (CSS keyframe para carga inmediata) */
   .intro__logo-wrap{
     width: clamp(90px, 18vw, 160px);
     height: clamp(90px, 18vw, 160px);
@@ -318,6 +315,7 @@
     from{ opacity:0; transform:translateY(28px); }
     to  { opacity:1; transform:translateY(0); }
   }
+  /* Tagline + skip: mantenemos CSS para carga rápida del intro */
 
   /* Tagline */
   .intro__tagline{
@@ -437,16 +435,16 @@
   .hero__label::before{
     content:""; width:48px; height:1px; background: var(--accent);
     transform-origin: left;
-    animation: lineGrow 1.2s var(--e-expo) 0.2s both;
+    transform: scaleX(0); /* GSAP activa con .anim-ready */
+  }
+  .hero__label.anim-ready::before{
+    animation: lineGrow 1.2s var(--e-expo) 0.1s both;
   }
   @keyframes lineGrow{
     from{ transform: scaleX(0); }
     to{ transform: scaleX(1); }
   }
-  .hero__label span{
-    opacity: 0;
-    animation: fadeIn 0.8s var(--e-expo) 0.6s both;
-  }
+  .hero__label span{ opacity: 0; } /* GSAP anima: heroTl */
 
   .hero__title{
     font-family: 'Instrument Serif', serif;
@@ -466,12 +464,7 @@
   }
   .hero__title .word > .inner{
     display: inline-block;
-    transform: translateY(110%);
-    animation: wordUp 1.1s var(--e-expo) forwards;
-    animation-delay: var(--d, 0s);
-  }
-  @keyframes wordUp{
-    to{ transform: translateY(0); }
+    /* Estado inicial para GSAP: yPercent:110 se aplica via gsap.from() */
   }
   .hero__title em{
     font-style: italic;
@@ -487,7 +480,9 @@
     z-index:-1;
     transform: scaleX(0);
     transform-origin: left;
-    animation: hlGrow 1s var(--e-expo) 1.7s forwards;
+  }
+  .hero__title.anim-ready em::after{
+    animation: hlGrow 1s var(--e-expo) 0.8s forwards;
   }
   @keyframes hlGrow{
     to{ transform: scaleX(1); }
@@ -500,8 +495,7 @@
     max-width: 580px;
     line-height: 1.7;
     margin-top: 40px;
-    opacity: 0;
-    animation: fadeUp 1s var(--e-expo) 1.5s forwards;
+    opacity: 0; /* GSAP anima: heroTl */
   }
   .hero__sub strong{ color: var(--cream); font-weight: 500; }
 
@@ -509,8 +503,7 @@
     margin-top: 48px;
     display:flex; align-items:center; gap: clamp(12px, 2vw, 20px);
     flex-wrap: wrap;
-    opacity: 0;
-    animation: fadeUp 1s var(--e-expo) 1.8s forwards;
+    opacity: 0; /* GSAP anima: heroTl */
   }
   .tag{
     font-family: 'JetBrains Mono', monospace;
@@ -584,8 +577,7 @@
     letter-spacing: 3px;
     text-transform: uppercase;
     color: var(--muted);
-    opacity: 0;
-    animation: fadeIn 1s var(--e-expo) 2.2s forwards;
+    opacity: 0; /* GSAP anima: heroTl */
   }
   .hero__scroll::before{
     content:"";
@@ -1376,7 +1368,7 @@
   .hero__ctas{
     display:flex; align-items:center; gap:clamp(12px,2vw,20px);
     flex-wrap:wrap; margin-top:48px;
-    opacity:0; animation:fadeUp 1s var(--e-expo) 1.8s forwards;
+    opacity:0; /* GSAP anima: heroTl */
   }
   .btn-cta{
     font-family:'JetBrains Mono',monospace;
@@ -2567,11 +2559,7 @@
   }
   .nc-word .nc-inner{
     display:inline-block;
-    transform:translateY(110%);
-    transition:transform .75s var(--e-expo) calc(var(--wi,0) * .07s);
-  }
-  .nc-bloque.is-active .nc-word .nc-inner{
-    transform:translateY(0);
+    /* GSAP anima: gsap.from(words, { yPercent:105, stagger:0.045 }) */
   }
   .nc-cuerpo{
     font-family:'Manrope',sans-serif;
@@ -3256,20 +3244,38 @@
 
 <button class="totop" id="totop" aria-label="Volver arriba">↑</button>
 
+<!-- GSAP + ScrollTrigger — motor de animaciones cinemáticas -->
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
 <script>
 (function(){
   'use strict';
+  gsap.registerPlugin(ScrollTrigger);
 
   // INTRO ANIME — comet logo + particle explosion
   const intro      = document.getElementById('intro');
   const introSkip  = document.getElementById('introSkip');
   const introImpact = document.getElementById('introImpact');
 
+  // HERO entrance — GSAP timeline cinemático (se lanza al cerrar el intro)
+  const heroTl = gsap.timeline({ paused: true })
+    .from('.hero__label span',         { opacity: 0, duration: 0.8, ease: 'expo.out' },                    0.1)
+    .from('.hero__title .word .inner', { yPercent: 110, duration: 1.1, ease: 'expo.out', stagger: 0.09 }, 0.26)
+    .from('.hero__sub',                { opacity: 0, y: 28, duration: 1,   ease: 'expo.out' },            0.80)
+    .from('.hero__ctas',               { opacity: 0, y: 22, duration: 0.9, ease: 'expo.out' },            1.05)
+    .from('.hero__scroll',             { opacity: 0, duration: 0.8,        ease: 'expo.out' },             1.30);
+
   function endIntro(){
     if (!intro || intro.classList.contains('done')) return;
     intro.classList.add('done');
     document.body.classList.remove('is-loading');
     setTimeout(() => { if (intro) intro.style.display = 'none'; }, 1200);
+
+    // Lanzar hero entrance + activar animaciones de pseudo-elementos
+    heroTl.play();
+    document.querySelector('.hero__label')?.classList.add('anim-ready');
+    document.getElementById('heroTitle')?.classList.add('anim-ready');
   }
 
   function spawnParticles(){
@@ -3418,41 +3424,28 @@
       closeMobileMenu();
   });
 
-  // INTERSECTION OBSERVER
-  const io = new IntersectionObserver((entries) => {
-    entries.forEach(e => {
-      if (e.isIntersecting) {
-        e.target.classList.add('in');
-        io.unobserve(e.target);
-      }
+  // SCROLL REVEALS — GSAP ScrollTrigger (reemplaza IntersectionObserver)
+  document.querySelectorAll('.reveal').forEach(el => {
+    ScrollTrigger.create({
+      trigger: el, start: 'top 88%', once: true,
+      onEnter: () => el.classList.add('in')
     });
-  }, { threshold: 0.12 });
-  document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+  });
 
   const archPhoto = document.getElementById('archPhoto');
   if (archPhoto) {
-    const ioPhoto = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          archPhoto.classList.add('in');
-          ioPhoto.unobserve(archPhoto);
-        }
-      });
-    }, { threshold: 0.3 });
-    ioPhoto.observe(archPhoto);
+    ScrollTrigger.create({
+      trigger: archPhoto, start: 'top 72%', once: true,
+      onEnter: () => archPhoto.classList.add('in')
+    });
   }
 
   const pq = document.getElementById('pullquote');
   if (pq) {
-    const ioPq = new IntersectionObserver((entries) => {
-      entries.forEach(e => {
-        if (e.isIntersecting) {
-          pq.classList.add('in');
-          ioPq.unobserve(pq);
-        }
-      });
-    }, { threshold: 0.4 });
-    ioPq.observe(pq);
+    ScrollTrigger.create({
+      trigger: pq, start: 'top 64%', once: true,
+      onEnter: () => pq.classList.add('in')
+    });
   }
 
   // Detector de puntero fino (mouse) para activar efectos opcionales
@@ -3860,16 +3853,25 @@ watchAuth(user => {
     }).join(' ');
   });
 
-  var ncObserver = new IntersectionObserver(function(entries){
-    entries.forEach(function(e){
-      if(e.isIntersecting){
-        e.target.classList.add('is-active');
-        ncObserver.unobserve(e.target);
+  // Narrativa — GSAP ScrollTrigger con stagger cinemático en palabras
+  document.querySelectorAll('.nc-bloque').forEach(function(el){
+    var words = el.querySelectorAll('.nc-inner');
+    ScrollTrigger.create({
+      trigger: el,
+      start: 'top 62%',
+      once: true,
+      onEnter: function(){
+        el.classList.add('is-active');
+        gsap.from(words, {
+          opacity: 0,
+          yPercent: 105,
+          duration: 0.75,
+          stagger: 0.045,
+          ease: 'expo.out',
+          delay: 0.15
+        });
       }
     });
-  }, { threshold: 0.4 });
-  document.querySelectorAll('.nc-bloque').forEach(function(el){
-    ncObserver.observe(el);
   });
 })();
 </script>

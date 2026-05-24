@@ -1,6 +1,6 @@
 /**
  * page-transition.js — Transición entre páginas con el logo animado de Logidma.
- * Muestra el overlay del logo SVG durante 380ms antes de navegar.
+ * Muestra el overlay GSAP del logo SVG antes de navegar.
  *
  * Respeta prefers-reduced-motion: navega instantáneo si se prefiere.
  * Auto-skip: target=_blank, modificadores, anchors (#), mailto, tel, externos.
@@ -27,7 +27,7 @@ function isInternalNav(a) {
 }
 
 function triggerTransition(href) {
-  showLoading();
+  showLoading(); // fire-and-forget — GSAP starts immediately
   setTimeout(() => { window.location.href = href; }, DURATION);
 }
 
