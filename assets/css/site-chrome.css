@@ -15,12 +15,17 @@
   backdrop-filter: blur(16px) saturate(1.1);
   -webkit-backdrop-filter: blur(16px) saturate(1.1);
   border-bottom: 1px solid rgba(235, 229, 214, 0.08);
-  opacity: 0; /* GSAP anima la entrada */
+  opacity: 0;
+  transform: translateY(-12px);
+  animation: snavIn 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s forwards;
 }
 /* Cuando el mobile menu está abierto, el header debe ser transparente */
 .snav:has(.snav__mobile.is-open){
   background: transparent;
   border-bottom-color: transparent;
+}
+@keyframes snavIn{
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Scroll state — más opaca cuando el usuario hace scroll */
@@ -146,7 +151,8 @@
     radial-gradient(ellipse at 50% 0%, rgba(196,255,58,0.06) 0%, transparent 60%),
     radial-gradient(ellipse at 50% 100%, rgba(176,141,87,0.05) 0%, transparent 50%);
   opacity: 0;
-  pointer-events: none; /* GSAP controla opacity y pointer-events */
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex; align-items: center; justify-content: center;
   padding: 80px 24px 24px;
   overflow-y: auto;
@@ -179,7 +185,21 @@
   color: #ebe5d6;
   text-decoration: none;
   border-bottom: 1px solid rgba(235, 229, 214, 0.08);
+  opacity: 0;
+  transform: translateY(20px);
   transition: color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.snav__mobile.is-open .snav__mlink{
+  animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.snav__mobile.is-open .snav__mlink:nth-child(1){ animation-delay: 0.08s; }
+.snav__mobile.is-open .snav__mlink:nth-child(2){ animation-delay: 0.13s; }
+.snav__mobile.is-open .snav__mlink:nth-child(3){ animation-delay: 0.18s; }
+.snav__mobile.is-open .snav__mlink:nth-child(4){ animation-delay: 0.23s; }
+.snav__mobile.is-open .snav__mlink:nth-child(5){ animation-delay: 0.28s; }
+.snav__mobile.is-open .snav__mlink:nth-child(6){ animation-delay: 0.33s; }
+@keyframes snavMobileItem{
+  to { opacity: 1; transform: translateY(0); }
 }
 .snav__mlink:hover{ color: #c4ff3a; }
 .snav__mlink.is-active{ color: #c4ff3a; }
@@ -195,8 +215,13 @@
   font-family: 'Manrope', sans-serif;
   font-weight: 500;
   font-size: 15px;
+  opacity: 0;
+  transform: translateY(20px);
   transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
               box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.snav__mobile.is-open .snav__mcta{
+  animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.42s forwards;
 }
 .snav__mcta:hover{ transform: translateY(-2px); box-shadow: 0 14px 36px rgba(196, 255, 58, 0.4); }
 
@@ -212,8 +237,14 @@
   font-family: 'JetBrains Mono', ui-monospace, monospace;
   font-size: 12px;
   letter-spacing: 0.1em;
+  opacity: 0;
+  transform: translateY(20px);
   transition: border-color 0.3s cubic-bezier(0.16, 1, 0.3, 1), color 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
+.snav__mobile.is-open .snav__mcontact{
+  animation: snavMobileItem 0.6s cubic-bezier(0.16, 1, 0.3, 1) 0.48s forwards;
+}
+.snav__mobile.is-open .snav__mcontact:nth-of-type(2){ animation-delay: 0.54s; }
 .snav__mcontact:hover{ border-color: #c4ff3a; color: #c4ff3a; }
 
 /* ── RESPONSIVE NAV ── */
